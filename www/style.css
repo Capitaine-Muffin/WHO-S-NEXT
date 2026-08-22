@@ -1,35 +1,264 @@
-/* Le jeu remplit l'écran, sans jamais défiler horizontalement. */
+:root {
+  font-family: Inter, ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+  --fond: #dceff7;
+  --surface: #ffffff;
+  --surface-2: #eaf7fb;
+  --rose: #f47b21;
+  --jaune: #ffd44c;
+  --vert: #41bf91;
+  --bleu: #29b6d1;
+  --bleu-fonce: #167aa9;
+  --texte: #282127;
+  --muet: #635a61;
+}
+
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
   overflow-x: hidden;
-  background: #140d18;
-  color: #f4eef7;
-  font-family: system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, #8fdded 0, transparent 30%),
+    radial-gradient(circle at 90% 70%, #fff4d3 0, transparent 35%),
+    var(--fond);
+  color: var(--texte);
 }
 
-/* Les encoches et la barre de gestes ne doivent rien recouvrir. */
-#jeu {
-  min-height: 100%;
-  padding: max(1rem, env(safe-area-inset-top)) 1rem
-           max(1rem, env(safe-area-inset-bottom));
-  display: flex;
+button, select { font: inherit; }
+button { touch-action: manipulation; }
+
+#jeu { min-height: 100dvh; }
+
+.ecran {
+  display: none;
+  min-height: 100dvh;
+  padding: max(1.2rem, env(safe-area-inset-top)) 1rem max(1.2rem, env(safe-area-inset-bottom));
+}
+
+.ecran.actif { display: flex; }
+
+#accueil {
+  max-width: 520px;
+  margin: auto;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   gap: 1rem;
+}
+
+.surtitre {
+  margin: 0;
+  color: var(--jaune);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(4rem, 20vw, 7rem);
+  line-height: .72;
+  letter-spacing: -.08em;
+  transform: rotate(-2deg);
+}
+
+h1 span { color: var(--rose); }
+h1 { color: var(--bleu-fonce); text-shadow: 3px 3px 0 white, -2px -2px 0 white; }
+
+.accroche {
+  max-width: 29rem;
+  margin: .8rem 0 1.2rem;
+  color: var(--muet);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.champ {
+  display: grid;
+  gap: .45rem;
+  color: var(--muet);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+
+select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 1rem;
+  border: 2px solid var(--bleu);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--texte);
+}
+
+.primaire {
+  min-height: 56px;
+  margin-top: .5rem;
+  padding: .9rem 1.4rem;
+  border: 0;
+  border-radius: 16px;
+  background: var(--rose);
+  color: white;
+  font-weight: 950;
+  box-shadow: 0 8px 0 #b74d0b;
+}
+
+.primaire:active { transform: translateY(4px); box-shadow: 0 4px 0 #b74d0b; }
+
+#partie {
+  flex-direction: column;
+  gap: .8rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+.barre {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  gap: .8rem;
+}
+
+.barre div:nth-child(2) { display: grid; }
+.barre span { color: var(--muet); font-size: .78rem; }
+
+.icone {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--bleu);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--bleu-fonce);
+  font-size: 1.8rem;
+}
+
+.table {
+  position: relative;
+  flex: 1;
+  min-height: 310px;
+  border: 3px solid var(--bleu);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, .86);
+  overflow: hidden;
+}
+
+#joueurs-table { position: absolute; inset: 0; }
+
+.pendule {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 128px;
+  height: 128px;
+  padding: 7px;
+  border-radius: 50%;
+  background: #efe6d8;
+  box-shadow: 0 10px 0 #988c80, 0 15px 32px #08050c99;
+  transform: translate(-50%, -50%);
+}
+
+.cadran {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  border: 3px solid #251b29;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -1deg, #251b29 0 2deg, transparent 2deg 30deg), #fffaf1;
+  color: #251b29;
   text-align: center;
 }
 
-button {
-  font: inherit;
-  padding: 0.9rem 1.6rem;
-  border: 0;
-  border-radius: 999px;
-  background: #ff3d68;
-  color: #fff;
-  /* Cible tactile confortable : le jeu se teste au téléphone. */
-  min-height: 48px;
+.cadran::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: #fffaf1;
 }
+
+.cadran span, .cadran small { position: relative; z-index: 2; }
+.cadran span { font-size: 2.5rem; font-weight: 1000; line-height: .9; }
+.cadran small { margin-top: .25rem; font-size: .52rem; font-weight: 950; letter-spacing: .09em; }
+.aiguille { position: absolute; z-index: 1; left: calc(50% - 2px); top: 10px; width: 4px; height: 45%; border-radius: 5px; background: var(--rose); transform-origin: 50% 100%; animation: tic 1s steps(1) infinite; }
+.pendule.urgent { background: var(--rose); animation: pulse .45s infinite alternate; }
+
+.musicien {
+  position: absolute;
+  width: 82px;
+  padding: .35rem;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  transition: .2s ease;
+}
+
+.musicien.actif { transform: translate(-50%, -50%) scale(1.12); }
+.musicien.actif .avatar { outline-color: var(--rose); box-shadow: 0 0 28px #f47b2188; }
+.musicien strong, .musicien span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.musicien span { margin-top: .2rem; color: var(--muet); font-size: .7rem; }
+.avatar { width: 58px; height: 58px; margin: auto; display: grid; place-items: center; border-radius: 50%; outline: 3px solid var(--bleu); background: #fff; font-size: 1.8rem; transition: .2s ease; }
+.musicien.humain .avatar { background: #fff2d1; }
+.derniere-carte { width: max-content; max-width: 88px; margin: .35rem auto 0; padding: .22rem .38rem; border-radius: 6px; background: #fffaf1; color: #2b1e30; font-size: .58rem; font-weight: 950; transform: rotate(-3deg); }
+
+.message {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--bleu-fonce);
+  font-weight: 900;
+  text-align: center;
+}
+
+.zone-joueur { position: relative; z-index: 3; display: grid; gap: .55rem; margin-top: -1.3rem; padding: .9rem .8rem .35rem; border: 3px solid var(--bleu); border-bottom: 0; border-radius: 22px 22px 0 0; background: linear-gradient(180deg, #fffffffa, #e8f7fb); box-shadow: 0 -12px 30px #167aa933; }
+.infos-joueur { display: flex; justify-content: space-between; color: var(--muet); font-size: .78rem; font-weight: 800; }
+.main-cartes { display: flex; gap: .6rem; overflow-x: auto; padding: .3rem .2rem .65rem; scrollbar-width: none; }
+
+.carte {
+  flex: 0 0 104px;
+  min-height: 142px;
+  padding: .75rem .5rem;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(155deg, #fffaf1, #e8dfd4);
+  color: #24192a;
+  box-shadow: 0 7px 0 #aa9f94;
+  font-weight: 950;
+}
+
+.carte:active { transform: translateY(4px); box-shadow: 0 3px 0 #aa9f94; }
+.carte:disabled { opacity: .42; filter: grayscale(.6); }
+.carte .numero { display: block; color: var(--rose); font-size: 2.4rem; line-height: 1; }
+.carte .face { display: block; margin-top: .35rem; font-size: .72rem; }
+.carte .retourne { display: block; margin-top: .45rem; color: #6e5a78; font-size: .62rem; }
+
+dialog {
+  width: min(88vw, 420px);
+  padding: 1.5rem;
+  border: 1px solid #513c61;
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--texte);
+  text-align: center;
+}
+
+dialog::backdrop { background: #08050cbb; backdrop-filter: blur(5px); }
+dialog h2 { margin: .5rem 0; font-size: 2rem; }
+dialog p { color: var(--muet); line-height: 1.45; }
+dialog .primaire { width: 100%; }
+
+@keyframes pulse { to { transform: scale(1.06); } }
+@keyframes tic { to { transform: rotate(6deg); } }
+
+@media (min-width: 700px) {
+  #partie { padding-inline: 2rem; }
+  .table { min-height: 430px; }
+  .musicien { width: 112px; }
+  .pendule { width: 160px; height: 160px; }
+  .carte { flex-basis: 116px; }
+}
+
