@@ -1,33 +1,297 @@
-/**
- * Le jeu. Tout part d'ici.
- *
- * La monétisation est déjà branchée plus bas : tant que les identifiants
- * ne sont pas renseignés dans `config.js`, elle ne fait rien et le jeu
- * tourne normalement dans un navigateur.
- */
-import { CLE_REVENUECAT, DROITS, BLOC_BANNIERE, PRODUITS } from './config.js';
-import { configurer, lireAchats, appliquer, surAchatsChanges } from './vendor/monetisation/achats.js';
-import { demarrerPubs, montrerBanniere } from './vendor/monetisation/pubs.js';
+const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
+const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
+const tempsParNiveau = [14, 10, 8, 7, 6, 5, 4];
 
-let achats = [];
+const elements = {
+  accueil: document.querySelector('#accueil'),
+  partie: document.querySelector('#partie'),
+  nombreJoueurs: document.querySelector('#nombre-joueurs'),
+  niveau: document.querySelector('#niveau'),
+  jouer: document.querySelector('#jouer'),
+  quitter: document.querySelector('#quitter'),
+  table: document.querySelector('#joueurs-table'),
+  main: document.querySelector('#main-joueur'),
+  message: document.querySelector('#message'),
+  chrono: document.querySelector('#chrono'),
+  chronoBloc: document.querySelector('.pendule'),
+  niveauAffiche: document.querySelector('#niveau-affiche'),
+  mancheAffiche: document.querySelector('#manche-affiche'),
+  notesJoueur: document.querySelector('#notes-joueur'),
+  dialogue: document.querySelector('#fin-manche'),
+  finSurtitre: document.querySelector('#fin-surtitre'),
+  finTitre: document.querySelector('#fin-titre'),
+  finTexte: document.querySelector('#fin-texte'),
+  continuer: document.querySelector('#continuer'),
+};
 
-document.querySelector('#jouer').addEventListener('click', () => {
-  // À remplacer par le jeu.
-});
+let etat = null;
+let minuterie = null;
+let actionIA = null;
 
-demarrer();
+elements.jouer.addEventListener('click', demarrerPartie);
+elements.quitter.addEventListener('click', quitterPartie);
+elements.continuer.addEventListener('click', nouvelleManche);
+document.addEventListener('keydown', gererClavier);
 
-async function demarrer() {
-  await configurer({ cle: CLE_REVENUECAT, correspondances: DROITS });
+function demarrerPartie() {
+  const nombre = Number(elements.nombreJoueurs.value);
+  const niveau = Number(elements.niveau.value);
+  const joueurs = Array.from({ length: nombre }, (_, index) => ({
+    nom: index === 0 ? 'Toi' : nomsIA[index - 1],
+    humain: index === 0,
+    avatar: avatars[index],
+    notes: 0,
+    main: [],
+    derniere: null,
+    erreurConsecutive: 0,
+  }));
 
-  // Le store fait foi ; `appliquer` ne remplace que s'il a vraiment répondu.
-  achats = appliquer(achats, await lireAchats());
-  surAchatsChanges((produits) => {
-    achats = produits;
+  etat = {
+    joueurs,
+    niveau,
+    manche: 0,
+    sens: Math.random() < .5 ? 1 : -1,
+    actif: 0,
+    temps: tempsParNiveau[niveau],
+    enCours: true,
+  };
+
+  elements.accueil.classList.remove('actif');
+  elements.partie.classList.add('actif');
+  nouvelleManche();
+}
+
+function nouvelleManche() {
+  elements.dialogue.close();
+  if (!etat) return;
+
+  const perdant = etat.joueurs.find((joueur) => joueur.notes >= 7);
+  if (perdant) {
+    quitterPartie();
+    return;
+  }
+
+  etat.manche += 1;
+  etat.sens = Math.random() < .5 ? 1 : -1;
+  etat.actif = etat.manche === 1 ? 0 : (etat.actif + etat.sens + etat.joueurs.length) % etat.joueurs.length;
+  etat.joueurs.forEach((joueur) => {
+    joueur.main = creerMain(etat.joueurs.length);
+    joueur.derniere = null;
   });
+  etat.enCours = true;
+  afficher();
+  commencerTour();
+}
 
-  const sansPub = achats.includes(PRODUITS.SANS_PUB);
-  if (await demarrerPubs({ testeur: location.hostname === 'localhost' })) {
-    await montrerBanniere({ bloc: BLOC_BANNIERE, sansPub });
+function creerMain(nombreJoueurs) {
+  const maximum = Math.max(1, nombreJoueurs - 1);
+  return Array.from({ length: 8 }, () => ({
+    valeur: 1 + Math.floor(Math.random() * maximum),
+    whootchi: false,
+  }));
+}
+
+function jouerCarte(indexCarte, retourner = false) {
+  if (!etat?.enCours) return;
+  const joueur = etat.joueurs[etat.actif];
+  if (!joueur) return;
+  const carte = joueur.main[indexCarte];
+  if (!carte) return;
+
+  carte.whootchi = retourner && etat.niveau >= 1;
+
+  if (estPoseInterdite(joueur, carte)) {
+    sanctionner(joueur, 'Cette carte ne pouvait pas être jouée.');
+    return;
+  }
+
+  arreterTemps();
+  joueur.main.splice(indexCarte, 1);
+  joueur.derniere = { ...carte };
+  joueur.erreurConsecutive = 0;
+
+  if (carte.whootchi) etat.sens *= -1;
+  const distance = carte.valeur * etat.sens;
+  etat.actif = (etat.actif + distance + etat.joueurs.length * 10) % etat.joueurs.length;
+
+  if (joueur.main.length === 0) {
+    terminerManche(true, `${joueur.nom} a joué toutes ses cartes sans fausse note.`);
+    return;
+  }
+
+  afficher();
+  commencerTour();
+}
+
+function estPoseInterdite(joueur, carte) {
+  if (etat.niveau >= 3 && joueur.derniere && joueur.derniere.valeur === carte.valeur && joueur.derniere.whootchi === carte.whootchi) {
+    return true;
+  }
+
+  if (etat.niveau >= 4) {
+    const identiques = etat.joueurs.filter(({ derniere }) => derniere && derniere.valeur === carte.valeur && derniere.whootchi === carte.whootchi).length;
+    if (identiques >= 2) return true;
+  }
+  return false;
+}
+
+function commencerTour() {
+  arreterTemps();
+  if (!etat?.enCours) return;
+
+  const joueur = etat.joueurs[etat.actif];
+  etat.temps = etat.niveau === 6 ? Math.max(1, 5 - etat.manche) : tempsParNiveau[etat.niveau];
+  elements.message.textContent = joueur.humain ? 'À toi de jouer !' : `${joueur.nom} réfléchit…`;
+  afficher();
+
+  minuterie = setInterval(() => {
+    etat.temps -= 1;
+    afficherChrono();
+    if (etat.temps <= 0) sanctionner(joueur, `${joueur.nom} a dépassé le chrono.`);
+  }, 1000);
+
+  if (!joueur.humain) {
+    const delai = 650 + Math.random() * Math.min(2100, etat.temps * 450);
+    actionIA = setTimeout(() => jouerIA(joueur), delai);
   }
 }
+
+function jouerIA(joueur) {
+  if (!etat?.enCours || etat.joueurs[etat.actif] !== joueur) return;
+
+  const options = joueur.main
+    .map((carte, index) => ({ carte, index }))
+    .filter(({ carte }) => !estPoseInterdite(joueur, carte));
+
+  if (Math.random() < probabiliteErreur()) {
+    sanctionner(joueur, `${joueur.nom} s'est emmêlé dans le rythme.`);
+    return;
+  }
+
+  const choix = options[Math.floor(Math.random() * options.length)];
+  if (!choix) {
+    sanctionner(joueur, `${joueur.nom} n'avait aucun coup valable.`);
+    return;
+  }
+
+  const retourner = etat.niveau >= 1 && Math.random() < .32;
+  jouerCarte(choix.index, retourner);
+}
+
+function probabiliteErreur() {
+  return .03 + etat.niveau * .012;
+}
+
+function sanctionner(joueur, raison) {
+  if (!etat?.enCours) return;
+  arreterTemps();
+  etat.enCours = false;
+  joueur.erreurConsecutive += 1;
+  const penalite = etat.niveau >= 4 ? Math.min(3, joueur.erreurConsecutive) : 1;
+  joueur.notes += penalite;
+  etat.actif = etat.joueurs.indexOf(joueur);
+  afficher();
+
+  if (joueur.notes >= 7) {
+    const gagnants = etat.joueurs.filter((candidat) => candidat.notes === Math.min(...etat.joueurs.map((j) => j.notes))).map((j) => j.nom).join(' et ');
+    ouvrirDialogue('FIN DU CONCERT', `${joueur.nom} atteint 7 fausses notes`, `${raison} ${gagnants} remporte${gagnants.includes(' et ') ? 'nt' : ''} la partie.`);
+  } else {
+    ouvrirDialogue('FAUSSE NOTE', `${penalite} fausse note${penalite > 1 ? 's' : ''} pour ${joueur.nom}`, raison);
+  }
+}
+
+function terminerManche(reussie, texte) {
+  arreterTemps();
+  etat.enCours = false;
+  ouvrirDialogue(reussie ? 'BRAVO' : 'MANCHE TERMINÉE', 'Le rythme est tenu !', texte);
+}
+
+function ouvrirDialogue(surtitre, titre, texte) {
+  elements.finSurtitre.textContent = surtitre;
+  elements.finTitre.textContent = titre;
+  elements.finTexte.textContent = texte;
+  elements.continuer.textContent = etat.joueurs.some((j) => j.notes >= 7) ? 'Retour au menu' : 'Manche suivante';
+  elements.dialogue.showModal();
+}
+
+function afficher() {
+  if (!etat) return;
+  elements.niveauAffiche.textContent = `Niveau ${etat.niveau}`;
+  elements.mancheAffiche.textContent = `Manche ${etat.manche} · sens ${etat.sens === 1 ? 'horaire' : 'antihoraire'}`;
+  const notes = etat.joueurs[0].notes;
+  elements.notesJoueur.textContent = `${notes} fausse note${notes === 1 ? '' : 's'}`;
+  afficherChrono();
+  afficherTable();
+  afficherMain();
+}
+
+function afficherChrono() {
+  elements.chrono.textContent = etat?.temps ?? 0;
+  elements.chronoBloc.classList.toggle('urgent', Boolean(etat && etat.temps <= 3));
+}
+
+function afficherTable() {
+  elements.table.replaceChildren();
+  const nombre = etat.joueurs.length;
+  etat.joueurs.forEach((joueur, index) => {
+    const angle = -Math.PI / 2 + (index / nombre) * Math.PI * 2;
+    const carte = document.createElement('article');
+    carte.className = `musicien${index === etat.actif ? ' actif' : ''}${joueur.humain ? ' humain' : ''}`;
+    carte.style.left = `${50 + Math.cos(angle) * 37}%`;
+    carte.style.top = `${50 + Math.sin(angle) * 36}%`;
+    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${joueur.derniere ? `<div class="derniere-carte">${joueur.derniere.valeur} ${joueur.derniere.whootchi ? 'WHOOTCHI' : 'WHOOT'}</div>` : ''}`;
+    elements.table.append(carte);
+  });
+}
+
+function afficherMain() {
+  elements.main.replaceChildren();
+  const humainActif = etat.actif === 0 && etat.enCours;
+  etat.joueurs[0].main.forEach((carte, index) => {
+    const bouton = document.createElement('button');
+    bouton.className = 'carte';
+    bouton.disabled = !humainActif;
+    bouton.innerHTML = `<span class="numero">${carte.valeur}</span><span class="face">WHOOT</span>${etat.niveau >= 1 ? '<span class="retourne">Appui long : WHOOTCHI</span>' : ''}`;
+    bouton.addEventListener('click', () => jouerCarte(index, false));
+    if (etat.niveau >= 1) ajouterAppuiLong(bouton, () => jouerCarte(index, true));
+    elements.main.append(bouton);
+  });
+}
+
+function ajouterAppuiLong(element, action) {
+  let attente;
+  let declenche = false;
+  const commencer = () => {
+    declenche = false;
+    attente = setTimeout(() => { declenche = true; action(); }, 500);
+  };
+  const finir = (event) => {
+    clearTimeout(attente);
+    if (declenche) event.preventDefault();
+  };
+  element.addEventListener('pointerdown', commencer);
+  element.addEventListener('pointerup', finir);
+  element.addEventListener('pointerleave', finir);
+}
+
+function gererClavier(event) {
+  if (!etat?.enCours || etat.actif !== 0) return;
+  const index = Number(event.key) - 1;
+  if (index >= 0 && index < etat.joueurs[0].main.length) jouerCarte(index, event.shiftKey);
+}
+
+function arreterTemps() {
+  clearInterval(minuterie);
+  clearTimeout(actionIA);
+  minuterie = null;
+  actionIA = null;
+}
+
+function quitterPartie() {
+  arreterTemps();
+  if (elements.dialogue.open) elements.dialogue.close();
+  etat = null;
+  elements.partie.classList.remove('actif');
+  elements.accueil.classList.add('actif');
+}
+
