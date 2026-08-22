@@ -1,0 +1,10 @@
+node_modules/
+android/
+ios/
+www/vendor/
+
+# Cles de signature : jamais commitees, elles vivent dans les secrets GitHub
+credentials/
+credentials.json
+*.jks
+*.keystore

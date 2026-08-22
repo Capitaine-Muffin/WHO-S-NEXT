@@ -1,0 +1,19 @@
+{
+  "name": "mon-jeu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preparer": "node tools/vendorer.mjs",
+    "android": "npm run preparer && npx cap sync android && npx cap open android",
+    "servir": "python3 -m http.server 8000 --directory www"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capitaine-muffin/monetisation": "github:Capitaine-Muffin/monetisation",
+    "@revenuecat/purchases-capacitor": "^9.0.0"
+  }
+}

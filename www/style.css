@@ -1,0 +1,35 @@
+/* Le jeu remplit l'écran, sans jamais défiler horizontalement. */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow-x: hidden;
+  background: #140d18;
+  color: #f4eef7;
+  font-family: system-ui, sans-serif;
+}
+
+/* Les encoches et la barre de gestes ne doivent rien recouvrir. */
+#jeu {
+  min-height: 100%;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem
+           max(1rem, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+button {
+  font: inherit;
+  padding: 0.9rem 1.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: #ff3d68;
+  color: #fff;
+  /* Cible tactile confortable : le jeu se teste au téléphone. */
+  min-height: 48px;
+}
