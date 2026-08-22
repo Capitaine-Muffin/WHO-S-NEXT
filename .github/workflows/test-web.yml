@@ -1,0 +1,35 @@
+name: Tester le jeu sur GitHub Pages
+
+on:
+  push:
+    branches:
+      - dev/mode-solo-ia
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-test
+  cancel-in-progress: true
+
+jobs:
+  publier:
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le jeu
+        uses: actions/checkout@v4
+
+      - name: Préparer les fichiers
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+
+      - name: Déployer le test
+        id: deploiement
+        uses: actions/deploy-pages@v4
