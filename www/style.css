@@ -1,6 +1,6 @@
 :root {
   font-family: Inter, ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
-  --fond: #dceff7;
+  --fond: #ffea6d;
   --surface: #ffffff;
   --surface-2: #eaf7fb;
   --rose: #f47b21;
@@ -20,8 +20,8 @@ html, body {
   min-height: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 15% 10%, #8fdded 0, transparent 30%),
-    radial-gradient(circle at 90% 70%, #fff4d3 0, transparent 35%),
+    radial-gradient(circle at 15% 10%, #fff5aa 0, transparent 30%),
+    radial-gradient(circle at 90% 70%, #ffd94a 0, transparent 35%),
     var(--fond);
   color: var(--texte);
 }
