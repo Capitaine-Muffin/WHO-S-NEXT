@@ -9,6 +9,7 @@ const elements = {
   nombreJoueurs: document.querySelector('#nombre-joueurs'),
   nomJoueur: document.querySelector('#nom-joueur'),
   niveau: document.querySelector('#niveau'),
+  niveauIA: document.querySelector('#niveau-ia'),
   dureeChrono: document.querySelector('#duree-chrono'),
   jouer: document.querySelector('#jouer'),
   quitter: document.querySelector('#quitter'),
@@ -52,6 +53,7 @@ elements.nomJoueur.value = nomDeSceneAleatoire();
 function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
   const niveau = Number(elements.niveau.value);
+  const niveauIA = Number(elements.niveauIA.value);
   const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || tempsParNiveau[niveau]));
   const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
   elements.nomJoueur.value = nomHumain;
@@ -72,6 +74,7 @@ function demarrerPartie() {
   etat = {
     joueurs,
     niveau,
+    niveauIA,
     manche: 0,
     sens: 0,
     actif: 0,
@@ -264,7 +267,9 @@ function commencerTour() {
 
   if (!joueur.humain) {
     const delaiMinimum = etat.premierTour ? 1900 : 650;
-    const delai = delaiMinimum + Math.random() * Math.min(1700, etat.temps * 350);
+    const delaiSouhaite = delaiMinimum + Math.random() * Math.min(1700, etat.temps * 350);
+    const delaiMaximum = Math.max(120, etat.temps * 1000 - 150);
+    const delai = Math.min(delaiSouhaite, delaiMaximum);
     actionIA = setTimeout(() => jouerIA(joueur), delai);
   }
 }
@@ -281,9 +286,10 @@ function relancerChrono() {
 function jouerIA(joueur) {
   if (!etat?.enCours || etat.joueurs[etat.actif] !== joueur) return;
 
-  const options = joueur.main
-    .map((carte, index) => ({ carte, index }))
-    .filter(({ carte }) => !estPoseInterdite(joueur, carte));
+  const faces = etat.niveau >= 1 ? [false, true] : [false];
+  const options = joueur.main.flatMap((carte, index) =>
+    faces.map((whootchi) => ({ carte: { ...carte, whootchi }, index, retourner: whootchi }))
+  ).filter(({ carte }) => !estPoseInterdite(joueur, carte));
 
   if (Math.random() < probabiliteErreur()) {
     sanctionner(joueur, `${joueur.nom} s'est emmêlé dans le rythme.`);
@@ -296,12 +302,11 @@ function jouerIA(joueur) {
     return;
   }
 
-  const retourner = etat.niveau >= 1 && Math.random() < .32;
-  jouerCarte(choix.index, retourner, etat.joueurs.indexOf(joueur));
+  jouerCarte(choix.index, choix.retourner, etat.joueurs.indexOf(joueur));
 }
 
 function probabiliteErreur() {
-  return .03 + etat.niveau * .012;
+  return etat.niveauIA >= 10 ? 0 : (10 - etat.niveauIA) * .05;
 }
 
 function sanctionner(joueur, raison) {
