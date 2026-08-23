@@ -148,11 +148,12 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   animation.innerHTML = `<strong>${joueur.nom} joue</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
   appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
   document.body.append(animation);
-  elements.plateau.classList.add('animation-carte');
+
+  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
+  cible?.classList.add('cible-animation');
 
   await attendre(1000);
 
-  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
   const cadre = cible?.getBoundingClientRect();
   if (cadre) {
     const etiquette = animation.querySelector('strong');
@@ -169,7 +170,7 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   }
 
   animation.remove();
-  elements.plateau.classList.remove('animation-carte');
+  cible?.classList.remove('cible-animation');
 }
 
 function attendre(duree) {
