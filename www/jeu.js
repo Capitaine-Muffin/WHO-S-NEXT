@@ -99,10 +99,16 @@ function creerMain(nombreJoueurs) {
   }));
 }
 
-function jouerCarte(indexCarte, retourner = false) {
+function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (!etat?.enCours) return;
-  const joueur = etat.joueurs[etat.actif];
+  const joueur = etat.joueurs[auteur];
   if (!joueur) return;
+
+  if (auteur !== etat.actif) {
+    sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
+    return;
+  }
+
   const carte = joueur.main[indexCarte];
   if (!carte) return;
 
@@ -149,7 +155,7 @@ function commencerTour() {
 
   const joueur = etat.joueurs[etat.actif];
   etat.temps = etat.niveau === 6 ? Math.max(1, etat.dureeChrono - etat.manche + 1) : etat.dureeChrono;
-  elements.message.textContent = joueur.humain ? 'À toi de jouer !' : `${joueur.nom} réfléchit…`;
+  elements.message.textContent = 'Qui doit jouer maintenant ?';
   afficher();
 
   minuterie = setInterval(() => {
@@ -192,7 +198,7 @@ function jouerIA(joueur) {
   }
 
   const retourner = etat.niveau >= 1 && Math.random() < .32;
-  jouerCarte(choix.index, retourner);
+  jouerCarte(choix.index, retourner, etat.joueurs.indexOf(joueur));
 }
 
 function probabiliteErreur() {
@@ -253,25 +259,27 @@ function afficherTable() {
   etat.joueurs.forEach((joueur, index) => {
     const angle = Math.PI / 2 + (index / nombre) * Math.PI * 2;
     const carte = document.createElement('article');
-    carte.className = `musicien${index === etat.actif ? ' actif' : ''}${joueur.humain ? ' humain' : ''}`;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
-    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${joueur.derniere ? `<div class="derniere-carte">${joueur.derniere.valeur} ${joueur.derniere.whootchi ? 'WHOOTCHI' : 'WHOOT'}</div>` : ''}`;
+    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${joueur.derniere ? '<div class="derniere-carte"><div class="mini-carte"></div></div>' : ''}`;
+    if (joueur.derniere) {
+      appliquerFaceCarte(carte.querySelector('.mini-carte'), joueur.derniere.valeur, joueur.derniere.whootchi);
+    }
     elements.table.append(carte);
   });
 }
 
 function afficherMain() {
   elements.main.replaceChildren();
-  const humainActif = etat.actif === 0 && etat.enCours;
   etat.joueurs[0].main.forEach((carte, index) => {
     const bouton = document.createElement('button');
     bouton.className = 'carte';
-    bouton.disabled = !humainActif;
+    bouton.disabled = !etat.enCours;
     appliquerFaceCarte(bouton, carte.valeur, false);
     bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, false)}${etat.niveau >= 1 ? ', appui long pour la face Whootchi' : ''}</span>`;
-    bouton.addEventListener('click', () => jouerCarte(index, false));
-    if (etat.niveau >= 1) ajouterAppuiLong(bouton, () => jouerCarte(index, true));
+    bouton.addEventListener('click', () => jouerCarte(index, false, 0));
+    if (etat.niveau >= 1) ajouterAppuiLong(bouton, () => jouerCarte(index, true, 0));
     elements.main.append(bouton);
   });
 }
@@ -305,9 +313,9 @@ function ajouterAppuiLong(element, action) {
 }
 
 function gererClavier(event) {
-  if (!etat?.enCours || etat.actif !== 0) return;
+  if (!etat?.enCours) return;
   const index = Number(event.key) - 1;
-  if (index >= 0 && index < etat.joueurs[0].main.length) jouerCarte(index, event.shiftKey);
+  if (index >= 0 && index < etat.joueurs[0].main.length) jouerCarte(index, event.shiftKey, 0);
 }
 
 function arreterTemps() {
