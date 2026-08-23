@@ -25,6 +25,7 @@ const elements = {
   finTexte: document.querySelector('#fin-texte'),
   continuer: document.querySelector('#continuer'),
   relancerChrono: document.querySelector('#relancer-chrono'),
+  choixSens: document.querySelector('#choix-sens'),
 };
 
 let etat = null;
@@ -37,6 +38,9 @@ elements.continuer.addEventListener('click', nouvelleManche);
 elements.relancerChrono.addEventListener('click', relancerChrono);
 elements.niveau.addEventListener('change', () => {
   elements.dureeChrono.value = tempsParNiveau[Number(elements.niveau.value)];
+});
+elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => {
+  bouton.addEventListener('click', () => appliquerSens(Number(bouton.dataset.sens)));
 });
 document.addEventListener('keydown', gererClavier);
 
@@ -59,7 +63,7 @@ function demarrerPartie() {
     joueurs,
     niveau,
     manche: 0,
-    sens: Math.random() < .5 ? 1 : -1,
+    sens: 0,
     actif: 0,
     dureeChrono,
     temps: dureeChrono,
@@ -83,8 +87,9 @@ function nouvelleManche() {
   }
 
   etat.manche += 1;
-  etat.sens = Math.random() < .5 ? 1 : -1;
-  etat.actif = etat.manche === 1 ? 0 : (etat.actif + etat.sens + etat.joueurs.length) % etat.joueurs.length;
+  etat.chef = etat.actif;
+  etat.sens = 0;
+  etat.choixSens = true;
   etat.premierTour = true;
   etat.joueurs.forEach((joueur) => {
     joueur.main = creerMain(etat.joueurs.length);
@@ -92,6 +97,28 @@ function nouvelleManche() {
     joueur.historique = [];
   });
   etat.enCours = true;
+  afficher();
+  demanderSens();
+}
+
+function demanderSens() {
+  const chef = etat.joueurs[etat.chef];
+  elements.message.textContent = `${chef.nom} choisit le sens du jeu…`;
+  if (chef.humain) {
+    elements.choixSens.showModal();
+    return;
+  }
+
+  actionIA = setTimeout(() => appliquerSens(Math.random() < .5 ? 1 : -1), 1200);
+}
+
+function appliquerSens(sens) {
+  if (!etat?.choixSens) return;
+  clearTimeout(actionIA);
+  if (elements.choixSens.open) elements.choixSens.close();
+  etat.sens = sens;
+  etat.choixSens = false;
+  etat.actif = (etat.chef + sens + etat.joueurs.length) % etat.joueurs.length;
   afficher();
   commencerTour();
 }
@@ -105,7 +132,7 @@ function creerMain(nombreJoueurs) {
 }
 
 async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
-  if (!etat?.enCours || etat.animation) return;
+  if (!etat?.enCours || etat.animation || etat.choixSens) return;
   const joueur = etat.joueurs[auteur];
   if (!joueur) return;
 
@@ -301,11 +328,14 @@ function afficherTable() {
     const angle = Math.PI / 2 + (index / nombre) * Math.PI * 2;
     const carte = document.createElement('article');
     const coteDroit = Math.cos(angle) > .45;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${etat.premierTour && index === etat.actif ? ' premier' : ''}${coteDroit ? ' cote-droit' : ''}`;
+    const choisitSens = etat.choixSens && index === etat.chef;
+    const commence = !etat.choixSens && etat.premierTour && index === etat.actif;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${choisitSens || commence ? ' premier' : ''}${coteDroit ? ' cote-droit' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     carte.dataset.joueurIndex = index;
-    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${etat.premierTour && index === etat.actif ? '<b class="badge-premier">COMMENCE</b>' : ''}<div class="pile-cartes"></div>`;
+    const badge = choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : '');
+    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
     joueur.historique.forEach((carteJouee, position) => {
       const conteneur = document.createElement('div');
@@ -326,7 +356,7 @@ function afficherMain() {
   etat.joueurs[0].main.forEach((carte, index) => {
     const bouton = document.createElement('button');
     bouton.className = 'carte';
-    bouton.disabled = !etat.enCours;
+    bouton.disabled = !etat.enCours || etat.choixSens;
     appliquerFaceCarte(bouton, carte.valeur, false);
     bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, false)}${etat.niveau >= 1 ? ', appui long pour la face Whootchi' : ''}</span>`;
     bouton.addEventListener('click', () => jouerCarte(index, false, 0));
@@ -381,6 +411,7 @@ function arreterTemps() {
 function quitterPartie() {
   arreterTemps();
   if (elements.dialogue.open) elements.dialogue.close();
+  if (elements.choixSens.open) elements.choixSens.close();
   etat = null;
   elements.partie.classList.remove('actif');
   elements.accueil.classList.add('actif');
