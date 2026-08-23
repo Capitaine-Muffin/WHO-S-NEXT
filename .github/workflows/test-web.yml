@@ -3,6 +3,7 @@ name: Tester le jeu sur GitHub Pages
 on:
   push:
     branches:
+      - main
       - dev/mode-solo-ia
   workflow_dispatch:
 
