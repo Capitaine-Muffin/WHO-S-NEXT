@@ -215,7 +215,7 @@ select {
 .musicien.cote-droit .pile-cartes { left: auto; right: calc(100% + 4px); }
 .derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
 .mini-carte { width: 104px; height: 144px; background: white url('assets/cartes.webp') no-repeat; background-size: 1000px 358px; background-position: var(--sprite-x) var(--sprite-y); transform: scale(.5); transform-origin: top left; }
-.table.animation-carte .derniere-carte:last-child { opacity: 0; }
+.derniere-carte.cible-animation { opacity: 0; }
 
 .pose-carte {
   position: fixed;
