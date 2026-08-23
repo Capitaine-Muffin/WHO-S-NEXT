@@ -1,4 +1,5 @@
 const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
+const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
 const tempsParNiveau = [14, 10, 8, 7, 6, 5, 4];
 
@@ -6,6 +7,7 @@ const elements = {
   accueil: document.querySelector('#accueil'),
   partie: document.querySelector('#partie'),
   nombreJoueurs: document.querySelector('#nombre-joueurs'),
+  nomJoueur: document.querySelector('#nom-joueur'),
   niveau: document.querySelector('#niveau'),
   dureeChrono: document.querySelector('#duree-chrono'),
   jouer: document.querySelector('#jouer'),
@@ -43,13 +45,19 @@ elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => {
   bouton.addEventListener('click', () => appliquerSens(Number(bouton.dataset.sens)));
 });
 document.addEventListener('keydown', gererClavier);
+elements.nomJoueur.value = nomDeSceneAleatoire();
 
 function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
   const niveau = Number(elements.niveau.value);
   const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || tempsParNiveau[niveau]));
+  const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
+  elements.nomJoueur.value = nomHumain;
+  const nomsDisponibles = [...nomsIA, ...nomsDeScene].filter((nom, index, liste) =>
+    nom.toLocaleLowerCase('fr') !== nomHumain.toLocaleLowerCase('fr') && liste.indexOf(nom) === index
+  );
   const joueurs = Array.from({ length: nombre }, (_, index) => ({
-    nom: index === 0 ? 'Toi' : nomsIA[index - 1],
+    nom: index === 0 ? nomHumain : nomsDisponibles[index - 1],
     humain: index === 0,
     avatar: avatars[index],
     notes: 0,
@@ -74,6 +82,10 @@ function demarrerPartie() {
   elements.accueil.classList.remove('actif');
   elements.partie.classList.add('actif');
   nouvelleManche();
+}
+
+function nomDeSceneAleatoire() {
+  return nomsDeScene[Math.floor(Math.random() * nomsDeScene.length)];
 }
 
 function nouvelleManche() {
@@ -344,12 +356,14 @@ function afficherTable() {
   etat.joueurs.forEach((joueur, index) => {
     const angle = Math.PI / 2 + (index / nombre) * Math.PI * 2;
     const carte = document.createElement('article');
-    const coteDroit = Math.cos(angle) > .45;
     const choisitSens = etat.choixSens && index === etat.chef;
     const commence = !etat.choixSens && etat.premierTour && index === etat.actif;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${choisitSens || commence ? ' premier' : ''}${coteDroit ? ' cote-droit' : ''}`;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${choisitSens || commence ? ' premier' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
+    const distancePile = nombre >= 6 ? 47 : 58;
+    carte.style.setProperty('--pile-x', `${-Math.sin(angle) * distancePile}px`);
+    carte.style.setProperty('--pile-y', `${Math.cos(angle) * distancePile}px`);
     carte.dataset.joueurIndex = index;
     const badge = choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : '');
     carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
