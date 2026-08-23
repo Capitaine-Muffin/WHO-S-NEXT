@@ -11,7 +11,7 @@
     <main id="jeu">
       <section id="accueil" class="ecran actif">
         <p class="surtitre">LE CONCERT VA COMMENCER</p>
-        <h1>WHO'S<br /><span>NEXT?</span></h1>
+        <h1><img src="assets/logo-vertical.png" alt="Who's Next ?" /></h1>
         <p class="accroche">Garde le rythme. Trouve qui joue. Ne fais pas de fausse note.</p>
 
         <label class="champ">
@@ -39,6 +39,14 @@
           </select>
         </label>
 
+        <label class="champ">
+          <span>Durée de la pendule</span>
+          <div class="reglage-chrono">
+            <input id="duree-chrono" type="number" min="1" max="60" value="14" inputmode="numeric" />
+            <span>secondes</span>
+          </div>
+        </label>
+
         <button id="jouer" class="primaire">Jouer contre l'IA</button>
       </section>
 
@@ -53,13 +61,13 @@
 
         <div id="table" class="table" aria-label="Table de jeu">
           <div id="joueurs-table"></div>
-          <div class="pendule" aria-label="Temps restant">
+          <button id="relancer-chrono" class="pendule" aria-label="Relancer immédiatement le minuteur">
             <div class="cadran">
               <i class="aiguille"></i>
               <span id="chrono">14</span>
               <small>SECONDES</small>
             </div>
-          </div>
+          </button>
         </div>
 
         <div class="message" id="message">À toi de jouer !</div>
