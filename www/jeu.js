@@ -150,7 +150,7 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   document.body.append(animation);
   elements.plateau.classList.add('animation-carte');
 
-  await attendre(420);
+  await attendre(1000);
 
   const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
   const cadre = cible?.getBoundingClientRect();
