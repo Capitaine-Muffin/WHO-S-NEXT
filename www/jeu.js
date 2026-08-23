@@ -135,14 +135,17 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (!etat?.enCours || etat.animation || etat.choixSens) return;
   const joueur = etat.joueurs[auteur];
   if (!joueur) return;
+  const carte = joueur.main[indexCarte];
+  if (!carte) return;
 
   if (auteur !== etat.actif) {
+    arreterTemps();
+    etat.animation = true;
+    await animerCarteErreur(joueur, { ...carte, whootchi: retourner && etat.niveau >= 1 });
+    etat.animation = false;
     sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
     return;
   }
-
-  const carte = joueur.main[indexCarte];
-  if (!carte) return;
 
   carte.whootchi = retourner && etat.niveau >= 1;
 
@@ -167,6 +170,20 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   await animerCarteJouee(auteur, joueur, carte);
   etat.animation = false;
   commencerTour();
+}
+
+async function animerCarteErreur(joueur, carte) {
+  const animation = document.createElement('div');
+  animation.className = 'pose-carte erreur-pose';
+  animation.innerHTML = `<strong>${joueur.nom} joue trop tôt !</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
+  appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
+  document.body.append(animation);
+  await attendre(1200);
+  await animation.animate([
+    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+    { transform: 'translate(-50%, -50%) scale(.9)', opacity: 0 },
+  ], { duration: 220, easing: 'ease-in', fill: 'forwards' }).finished;
+  animation.remove();
 }
 
 async function animerCarteJouee(indexJoueur, joueur, carte) {
