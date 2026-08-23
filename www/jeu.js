@@ -124,7 +124,6 @@ function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   }
 
   arreterTemps();
-  joueur.main.splice(indexCarte, 1);
   joueur.derniere = { ...carte };
   joueur.historique.push({ ...carte });
   joueur.historique = joueur.historique.slice(-2);
@@ -134,11 +133,6 @@ function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (carte.whootchi) etat.sens *= -1;
   const distance = carte.valeur * etat.sens;
   etat.actif = (etat.actif + distance + etat.joueurs.length * 10) % etat.joueurs.length;
-
-  if (joueur.main.length === 0) {
-    terminerManche(true, `${joueur.nom} a joué toutes ses cartes sans fausse note.`);
-    return;
-  }
 
   afficher();
   commencerTour();
