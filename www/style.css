@@ -160,6 +160,7 @@ select {
   transform: translate(-50%, -50%);
   cursor: pointer;
   touch-action: manipulation;
+  z-index: 6;
 }
 
 .pendule:active { transform: translate(-50%, -50%) scale(.94); }
@@ -204,10 +205,14 @@ select {
 }
 
 .musicien strong, .musicien span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.musicien .avatar, .musicien strong, .musicien span, .badge-premier { position: relative; z-index: 2; }
 .musicien span { margin-top: .2rem; color: var(--muet); font-size: .7rem; }
 .avatar { width: 58px; height: 58px; margin: auto; display: grid; place-items: center; border-radius: 50%; outline: 3px solid var(--bleu); background: #fff; font-size: 1.8rem; transition: .2s ease; }
 .musicien.humain .avatar { background: #fff2d1; }
-.derniere-carte { width: 52px; height: 72px; margin: .35rem auto 0; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(-3deg); }
+.musicien.premier .avatar { outline-color: var(--rose); box-shadow: 0 0 0 5px #ffea6d, 0 0 24px #f47b2188; }
+.badge-premier { position: absolute; left: 50%; top: -14px; padding: .25rem .42rem; border-radius: 999px; background: var(--rose); color: white; font-size: .52rem; letter-spacing: .06em; transform: translateX(-50%) rotate(-3deg); }
+.pile-cartes { position: absolute; z-index: 1; left: 50%; top: 54px; width: 66px; height: 82px; transform: translateX(-50%); pointer-events: none; }
+.derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
 .mini-carte { width: 104px; height: 144px; background: white url('assets/cartes.webp') no-repeat; background-size: 1000px 358px; background-position: var(--sprite-x) var(--sprite-y); transform: scale(.5); transform-origin: top left; }
 
 .message {
