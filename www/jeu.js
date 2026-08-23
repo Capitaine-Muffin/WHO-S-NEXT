@@ -1,4 +1,4 @@
-import { initialiserMultijoueur } from './multijoueur.js?v=1';
+import { initialiserMultijoueur } from './multijoueur.js?v=2';
 
 const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
@@ -8,7 +8,6 @@ const elements = {
   partie: document.querySelector('#partie'),
   nombreJoueurs: document.querySelector('#nombre-joueurs'),
   nomJoueur: document.querySelector('#nom-joueur'),
-  niveau: document.querySelector('#niveau'),
   niveauIA: document.querySelector('#niveau-ia'),
   dureeChrono: document.querySelector('#duree-chrono'),
   jouer: document.querySelector('#jouer'),
@@ -47,8 +46,8 @@ elements.relancerChrono.addEventListener('click', relancerChrono);
 elements.flip.addEventListener('click', retournerMain);
 elements.ouvrirDifficulte.addEventListener('click', ouvrirDifficulte);
 elements.validerDifficulte.addEventListener('click', () => elements.difficulte.close());
-elements.difficulte.querySelectorAll('[data-niveau]').forEach((bouton) => {
-  bouton.addEventListener('click', () => choisirNiveau(Number(bouton.dataset.niveau)));
+elements.difficulte.querySelectorAll('[data-regle]').forEach((bouton) => {
+  bouton.addEventListener('click', () => basculerRegle(bouton));
 });
 elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => {
   bouton.addEventListener('click', () => appliquerSens(Number(bouton.dataset.sens)));
@@ -59,12 +58,12 @@ initialiserMultijoueur({
   elements,
   obtenirNom: () => elements.nomJoueur.value.trim() || nomDeSceneAleatoire(),
   ouvrirReglages: ouvrirDifficulte,
-  obtenirReglages: () => ({ niveau: Number(elements.niveau.value), chrono: Number(elements.dureeChrono.value), animation: elements.vitesseAnimation.value }),
+  obtenirReglages: () => ({ regles: obtenirRegles(), chrono: Number(elements.dureeChrono.value), animation: elements.vitesseAnimation.value }),
 });
 
 function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
-  const niveau = Number(elements.niveau.value);
+  const regles = obtenirRegles();
   const niveauIA = Number(elements.niveauIA.value);
   const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || 14));
   const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
@@ -85,7 +84,7 @@ function demarrerPartie() {
 
   etat = {
     joueurs,
-    niveau,
+    regles,
     niveauIA,
     manche: 0,
     sens: 0,
@@ -108,15 +107,25 @@ function nomDeSceneAleatoire() {
 }
 
 function ouvrirDifficulte() {
-  choisirNiveau(Number(elements.niveau.value));
   elements.difficulte.showModal();
 }
 
-function choisirNiveau(niveau) {
-  elements.niveau.value = niveau;
-  const choix = elements.difficulte.querySelector(`[data-niveau="${niveau}"]`);
-  elements.difficulte.querySelectorAll('[data-niveau]').forEach((bouton) => bouton.classList.toggle('actif', bouton === choix));
-  elements.ouvrirDifficulte.innerHTML = choix.innerHTML;
+function basculerRegle(bouton) {
+  bouton.classList.toggle('actif');
+  afficherResumeRegles();
+}
+
+function obtenirRegles() {
+  return [...elements.difficulte.querySelectorAll('[data-regle].actif')].map((bouton) => bouton.dataset.regle);
+}
+
+function aRegle(regle) {
+  return etat.regles.includes(regle);
+}
+
+function afficherResumeRegles() {
+  const noms = [...elements.difficulte.querySelectorAll('[data-regle].actif strong')].map(({ textContent }) => textContent);
+  elements.ouvrirDifficulte.innerHTML = `<strong>${noms.length} règle${noms.length > 1 ? 's' : ''} active${noms.length > 1 ? 's' : ''}</strong><small>${noms.join(' · ') || 'Whoot uniquement'}</small>`;
 }
 
 function nouvelleManche() {
@@ -180,7 +189,7 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (!joueur) return;
   const carteBase = joueur.main[indexCarte];
   if (!carteBase) return;
-  const carte = { ...carteBase, whootchi: retourner && etat.niveau >= 1 };
+  const carte = { ...carteBase, whootchi: retourner && aRegle('whootchi') };
 
   if (auteur !== etat.actif) {
     arreterTemps();
@@ -268,16 +277,16 @@ function attendre(duree) {
 }
 
 function estPoseInterdite(joueur, carte) {
-  if (etat.niveau >= 2 && joueur.derniere && joueur.derniere.valeur === carte.valeur && joueur.derniere.whootchi === carte.whootchi) {
+  if (aRegle('repetition') && joueur.derniere && joueur.derniere.valeur === carte.valeur && joueur.derniere.whootchi === carte.whootchi) {
     return true;
   }
 
-  if (etat.niveau >= 3) {
+  if (aRegle('trio')) {
     const identiques = etat.joueurs.filter(({ derniere }) => derniere && derniere.valeur === carte.valeur && derniere.whootchi === carte.whootchi).length;
     if (identiques >= 2) return true;
   }
 
-  if (etat.niveau >= 4 && visePointFaible(joueur, carte)) return true;
+  if (aRegle('point-faible') && visePointFaible(joueur, carte)) return true;
   return false;
 }
 
@@ -311,10 +320,8 @@ function commencerTour() {
   }, 1000);
 
   if (!joueur.humain) {
-    const delaiMinimum = etat.premierTour ? 1900 : 650;
-    const delaiSouhaite = delaiMinimum + Math.random() * Math.min(1700, etat.temps * 350);
-    const delaiMaximum = Math.max(120, etat.temps * 1000 - 150);
-    const delai = Math.min(delaiSouhaite, delaiMaximum);
+    const delaiMaximum = Math.max(180, etat.temps * 1000 - 120);
+    const delai = 120 + Math.random() * (delaiMaximum - 120);
     actionIA = setTimeout(() => jouerIA(joueur), delai);
   }
 }
@@ -331,7 +338,7 @@ function relancerChrono() {
 function jouerIA(joueur) {
   if (!etat?.enCours || etat.joueurs[etat.actif] !== joueur) return;
 
-  const faces = etat.niveau >= 1 ? [false, true] : [false];
+  const faces = aRegle('whootchi') ? [false, true] : [false];
   const options = joueur.main.flatMap((carte, index) =>
     faces.map((whootchi) => ({ carte: { ...carte, whootchi }, index, retourner: whootchi }))
   ).filter(({ carte }) => !estPoseInterdite(joueur, carte));
@@ -388,7 +395,7 @@ function ouvrirDialogue(surtitre, titre, texte) {
 
 function afficher() {
   if (!etat) return;
-  elements.niveauAffiche.textContent = `Niveau ${etat.niveau}`;
+  elements.niveauAffiche.textContent = `${etat.regles.length} règle${etat.regles.length > 1 ? 's' : ''}`;
   elements.mancheAffiche.textContent = `Manche ${etat.manche} · sens ${etat.sens === 1 ? 'horaire' : 'antihoraire'}`;
   const notes = etat.joueurs[0].notes;
   elements.notesJoueur.textContent = `${notes} fausse note${notes === 1 ? '' : 's'}`;
@@ -438,7 +445,7 @@ function afficherMain() {
   elements.main.replaceChildren();
   const nombreCartes = etat.joueurs[0].main.length;
   elements.main.style.gridTemplateColumns = `repeat(${nombreCartes >= 5 ? 3 : nombreCartes}, 66px)`;
-  elements.flip.hidden = etat.niveau < 1;
+  elements.flip.hidden = !aRegle('whootchi');
   elements.flip.classList.toggle('actif', etat.faceMainWhootchi);
   elements.flip.setAttribute('aria-pressed', String(etat.faceMainWhootchi));
   etat.joueurs[0].main.forEach((carte, index) => {
@@ -453,7 +460,7 @@ function afficherMain() {
 }
 
 function retournerMain() {
-  if (!etat || etat.niveau < 1) return;
+  if (!etat || !aRegle('whootchi')) return;
   etat.faceMainWhootchi = !etat.faceMainWhootchi;
   afficherMain();
 }
