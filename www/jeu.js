@@ -7,6 +7,7 @@ const elements = {
   partie: document.querySelector('#partie'),
   nombreJoueurs: document.querySelector('#nombre-joueurs'),
   niveau: document.querySelector('#niveau'),
+  dureeChrono: document.querySelector('#duree-chrono'),
   jouer: document.querySelector('#jouer'),
   quitter: document.querySelector('#quitter'),
   table: document.querySelector('#joueurs-table'),
@@ -22,6 +23,7 @@ const elements = {
   finTitre: document.querySelector('#fin-titre'),
   finTexte: document.querySelector('#fin-texte'),
   continuer: document.querySelector('#continuer'),
+  relancerChrono: document.querySelector('#relancer-chrono'),
 };
 
 let etat = null;
@@ -31,11 +33,16 @@ let actionIA = null;
 elements.jouer.addEventListener('click', demarrerPartie);
 elements.quitter.addEventListener('click', quitterPartie);
 elements.continuer.addEventListener('click', nouvelleManche);
+elements.relancerChrono.addEventListener('click', relancerChrono);
+elements.niveau.addEventListener('change', () => {
+  elements.dureeChrono.value = tempsParNiveau[Number(elements.niveau.value)];
+});
 document.addEventListener('keydown', gererClavier);
 
 function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
   const niveau = Number(elements.niveau.value);
+  const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || tempsParNiveau[niveau]));
   const joueurs = Array.from({ length: nombre }, (_, index) => ({
     nom: index === 0 ? 'Toi' : nomsIA[index - 1],
     humain: index === 0,
@@ -52,7 +59,8 @@ function demarrerPartie() {
     manche: 0,
     sens: Math.random() < .5 ? 1 : -1,
     actif: 0,
-    temps: tempsParNiveau[niveau],
+    dureeChrono,
+    temps: dureeChrono,
     enCours: true,
   };
 
@@ -140,7 +148,7 @@ function commencerTour() {
   if (!etat?.enCours) return;
 
   const joueur = etat.joueurs[etat.actif];
-  etat.temps = etat.niveau === 6 ? Math.max(1, 5 - etat.manche) : tempsParNiveau[etat.niveau];
+  etat.temps = etat.niveau === 6 ? Math.max(1, etat.dureeChrono - etat.manche + 1) : etat.dureeChrono;
   elements.message.textContent = joueur.humain ? 'À toi de jouer !' : `${joueur.nom} réfléchit…`;
   afficher();
 
@@ -154,6 +162,15 @@ function commencerTour() {
     const delai = 650 + Math.random() * Math.min(2100, etat.temps * 450);
     actionIA = setTimeout(() => jouerIA(joueur), delai);
   }
+}
+
+function relancerChrono() {
+  if (!etat?.enCours) return;
+  etat.temps = etat.niveau === 6 ? Math.max(1, etat.dureeChrono - etat.manche + 1) : etat.dureeChrono;
+  afficherChrono();
+  elements.chronoBloc.classList.remove('relance');
+  void elements.chronoBloc.offsetWidth;
+  elements.chronoBloc.classList.add('relance');
 }
 
 function jouerIA(joueur) {
@@ -251,11 +268,24 @@ function afficherMain() {
     const bouton = document.createElement('button');
     bouton.className = 'carte';
     bouton.disabled = !humainActif;
-    bouton.innerHTML = `<span class="numero">${carte.valeur}</span><span class="face">WHOOT</span>${etat.niveau >= 1 ? '<span class="retourne">Appui long : WHOOTCHI</span>' : ''}`;
+    appliquerFaceCarte(bouton, carte.valeur, false);
+    bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, false)}${etat.niveau >= 1 ? ', appui long pour la face Whootchi' : ''}</span>`;
     bouton.addEventListener('click', () => jouerCarte(index, false));
     if (etat.niveau >= 1) ajouterAppuiLong(bouton, () => jouerCarte(index, true));
     elements.main.append(bouton);
   });
+}
+
+function appliquerFaceCarte(element, valeur, whootchi) {
+  const colonnes = [18, 191, 364, 537, 710, 883];
+  const index = (valeur - 1) * 2 + (whootchi ? 1 : 0);
+  element.style.setProperty('--sprite-x', `${-colonnes[index % 6]}px`);
+  element.style.setProperty('--sprite-y', `${index < 6 ? -18 : -192}px`);
+}
+
+function nomCarte(valeur, whootchi) {
+  const multiplicateurs = ['', 'Double ', 'Triple ', 'Quadruple ', 'Quintuple ', 'Sextuple '];
+  return `${multiplicateurs[valeur - 1]}${whootchi ? 'Whootchi' : 'Whoot'}`;
 }
 
 function ajouterAppuiLong(element, action) {
