@@ -93,8 +93,8 @@ function nouvelleManche() {
 
 function creerMain(nombreJoueurs) {
   const maximum = Math.max(1, nombreJoueurs - 1);
-  return Array.from({ length: 8 }, () => ({
-    valeur: 1 + Math.floor(Math.random() * maximum),
+  return Array.from({ length: maximum }, (_, index) => ({
+    valeur: index + 1,
     whootchi: false,
   }));
 }
@@ -251,7 +251,7 @@ function afficherTable() {
   elements.table.replaceChildren();
   const nombre = etat.joueurs.length;
   etat.joueurs.forEach((joueur, index) => {
-    const angle = -Math.PI / 2 + (index / nombre) * Math.PI * 2;
+    const angle = Math.PI / 2 + (index / nombre) * Math.PI * 2;
     const carte = document.createElement('article');
     carte.className = `musicien${index === etat.actif ? ' actif' : ''}${joueur.humain ? ' humain' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
