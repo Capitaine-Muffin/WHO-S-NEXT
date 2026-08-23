@@ -105,6 +105,10 @@ select {
 .reglage-chrono { display: flex; align-items: center; gap: .7rem; }
 .reglage-chrono input { width: 86px; min-height: 52px; padding: 0 .8rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--texte); font: inherit; font-size: 1.1rem; font-weight: 950; }
 
+.bouton-difficulte { width: 100%; min-height: 64px; padding: .7rem 1rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--texte); text-align: left; }
+.bouton-difficulte strong, .bouton-difficulte small { display: block; }
+.bouton-difficulte small { margin-top: .25rem; color: var(--muet); }
+
 .primaire {
   min-height: 56px;
   margin-top: .5rem;
@@ -316,6 +320,12 @@ dialog p { color: var(--muet); line-height: 1.45; }
 dialog .primaire { width: 100%; }
 .boutons-sens { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 .boutons-sens .primaire { min-height: 72px; padding-inline: .7rem; }
+.liste-niveaux { display: grid; gap: .65rem; margin: 1rem 0; }
+.liste-niveaux button { padding: .8rem 1rem; border: 2px solid #c8e9f0; border-radius: 14px; background: white; color: var(--texte); text-align: left; }
+.liste-niveaux button strong, .liste-niveaux button small { display: block; }
+.liste-niveaux button small { margin-top: .25rem; color: var(--muet); line-height: 1.25; }
+.liste-niveaux button.actif { border-color: var(--rose); background: #fff3e9; box-shadow: 0 0 0 2px #f47b2133; }
+.chrono-difficulte { margin-top: 1rem; text-align: left; }
 
 @keyframes pulse { to { transform: scale(1.06); } }
 @keyframes tic { to { transform: rotate(6deg); } }
