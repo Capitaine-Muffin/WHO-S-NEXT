@@ -155,11 +155,16 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
   const cadre = cible?.getBoundingClientRect();
   if (cadre) {
+    const etiquette = animation.querySelector('strong');
+    await etiquette.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished;
+    etiquette.style.display = 'none';
     const arriveeX = cadre.left + cadre.width / 2;
     const arriveeY = cadre.top + cadre.height / 2;
+    const positionPile = Math.max(0, joueur.historique.length - 1);
+    const angleFinal = -7 + positionPile * 10;
     await animation.animate([
       { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: 'translate(-50%, -50%) scale(.45)', opacity: .92 },
+      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: `translate(-50%, -50%) scale(.3333) rotate(${angleFinal}deg)`, opacity: 1 },
     ], { duration: 620, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
   }
 
