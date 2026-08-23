@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=14" />
+    <link rel="stylesheet" href="style.css?v=15" />
   </head>
   <body>
     <main id="jeu">
@@ -57,6 +57,34 @@
         </label>
 
         <button id="jouer" class="primaire">Jouer contre l'IA</button>
+        <button id="jouer-en-ligne" class="secondaire" type="button">Jouer en ligne</button>
+      </section>
+
+      <section id="en-ligne" class="ecran ecran-en-ligne">
+        <header class="barre">
+          <button id="retour-en-ligne" class="icone" aria-label="Retour au menu">×</button>
+          <div><strong>Mode en ligne</strong><span>De 2 à 7 musiciens</span></div>
+        </header>
+        <div id="connexion-en-ligne" class="panneau-en-ligne">
+          <img src="assets/logo-horizontal.webp" alt="Who's Next ?" />
+          <p>Crée une scène ou rejoins tes amis avec leur code.</p>
+          <button id="creer-salle" class="primaire" type="button">Créer une partie</button>
+          <div class="separateur"><span>OU</span></div>
+          <label class="champ"><span>Code de la partie</span><input id="code-salle" type="text" maxlength="6" autocomplete="off" placeholder="ABC123" /></label>
+          <button id="rejoindre-salle" class="secondaire" type="button">Rejoindre</button>
+          <p id="statut-en-ligne" class="statut-en-ligne" aria-live="polite"></p>
+        </div>
+        <div id="salon" class="panneau-en-ligne" hidden>
+          <p class="surtitre">SALLE PRIVÉE</p>
+          <h2 id="code-salon">------</h2>
+          <button id="copier-code" class="mini-bouton" type="button">Copier le code</button>
+          <p>Envoie ce code aux autres musiciens.</p>
+          <div id="joueurs-salon" class="joueurs-salon"></div>
+          <button id="regler-salon" class="bouton-difficulte" type="button"><strong>Régler la partie</strong><small>Niveau, chrono et animations</small></button>
+          <p id="resume-salon" class="resume-salon">Niveau 1 · 14 secondes · animation normale</p>
+          <button id="lancer-en-ligne" class="primaire" type="button" disabled>Lancer la partie</button>
+          <button id="quitter-salon" class="secondaire" type="button">Quitter le salon</button>
+        </div>
       </section>
 
       <section id="partie" class="ecran" aria-live="polite">
@@ -127,10 +155,18 @@
             <span>secondes</span>
           </div>
         </label>
+        <label class="champ chrono-difficulte">
+          <span>Animation des cartes</span>
+          <select id="vitesse-animation">
+            <option value="normale">Normale · bien visible</option>
+            <option value="rapide">Rapide · joueurs confirmés</option>
+            <option value="aucune">Désactivée · jeu instantané</option>
+          </select>
+        </label>
         <button id="valider-difficulte" class="primaire" type="button">C'est parti !</button>
       </dialog>
     </main>
-    <script type="module" src="jeu.js?v=16"></script>
+    <script type="module" src="jeu.js?v=17"></script>
   </body>
 </html>
 
