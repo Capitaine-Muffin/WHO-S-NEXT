@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=8" />
+    <link rel="stylesheet" href="style.css?v=9" />
   </head>
   <body>
     <main id="jeu">
@@ -87,8 +87,18 @@
         <p id="fin-texte"></p>
         <button id="continuer" class="primaire">Continuer</button>
       </dialog>
+
+      <dialog id="choix-sens">
+        <p class="surtitre">NOUVEAU TOUR</p>
+        <h2>Choisis le sens</h2>
+        <p>Quel voisin jouera la première carte ?</p>
+        <div class="boutons-sens">
+          <button class="primaire" data-sens="1">← Voisin de gauche</button>
+          <button class="primaire" data-sens="-1">Voisin de droite →</button>
+        </div>
+      </dialog>
     </main>
-    <script type="module" src="jeu.js?v=8"></script>
+    <script type="module" src="jeu.js?v=9"></script>
   </body>
 </html>
 
