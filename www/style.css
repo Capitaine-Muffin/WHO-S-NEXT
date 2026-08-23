@@ -232,7 +232,7 @@ select {
   border: 3px solid white;
   border-radius: 8px;
   background-color: white;
-  background-image: url('assets/cartes.png');
+  background-image: url('assets/cartes.webp');
   background-repeat: no-repeat;
   background-size: 1000px 358px;
   background-position: var(--sprite-x) var(--sprite-y);
