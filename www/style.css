@@ -215,6 +215,39 @@ select {
 .musicien.cote-droit .pile-cartes { left: auto; right: calc(100% + 4px); }
 .derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
 .mini-carte { width: 104px; height: 144px; background: white url('assets/cartes.webp') no-repeat; background-size: 1000px 358px; background-position: var(--sprite-x) var(--sprite-y); transform: scale(.5); transform-origin: top left; }
+.table.animation-carte .derniere-carte:last-child { opacity: 0; }
+
+.pose-carte {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  justify-items: center;
+  gap: .65rem;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 16px 24px #24192566);
+}
+
+.pose-carte strong {
+  padding: .45rem .75rem;
+  border-radius: 999px;
+  background: var(--rose);
+  color: white;
+  font-size: 1.05rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 0 #b74d0b;
+}
+
+.pose-carte .carte-animee {
+  width: 156px;
+  min-height: 216px;
+  background-size: 1500px 537px;
+  background-position: var(--sprite-x-grand) var(--sprite-y-grand);
+  border-width: 5px;
+  box-shadow: 0 10px 0 #8f8178;
+}
 
 .message {
   min-height: 42px;
