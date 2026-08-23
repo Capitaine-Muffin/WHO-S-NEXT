@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=13" />
+    <link rel="stylesheet" href="style.css?v=14" />
   </head>
   <body>
     <main id="jeu">
@@ -31,18 +31,14 @@
           </select>
         </label>
 
-        <label class="champ">
-          <span>Niveau</span>
-          <select id="niveau">
-            <option value="0">Niveau 0 · 14 secondes</option>
-            <option value="1">Niveau 1 · Whootchi</option>
-            <option value="2">Niveau 2 · 8 secondes</option>
-            <option value="3">Niveau 3 · Pas deux fois pareil</option>
-            <option value="4">Niveau 4 · Pas trois sur table</option>
-            <option value="5">Niveau 5 · 5 secondes</option>
-            <option value="6">Niveau 6 · Accélération</option>
-          </select>
-        </label>
+        <div class="champ">
+          <span>Difficulté de la partie</span>
+          <input id="niveau" type="hidden" value="1" />
+          <button id="ouvrir-difficulte" class="bouton-difficulte" type="button">
+            <strong>Niveau 1 · Sens dessus dessous</strong>
+            <small>Les cartes Whootchi entrent en scène</small>
+          </button>
+        </div>
 
         <label class="champ">
           <span>Niveau des adversaires</span>
@@ -58,14 +54,6 @@
             <option value="9">Niveau 9 · 95 % de réussite</option>
             <option value="10">Niveau 10 · aucune erreur</option>
           </select>
-        </label>
-
-        <label class="champ">
-          <span>Durée de la pendule</span>
-          <div class="reglage-chrono">
-            <input id="duree-chrono" type="number" min="1" max="60" value="14" inputmode="numeric" />
-            <span>secondes</span>
-          </div>
         </label>
 
         <button id="jouer" class="primaire">Jouer contre l'IA</button>
@@ -121,8 +109,27 @@
           <button class="primaire" data-sens="-1">Voisin de droite →</button>
         </div>
       </dialog>
+
+      <dialog id="difficulte">
+        <p class="surtitre">RÈGLES DE LA PARTIE</p>
+        <h2>Difficulté</h2>
+        <div class="liste-niveaux">
+          <button type="button" data-niveau="0"><strong>Échauffement</strong><small>Whoot uniquement</small></button>
+          <button type="button" data-niveau="1"><strong>Niveau 1 · Sens dessus dessous</strong><small>Whootchi rejoint la partie</small></button>
+          <button type="button" data-niveau="2"><strong>Niveau 2 · Gare au rappel</strong><small>Un joueur ne peut pas rejouer la même carte</small></button>
+          <button type="button" data-niveau="3"><strong>Niveau 3 · Jamais trois sans faute</strong><small>Pas de troisième carte identique sur la table</small></button>
+        </div>
+        <label class="champ chrono-difficulte">
+          <span>Temps pour jouer</span>
+          <div class="reglage-chrono">
+            <input id="duree-chrono" type="number" min="1" max="60" value="14" inputmode="numeric" />
+            <span>secondes</span>
+          </div>
+        </label>
+        <button id="valider-difficulte" class="primaire" type="button">C'est parti !</button>
+      </dialog>
     </main>
-    <script type="module" src="jeu.js?v=14"></script>
+    <script type="module" src="jeu.js?v=15"></script>
   </body>
 </html>
 
