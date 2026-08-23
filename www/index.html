@@ -3,15 +3,92 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Mon jeu</title>
+    <meta name="theme-color" content="#ffea6d" />
+    <title>Who's Next?</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main id="jeu">
-      <h1>Mon jeu</h1>
-      <p>Remplacer ce squelette par le jeu.</p>
-      <button id="jouer">Jouer</button>
+      <section id="accueil" class="ecran actif">
+        <p class="surtitre">LE CONCERT VA COMMENCER</p>
+        <h1><img src="assets/logo-vertical.webp" alt="Who's Next ?" /></h1>
+        <p class="accroche">Garde le rythme. Trouve qui joue. Ne fais pas de fausse note.</p>
+
+        <label class="champ">
+          <span>Nombre de musiciens</span>
+          <select id="nombre-joueurs">
+            <option value="2">2 joueurs</option>
+            <option value="3">3 joueurs</option>
+            <option value="4" selected>4 joueurs</option>
+            <option value="5">5 joueurs</option>
+            <option value="6">6 joueurs</option>
+            <option value="7">7 joueurs</option>
+          </select>
+        </label>
+
+        <label class="champ">
+          <span>Niveau</span>
+          <select id="niveau">
+            <option value="0">Niveau 0 · 14 secondes</option>
+            <option value="1">Niveau 1 · Whootchi</option>
+            <option value="2">Niveau 2 · 8 secondes</option>
+            <option value="3">Niveau 3 · Pas deux fois pareil</option>
+            <option value="4">Niveau 4 · Pas trois sur table</option>
+            <option value="5">Niveau 5 · 5 secondes</option>
+            <option value="6">Niveau 6 · Accélération</option>
+          </select>
+        </label>
+
+        <label class="champ">
+          <span>Durée de la pendule</span>
+          <div class="reglage-chrono">
+            <input id="duree-chrono" type="number" min="1" max="60" value="14" inputmode="numeric" />
+            <span>secondes</span>
+          </div>
+        </label>
+
+        <button id="jouer" class="primaire">Jouer contre l'IA</button>
+      </section>
+
+      <section id="partie" class="ecran" aria-live="polite">
+        <header class="barre">
+          <button id="quitter" class="icone" aria-label="Quitter la partie">×</button>
+          <div>
+            <strong id="niveau-affiche">Niveau 0</strong>
+            <span id="manche-affiche">Manche 1</span>
+          </div>
+        </header>
+
+        <div id="table" class="table" aria-label="Table de jeu">
+          <div id="joueurs-table"></div>
+          <button id="relancer-chrono" class="pendule" aria-label="Relancer immédiatement le minuteur">
+            <div class="cadran">
+              <i class="aiguille"></i>
+              <span id="chrono">14</span>
+              <small>SECONDES</small>
+            </div>
+          </button>
+        </div>
+
+        <div class="message" id="message">À toi de jouer !</div>
+
+        <section class="zone-joueur">
+          <div class="infos-joueur">
+            <span>Ta main</span>
+            <span id="notes-joueur">0 fausse note</span>
+          </div>
+          <div id="main-joueur" class="main-cartes"></div>
+        </section>
+      </section>
+
+      <dialog id="fin-manche">
+        <p class="surtitre" id="fin-surtitre">FAUSSE NOTE</p>
+        <h2 id="fin-titre">Oups !</h2>
+        <p id="fin-texte"></p>
+        <button id="continuer" class="primaire">Continuer</button>
+      </dialog>
     </main>
     <script type="module" src="jeu.js"></script>
   </body>
 </html>
+
