@@ -203,13 +203,12 @@ select {
   transition: .2s ease;
 }
 
-.musicien.actif { transform: translate(-50%, -50%) scale(1.12); }
-.musicien.actif .avatar { outline-color: var(--rose); box-shadow: 0 0 28px #f47b2188; }
 .musicien strong, .musicien span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .musicien span { margin-top: .2rem; color: var(--muet); font-size: .7rem; }
 .avatar { width: 58px; height: 58px; margin: auto; display: grid; place-items: center; border-radius: 50%; outline: 3px solid var(--bleu); background: #fff; font-size: 1.8rem; transition: .2s ease; }
 .musicien.humain .avatar { background: #fff2d1; }
-.derniere-carte { width: max-content; max-width: 88px; margin: .35rem auto 0; padding: .22rem .38rem; border-radius: 6px; background: #fffaf1; color: #2b1e30; font-size: .58rem; font-weight: 950; transform: rotate(-3deg); }
+.derniere-carte { width: 52px; height: 72px; margin: .35rem auto 0; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(-3deg); }
+.mini-carte { width: 104px; height: 144px; background: white url('assets/cartes.webp') no-repeat; background-size: 1000px 358px; background-position: var(--sprite-x) var(--sprite-y); transform: scale(.5); transform-origin: top left; }
 
 .message {
   min-height: 42px;
