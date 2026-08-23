@@ -50,6 +50,7 @@ function demarrerPartie() {
     notes: 0,
     main: [],
     derniere: null,
+    historique: [],
     erreurConsecutive: 0,
   }));
 
@@ -62,6 +63,7 @@ function demarrerPartie() {
     dureeChrono,
     temps: dureeChrono,
     enCours: true,
+    premierTour: true,
   };
 
   elements.accueil.classList.remove('actif');
@@ -82,9 +84,11 @@ function nouvelleManche() {
   etat.manche += 1;
   etat.sens = Math.random() < .5 ? 1 : -1;
   etat.actif = etat.manche === 1 ? 0 : (etat.actif + etat.sens + etat.joueurs.length) % etat.joueurs.length;
+  etat.premierTour = true;
   etat.joueurs.forEach((joueur) => {
     joueur.main = creerMain(etat.joueurs.length);
     joueur.derniere = null;
+    joueur.historique = [];
   });
   etat.enCours = true;
   afficher();
@@ -122,7 +126,10 @@ function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   arreterTemps();
   joueur.main.splice(indexCarte, 1);
   joueur.derniere = { ...carte };
+  joueur.historique.push({ ...carte });
+  joueur.historique = joueur.historique.slice(-2);
   joueur.erreurConsecutive = 0;
+  etat.premierTour = false;
 
   if (carte.whootchi) etat.sens *= -1;
   const distance = carte.valeur * etat.sens;
@@ -165,7 +172,8 @@ function commencerTour() {
   }, 1000);
 
   if (!joueur.humain) {
-    const delai = 650 + Math.random() * Math.min(2100, etat.temps * 450);
+    const delaiMinimum = etat.premierTour ? 1900 : 650;
+    const delai = delaiMinimum + Math.random() * Math.min(1700, etat.temps * 350);
     actionIA = setTimeout(() => jouerIA(joueur), delai);
   }
 }
@@ -259,13 +267,21 @@ function afficherTable() {
   etat.joueurs.forEach((joueur, index) => {
     const angle = Math.PI / 2 + (index / nombre) * Math.PI * 2;
     const carte = document.createElement('article');
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}`;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${etat.premierTour && index === etat.actif ? ' premier' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
-    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${joueur.derniere ? '<div class="derniere-carte"><div class="mini-carte"></div></div>' : ''}`;
-    if (joueur.derniere) {
-      appliquerFaceCarte(carte.querySelector('.mini-carte'), joueur.derniere.valeur, joueur.derniere.whootchi);
-    }
+    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${etat.premierTour && index === etat.actif ? '<b class="badge-premier">COMMENCE</b>' : ''}<div class="pile-cartes"></div>`;
+    const pile = carte.querySelector('.pile-cartes');
+    joueur.historique.forEach((carteJouee, position) => {
+      const conteneur = document.createElement('div');
+      conteneur.className = 'derniere-carte';
+      conteneur.style.setProperty('--position-pile', position);
+      const miniature = document.createElement('div');
+      miniature.className = 'mini-carte';
+      appliquerFaceCarte(miniature, carteJouee.valeur, carteJouee.whootchi);
+      conteneur.append(miniature);
+      pile.append(conteneur);
+    });
     elements.table.append(carte);
   });
 }
