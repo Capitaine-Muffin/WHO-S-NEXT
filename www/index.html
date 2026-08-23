@@ -32,11 +32,10 @@
         </label>
 
         <div class="champ">
-          <span>Difficulté de la partie</span>
-          <input id="niveau" type="hidden" value="1" />
+          <span>Règles de la partie</span>
           <button id="ouvrir-difficulte" class="bouton-difficulte" type="button">
-            <strong>Niveau 1 · Sens dessus dessous</strong>
-            <small>Les cartes Whootchi entrent en scène</small>
+            <strong>1 règle active</strong>
+            <small>Whootchi</small>
           </button>
         </div>
 
@@ -81,7 +80,7 @@
           <p>Envoie ce code aux autres musiciens.</p>
           <div id="joueurs-salon" class="joueurs-salon"></div>
           <button id="regler-salon" class="bouton-difficulte" type="button"><strong>Régler la partie</strong><small>Niveau, chrono et animations</small></button>
-          <p id="resume-salon" class="resume-salon">Niveau 1 · 14 secondes · animation normale</p>
+          <p id="resume-salon" class="resume-salon">1 règle · 14 secondes · animation normale</p>
           <button id="lancer-en-ligne" class="primaire" type="button" disabled>Lancer la partie</button>
           <button id="quitter-salon" class="secondaire" type="button">Quitter le salon</button>
         </div>
@@ -140,13 +139,13 @@
 
       <dialog id="difficulte">
         <p class="surtitre">RÈGLES DE LA PARTIE</p>
-        <h2>Difficulté</h2>
+        <h2>Règles à la carte</h2>
+        <p>Active uniquement les contraintes que tu veux jouer.</p>
         <div class="liste-niveaux">
-          <button type="button" data-niveau="0"><strong>Échauffement</strong><small>Whoot uniquement</small></button>
-          <button type="button" data-niveau="1"><strong>Niveau 1 · Sens dessus dessous</strong><small>Whootchi rejoint la partie</small></button>
-          <button type="button" data-niveau="2"><strong>Niveau 2 · Gare au rappel</strong><small>Un joueur ne peut pas rejouer la même carte</small></button>
-          <button type="button" data-niveau="3"><strong>Niveau 3 · Jamais trois sans faute</strong><small>Pas de troisième carte identique sur la table</small></button>
-          <button type="button" data-niveau="4"><strong>Niveau 4 · Protège le point faible</strong><small>Les meilleurs ne peuvent pas jouer sur l'unique joueur le plus pénalisé</small></button>
+          <button type="button" class="actif" data-regle="whootchi"><strong>Sens dessus dessous</strong><small>Les cartes Whootchi rejoignent la partie</small></button>
+          <button type="button" data-regle="repetition"><strong>Gare au rappel</strong><small>Un joueur ne peut pas rejouer exactement la même carte</small></button>
+          <button type="button" data-regle="trio"><strong>Jamais trois sans faute</strong><small>Pas de troisième carte identique sur la table</small></button>
+          <button type="button" data-regle="point-faible"><strong>Protège le point faible</strong><small>Les meilleurs ne peuvent pas jouer sur l'unique joueur le plus pénalisé</small></button>
         </div>
         <label class="champ chrono-difficulte">
           <span>Temps pour jouer</span>
@@ -166,7 +165,7 @@
         <button id="valider-difficulte" class="primaire" type="button">C'est parti !</button>
       </dialog>
     </main>
-    <script type="module" src="jeu.js?v=17"></script>
+    <script type="module" src="jeu.js?v=18"></script>
   </body>
 </html>
 
