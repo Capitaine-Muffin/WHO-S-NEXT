@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=10" />
+    <link rel="stylesheet" href="style.css?v=12" />
   </head>
   <body>
     <main id="jeu">
@@ -13,6 +13,11 @@
         <p class="surtitre">LE CONCERT VA COMMENCER</p>
         <h1><img src="assets/logo-vertical.webp" alt="Who's Next ?" /></h1>
         <p class="accroche">Garde le rythme. Trouve qui joue. Ne fais pas de fausse note.</p>
+
+        <label class="champ">
+          <span>Ton nom de scène</span>
+          <input id="nom-joueur" type="text" maxlength="18" autocomplete="nickname" />
+        </label>
 
         <label class="champ">
           <span>Nombre de musiciens</span>
@@ -98,7 +103,7 @@
         </div>
       </dialog>
     </main>
-    <script type="module" src="jeu.js?v=10"></script>
+    <script type="module" src="jeu.js?v=12"></script>
   </body>
 </html>
 
