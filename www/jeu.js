@@ -11,6 +11,7 @@ const elements = {
   jouer: document.querySelector('#jouer'),
   quitter: document.querySelector('#quitter'),
   table: document.querySelector('#joueurs-table'),
+  plateau: document.querySelector('#table'),
   main: document.querySelector('#main-joueur'),
   message: document.querySelector('#message'),
   chrono: document.querySelector('#chrono'),
@@ -103,8 +104,8 @@ function creerMain(nombreJoueurs) {
   }));
 }
 
-function jouerCarte(indexCarte, retourner = false, auteur = 0) {
-  if (!etat?.enCours) return;
+async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
+  if (!etat?.enCours || etat.animation) return;
   const joueur = etat.joueurs[auteur];
   if (!joueur) return;
 
@@ -124,6 +125,7 @@ function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   }
 
   arreterTemps();
+  etat.animation = true;
   joueur.derniere = { ...carte };
   joueur.historique.push({ ...carte });
   joueur.historique = joueur.historique.slice(-2);
@@ -135,7 +137,38 @@ function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   etat.actif = (etat.actif + distance + etat.joueurs.length * 10) % etat.joueurs.length;
 
   afficher();
+  await animerCarteJouee(auteur, joueur, carte);
+  etat.animation = false;
   commencerTour();
+}
+
+async function animerCarteJouee(indexJoueur, joueur, carte) {
+  const animation = document.createElement('div');
+  animation.className = 'pose-carte';
+  animation.innerHTML = `<strong>${joueur.nom} joue</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
+  appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
+  document.body.append(animation);
+  elements.plateau.classList.add('animation-carte');
+
+  await attendre(420);
+
+  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
+  const cadre = cible?.getBoundingClientRect();
+  if (cadre) {
+    const arriveeX = cadre.left + cadre.width / 2;
+    const arriveeY = cadre.top + cadre.height / 2;
+    await animation.animate([
+      { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: 'translate(-50%, -50%) scale(.45)', opacity: .92 },
+    ], { duration: 620, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
+  }
+
+  animation.remove();
+  elements.plateau.classList.remove('animation-carte');
+}
+
+function attendre(duree) {
+  return new Promise((resolve) => setTimeout(resolve, duree));
 }
 
 function estPoseInterdite(joueur, carte) {
@@ -265,6 +298,7 @@ function afficherTable() {
     carte.className = `musicien${joueur.humain ? ' humain' : ''}${etat.premierTour && index === etat.actif ? ' premier' : ''}${coteDroit ? ' cote-droit' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
+    carte.dataset.joueurIndex = index;
     carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${etat.premierTour && index === etat.actif ? '<b class="badge-premier">COMMENCE</b>' : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
     joueur.historique.forEach((carteJouee, position) => {
@@ -300,6 +334,8 @@ function appliquerFaceCarte(element, valeur, whootchi) {
   const index = (valeur - 1) * 2 + (whootchi ? 1 : 0);
   element.style.setProperty('--sprite-x', `${-colonnes[index % 6]}px`);
   element.style.setProperty('--sprite-y', `${index < 6 ? -18 : -192}px`);
+  element.style.setProperty('--sprite-x-grand', `${-colonnes[index % 6] * 1.5}px`);
+  element.style.setProperty('--sprite-y-grand', `${(index < 6 ? -18 : -192) * 1.5}px`);
 }
 
 function nomCarte(valeur, whootchi) {
