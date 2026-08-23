@@ -102,7 +102,8 @@ async function mettreAJourReglages(ui, reglages) {
 
 function afficherReglages(ui) {
   if (!salon) return;
-  ui.resume.textContent = `Niveau ${salon.niveau} · ${salon.chrono} secondes · animation ${salon.animation}`;
+  const nombreRegles = salon.regles?.length ?? 0;
+  ui.resume.textContent = `${nombreRegles} règle${nombreRegles > 1 ? 's' : ''} · ${salon.chrono} secondes · animation ${salon.animation}`;
 }
 
 function rendreJoueurs(ui, joueurs) {
