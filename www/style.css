@@ -296,6 +296,8 @@ dialog::backdrop { background: #08050cbb; backdrop-filter: blur(5px); }
 dialog h2 { margin: .5rem 0; font-size: 2rem; }
 dialog p { color: var(--muet); line-height: 1.45; }
 dialog .primaire { width: 100%; }
+.boutons-sens { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.boutons-sens .primaire { min-height: 72px; padding-inline: .7rem; }
 
 @keyframes pulse { to { transform: scale(1.06); } }
 @keyframes tic { to { transform: rotate(6deg); } }
