@@ -28,6 +28,7 @@ const elements = {
   continuer: document.querySelector('#continuer'),
   relancerChrono: document.querySelector('#relancer-chrono'),
   choixSens: document.querySelector('#choix-sens'),
+  flip: document.querySelector('#flip'),
 };
 
 let etat = null;
@@ -38,6 +39,7 @@ elements.jouer.addEventListener('click', demarrerPartie);
 elements.quitter.addEventListener('click', quitterPartie);
 elements.continuer.addEventListener('click', nouvelleManche);
 elements.relancerChrono.addEventListener('click', relancerChrono);
+elements.flip.addEventListener('click', retournerMain);
 elements.niveau.addEventListener('change', () => {
   elements.dureeChrono.value = tempsParNiveau[Number(elements.niveau.value)];
 });
@@ -77,6 +79,7 @@ function demarrerPartie() {
     temps: dureeChrono,
     enCours: true,
     premierTour: true,
+    faceMainWhootchi: false,
   };
 
   elements.accueil.classList.remove('actif');
@@ -147,19 +150,18 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (!etat?.enCours || etat.animation || etat.choixSens) return;
   const joueur = etat.joueurs[auteur];
   if (!joueur) return;
-  const carte = joueur.main[indexCarte];
-  if (!carte) return;
+  const carteBase = joueur.main[indexCarte];
+  if (!carteBase) return;
+  const carte = { ...carteBase, whootchi: retourner && etat.niveau >= 1 };
 
   if (auteur !== etat.actif) {
     arreterTemps();
     etat.animation = true;
-    await animerCarteErreur(joueur, { ...carte, whootchi: retourner && etat.niveau >= 1 });
+    await animerCarteErreur(joueur, carte);
     etat.animation = false;
     sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
     return;
   }
-
-  carte.whootchi = retourner && etat.niveau >= 1;
 
   if (estPoseInterdite(joueur, carte)) {
     sanctionner(joueur, 'Cette carte ne pouvait pas être jouée.');
@@ -384,25 +386,35 @@ function afficherTable() {
 
 function afficherMain() {
   elements.main.replaceChildren();
+  const nombreCartes = etat.joueurs[0].main.length;
+  elements.main.style.gridTemplateColumns = `repeat(${nombreCartes >= 5 ? 3 : nombreCartes}, 66px)`;
+  elements.flip.hidden = etat.niveau < 1;
+  elements.flip.classList.toggle('actif', etat.faceMainWhootchi);
+  elements.flip.setAttribute('aria-pressed', String(etat.faceMainWhootchi));
   etat.joueurs[0].main.forEach((carte, index) => {
     const bouton = document.createElement('button');
     bouton.className = 'carte';
     bouton.disabled = !etat.enCours || etat.choixSens;
-    appliquerFaceCarte(bouton, carte.valeur, false);
-    bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, false)}${etat.niveau >= 1 ? ', appui long pour la face Whootchi' : ''}</span>`;
-    bouton.addEventListener('click', () => jouerCarte(index, false, 0));
-    if (etat.niveau >= 1) ajouterAppuiLong(bouton, () => jouerCarte(index, true, 0));
+    appliquerFaceCarte(bouton, carte.valeur, etat.faceMainWhootchi);
+    bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, etat.faceMainWhootchi)}</span>`;
+    bouton.addEventListener('click', () => jouerCarte(index, etat.faceMainWhootchi, 0));
     elements.main.append(bouton);
   });
 }
 
+function retournerMain() {
+  if (!etat || etat.niveau < 1) return;
+  etat.faceMainWhootchi = !etat.faceMainWhootchi;
+  afficherMain();
+}
+
 function appliquerFaceCarte(element, valeur, whootchi) {
-  const colonnes = [18, 191, 364, 537, 710, 883];
+  const colonnesBrutes = [36, 382, 728, 1074, 1420, 1766];
   const index = (valeur - 1) * 2 + (whootchi ? 1 : 0);
-  element.style.setProperty('--sprite-x', `${-colonnes[index % 6]}px`);
-  element.style.setProperty('--sprite-y', `${index < 6 ? -18 : -192}px`);
-  element.style.setProperty('--sprite-x-grand', `${-colonnes[index % 6] * 1.5}px`);
-  element.style.setProperty('--sprite-y-grand', `${(index < 6 ? -18 : -192) * 1.5}px`);
+  element.style.setProperty('--sprite-x', `${-colonnesBrutes[index % 6] * .33}px`);
+  element.style.setProperty('--sprite-y', `${(index < 6 ? -36 : -384) * .33}px`);
+  element.style.setProperty('--sprite-x-grand', `${-colonnesBrutes[index % 6] * .75}px`);
+  element.style.setProperty('--sprite-y-grand', `${(index < 6 ? -36 : -384) * .75}px`);
 }
 
 function nomCarte(valeur, whootchi) {
@@ -429,7 +441,7 @@ function ajouterAppuiLong(element, action) {
 function gererClavier(event) {
   if (!etat?.enCours) return;
   const index = Number(event.key) - 1;
-  if (index >= 0 && index < etat.joueurs[0].main.length) jouerCarte(index, event.shiftKey, 0);
+  if (index >= 0 && index < etat.joueurs[0].main.length) jouerCarte(index, etat.faceMainWhootchi, 0);
 }
 
 function arreterTemps() {
