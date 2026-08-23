@@ -1,3 +1,5 @@
+import { initialiserMultijoueur } from './multijoueur.js?v=1';
+
 const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
@@ -31,6 +33,7 @@ const elements = {
   ouvrirDifficulte: document.querySelector('#ouvrir-difficulte'),
   difficulte: document.querySelector('#difficulte'),
   validerDifficulte: document.querySelector('#valider-difficulte'),
+  vitesseAnimation: document.querySelector('#vitesse-animation'),
 };
 
 let etat = null;
@@ -52,6 +55,12 @@ elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => {
 });
 document.addEventListener('keydown', gererClavier);
 elements.nomJoueur.value = nomDeSceneAleatoire();
+initialiserMultijoueur({
+  elements,
+  obtenirNom: () => elements.nomJoueur.value.trim() || nomDeSceneAleatoire(),
+  ouvrirReglages: ouvrirDifficulte,
+  obtenirReglages: () => ({ niveau: Number(elements.niveau.value), chrono: Number(elements.dureeChrono.value), animation: elements.vitesseAnimation.value }),
+});
 
 function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
@@ -86,6 +95,7 @@ function demarrerPartie() {
     enCours: true,
     premierTour: true,
     faceMainWhootchi: false,
+    vitesseAnimation: elements.vitesseAnimation.value,
   };
 
   elements.accueil.classList.remove('actif');
@@ -205,20 +215,24 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
 }
 
 async function animerCarteErreur(joueur, carte) {
+  if (etat.vitesseAnimation === 'aucune') return;
+  const rapide = etat.vitesseAnimation === 'rapide';
   const animation = document.createElement('div');
   animation.className = 'pose-carte erreur-pose';
   animation.innerHTML = `<strong>${joueur.nom} joue trop tôt !</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
   appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
   document.body.append(animation);
-  await attendre(1200);
+  await attendre(rapide ? 450 : 1200);
   await animation.animate([
     { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
     { transform: 'translate(-50%, -50%) scale(.9)', opacity: 0 },
-  ], { duration: 220, easing: 'ease-in', fill: 'forwards' }).finished;
+  ], { duration: rapide ? 100 : 220, easing: 'ease-in', fill: 'forwards' }).finished;
   animation.remove();
 }
 
 async function animerCarteJouee(indexJoueur, joueur, carte) {
+  if (etat.vitesseAnimation === 'aucune') return;
+  const rapide = etat.vitesseAnimation === 'rapide';
   const animation = document.createElement('div');
   animation.className = 'pose-carte';
   animation.innerHTML = `<strong>${joueur.nom} joue</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
@@ -228,12 +242,12 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
   cible?.classList.add('cible-animation');
 
-  await attendre(1000);
+  await attendre(rapide ? 350 : 1000);
 
   const cadre = cible?.getBoundingClientRect();
   if (cadre) {
     const etiquette = animation.querySelector('strong');
-    await etiquette.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished;
+    await etiquette.animate([{ opacity: 1 }, { opacity: 0 }], { duration: rapide ? 70 : 140, fill: 'forwards' }).finished;
     etiquette.style.display = 'none';
     const arriveeX = cadre.left + cadre.width / 2;
     const arriveeY = cadre.top + cadre.height / 2;
@@ -242,7 +256,7 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
     await animation.animate([
       { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
       { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: `translate(-50%, -50%) scale(.3333) rotate(${angleFinal}deg)`, opacity: 1 },
-    ], { duration: 620, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
+    ], { duration: rapide ? 240 : 620, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
   }
 
   animation.remove();
