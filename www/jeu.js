@@ -1,8 +1,6 @@
 const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
-const tempsParNiveau = [14, 10, 8, 7, 6, 5, 4];
-
 const elements = {
   accueil: document.querySelector('#accueil'),
   partie: document.querySelector('#partie'),
@@ -30,6 +28,9 @@ const elements = {
   relancerChrono: document.querySelector('#relancer-chrono'),
   choixSens: document.querySelector('#choix-sens'),
   flip: document.querySelector('#flip'),
+  ouvrirDifficulte: document.querySelector('#ouvrir-difficulte'),
+  difficulte: document.querySelector('#difficulte'),
+  validerDifficulte: document.querySelector('#valider-difficulte'),
 };
 
 let etat = null;
@@ -41,8 +42,10 @@ elements.quitter.addEventListener('click', quitterPartie);
 elements.continuer.addEventListener('click', nouvelleManche);
 elements.relancerChrono.addEventListener('click', relancerChrono);
 elements.flip.addEventListener('click', retournerMain);
-elements.niveau.addEventListener('change', () => {
-  elements.dureeChrono.value = tempsParNiveau[Number(elements.niveau.value)];
+elements.ouvrirDifficulte.addEventListener('click', ouvrirDifficulte);
+elements.validerDifficulte.addEventListener('click', () => elements.difficulte.close());
+elements.difficulte.querySelectorAll('[data-niveau]').forEach((bouton) => {
+  bouton.addEventListener('click', () => choisirNiveau(Number(bouton.dataset.niveau)));
 });
 elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => {
   bouton.addEventListener('click', () => appliquerSens(Number(bouton.dataset.sens)));
@@ -54,7 +57,7 @@ function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
   const niveau = Number(elements.niveau.value);
   const niveauIA = Number(elements.niveauIA.value);
-  const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || tempsParNiveau[niveau]));
+  const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || 14));
   const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
   elements.nomJoueur.value = nomHumain;
   const nomsDisponibles = [...nomsIA, ...nomsDeScene].filter((nom, index, liste) =>
@@ -92,6 +95,18 @@ function demarrerPartie() {
 
 function nomDeSceneAleatoire() {
   return nomsDeScene[Math.floor(Math.random() * nomsDeScene.length)];
+}
+
+function ouvrirDifficulte() {
+  choisirNiveau(Number(elements.niveau.value));
+  elements.difficulte.showModal();
+}
+
+function choisirNiveau(niveau) {
+  elements.niveau.value = niveau;
+  const choix = elements.difficulte.querySelector(`[data-niveau="${niveau}"]`);
+  elements.difficulte.querySelectorAll('[data-niveau]').forEach((bouton) => bouton.classList.toggle('actif', bouton === choix));
+  elements.ouvrirDifficulte.innerHTML = choix.innerHTML;
 }
 
 function nouvelleManche() {
@@ -239,11 +254,11 @@ function attendre(duree) {
 }
 
 function estPoseInterdite(joueur, carte) {
-  if (etat.niveau >= 3 && joueur.derniere && joueur.derniere.valeur === carte.valeur && joueur.derniere.whootchi === carte.whootchi) {
+  if (etat.niveau >= 2 && joueur.derniere && joueur.derniere.valeur === carte.valeur && joueur.derniere.whootchi === carte.whootchi) {
     return true;
   }
 
-  if (etat.niveau >= 4) {
+  if (etat.niveau >= 3) {
     const identiques = etat.joueurs.filter(({ derniere }) => derniere && derniere.valeur === carte.valeur && derniere.whootchi === carte.whootchi).length;
     if (identiques >= 2) return true;
   }
@@ -255,7 +270,7 @@ function commencerTour() {
   if (!etat?.enCours) return;
 
   const joueur = etat.joueurs[etat.actif];
-  etat.temps = etat.niveau === 6 ? Math.max(1, etat.dureeChrono - etat.manche + 1) : etat.dureeChrono;
+  etat.temps = etat.dureeChrono;
   elements.message.textContent = 'Qui doit jouer maintenant ?';
   afficher();
 
@@ -276,7 +291,7 @@ function commencerTour() {
 
 function relancerChrono() {
   if (!etat?.enCours) return;
-  etat.temps = etat.niveau === 6 ? Math.max(1, etat.dureeChrono - etat.manche + 1) : etat.dureeChrono;
+  etat.temps = etat.dureeChrono;
   afficherChrono();
   elements.chronoBloc.classList.remove('relance');
   void elements.chronoBloc.offsetWidth;
@@ -314,7 +329,7 @@ function sanctionner(joueur, raison) {
   arreterTemps();
   etat.enCours = false;
   joueur.erreurConsecutive += 1;
-  const penalite = etat.niveau >= 4 ? Math.min(3, joueur.erreurConsecutive) : 1;
+  const penalite = 1;
   joueur.notes += penalite;
   etat.actif = etat.joueurs.indexOf(joueur);
   afficher();
@@ -460,6 +475,7 @@ function quitterPartie() {
   arreterTemps();
   if (elements.dialogue.open) elements.dialogue.close();
   if (elements.choixSens.open) elements.choixSens.close();
+  if (elements.difficulte.open) elements.difficulte.close();
   etat = null;
   elements.partie.classList.remove('actif');
   elements.accueil.classList.add('actif');
