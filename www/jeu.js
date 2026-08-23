@@ -267,7 +267,8 @@ function afficherTable() {
   etat.joueurs.forEach((joueur, index) => {
     const angle = Math.PI / 2 + (index / nombre) * Math.PI * 2;
     const carte = document.createElement('article');
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${etat.premierTour && index === etat.actif ? ' premier' : ''}`;
+    const coteDroit = Math.cos(angle) > .45;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${etat.premierTour && index === etat.actif ? ' premier' : ''}${coteDroit ? ' cote-droit' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${etat.premierTour && index === etat.actif ? '<b class="badge-premier">COMMENCE</b>' : ''}<div class="pile-cartes"></div>`;
