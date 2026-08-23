@@ -2,7 +2,7 @@ create table public.salles (
   code text primary key check (char_length(code) = 6),
   hote uuid not null references auth.users(id) on delete cascade,
   statut text not null default 'attente',
-  niveau smallint not null default 1 check (niveau between 0 and 4),
+  regles jsonb not null default '["whootchi"]'::jsonb,
   chrono smallint not null default 14 check (chrono between 1 and 60),
   animation text not null default 'normale' check (animation in ('normale', 'rapide', 'aucune')),
   creee_le timestamptz not null default now()
@@ -43,13 +43,13 @@ end $$;
 create or replace function public.creer_salle(nom_joueur text, reglages jsonb) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare nouveau_code text := code_salle_aleatoire();
-declare v_niveau smallint := least(4, greatest(0, coalesce((reglages->>'niveau')::smallint, 1)));
+declare v_regles jsonb := coalesce(reglages->'regles', '["whootchi"]'::jsonb);
 declare v_chrono smallint := least(60, greatest(1, coalesce((reglages->>'chrono')::smallint, 14)));
 declare v_animation text := case when reglages->>'animation' in ('normale', 'rapide', 'aucune') then reglages->>'animation' else 'normale' end;
 begin
-  insert into salles(code, hote, niveau, chrono, animation) values (nouveau_code, auth.uid(), v_niveau, v_chrono, v_animation);
+  insert into salles(code, hote, regles, chrono, animation) values (nouveau_code, auth.uid(), v_regles, v_chrono, v_animation);
   insert into joueurs_salle(code_salle, utilisateur, nom, avatar, ordre) values (nouveau_code, auth.uid(), left(nom_joueur, 18), '🎤', 0);
-  return jsonb_build_object('code', nouveau_code, 'hote', true, 'niveau', v_niveau, 'chrono', v_chrono, 'animation', v_animation,
+  return jsonb_build_object('code', nouveau_code, 'hote', true, 'regles', v_regles, 'chrono', v_chrono, 'animation', v_animation,
     'joueurs', jsonb_build_array(jsonb_build_object('nom', left(nom_joueur, 18), 'avatar', '🎤')));
 end $$;
 
@@ -64,7 +64,7 @@ begin
   if nombre >= 7 then raise exception 'Cette partie est complète.'; end if;
   insert into joueurs_salle(code_salle, utilisateur, nom, avatar, ordre)
   values (v_code, auth.uid(), left(nom_joueur, 18), (array['🎤','🎸','🥁','🎷','🎹','🎺','🪕'])[nombre + 1], nombre);
-  select jsonb_build_object('code', s.code, 'hote', s.hote = auth.uid(), 'niveau', s.niveau, 'chrono', s.chrono, 'animation', s.animation,
+  select jsonb_build_object('code', s.code, 'hote', s.hote = auth.uid(), 'regles', s.regles, 'chrono', s.chrono, 'animation', s.animation,
     'joueurs', (select jsonb_agg(jsonb_build_object('nom', j.nom, 'avatar', j.avatar) order by j.ordre) from joueurs_salle j where j.code_salle = s.code))
   into resultat from salles s where s.code = v_code;
   return resultat;
@@ -74,7 +74,7 @@ create or replace function public.regler_salle(p_code_salle text, reglages jsonb
 language plpgsql security definer set search_path = public as $$
 begin
   update salles set
-    niveau = least(4, greatest(0, coalesce((reglages->>'niveau')::smallint, niveau))),
+    regles = coalesce(reglages->'regles', regles),
     chrono = least(60, greatest(1, coalesce((reglages->>'chrono')::smallint, chrono))),
     animation = case when reglages->>'animation' in ('normale', 'rapide', 'aucune') then reglages->>'animation' else animation end
   where code = upper(p_code_salle) and hote = auth.uid() and statut = 'attente';
