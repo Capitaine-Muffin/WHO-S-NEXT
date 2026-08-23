@@ -240,6 +240,8 @@ select {
   box-shadow: 0 4px 0 #b74d0b;
 }
 
+.pose-carte.erreur-pose strong { background: #df1738; box-shadow: 0 4px 0 #8d0d24; animation: secousse .18s 2; }
+
 .pose-carte .carte-animee {
   width: 156px;
   min-height: 216px;
@@ -302,6 +304,7 @@ dialog .primaire { width: 100%; }
 @keyframes pulse { to { transform: scale(1.06); } }
 @keyframes tic { to { transform: rotate(6deg); } }
 @keyframes relance { 50% { transform: translate(-50%, -50%) scale(1.1); } }
+@keyframes secousse { 25% { transform: translateX(-5px) rotate(-2deg); } 75% { transform: translateX(5px) rotate(2deg); } }
 
 @media (min-width: 700px) {
   #partie { padding-inline: 2rem; }
