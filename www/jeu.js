@@ -262,7 +262,23 @@ function estPoseInterdite(joueur, carte) {
     const identiques = etat.joueurs.filter(({ derniere }) => derniere && derniere.valeur === carte.valeur && derniere.whootchi === carte.whootchi).length;
     if (identiques >= 2) return true;
   }
+
+  if (etat.niveau >= 4 && visePointFaible(joueur, carte)) return true;
   return false;
+}
+
+function visePointFaible(joueur, carte) {
+  const maximum = Math.max(...etat.joueurs.map(({ notes }) => notes));
+  const pointsFaibles = etat.joueurs.filter(({ notes }) => notes === maximum);
+  if (pointsFaibles.length !== 1) return false;
+
+  const minimum = Math.min(...etat.joueurs.map(({ notes }) => notes));
+  if (joueur.notes !== minimum) return false;
+
+  const indexJoueur = etat.joueurs.indexOf(joueur);
+  const sensApresCarte = carte.whootchi ? -etat.sens : etat.sens;
+  const indexCible = (indexJoueur + carte.valeur * sensApresCarte + etat.joueurs.length * 10) % etat.joueurs.length;
+  return etat.joueurs[indexCible] === pointsFaibles[0];
 }
 
 function commencerTour() {
