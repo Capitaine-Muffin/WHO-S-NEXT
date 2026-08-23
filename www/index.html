@@ -45,6 +45,22 @@
         </label>
 
         <label class="champ">
+          <span>Niveau des adversaires</span>
+          <select id="niveau-ia">
+            <option value="1">Niveau 1 · 55 % de réussite</option>
+            <option value="2">Niveau 2 · 60 % de réussite</option>
+            <option value="3">Niveau 3 · 65 % de réussite</option>
+            <option value="4">Niveau 4 · 70 % de réussite</option>
+            <option value="5" selected>Niveau 5 · 75 % de réussite</option>
+            <option value="6">Niveau 6 · 80 % de réussite</option>
+            <option value="7">Niveau 7 · 85 % de réussite</option>
+            <option value="8">Niveau 8 · 90 % de réussite</option>
+            <option value="9">Niveau 9 · 95 % de réussite</option>
+            <option value="10">Niveau 10 · aucune erreur</option>
+          </select>
+        </label>
+
+        <label class="champ">
           <span>Durée de la pendule</span>
           <div class="reglage-chrono">
             <input id="duree-chrono" type="number" min="1" max="60" value="14" inputmode="numeric" />
@@ -106,7 +122,7 @@
         </div>
       </dialog>
     </main>
-    <script type="module" src="jeu.js?v=13"></script>
+    <script type="module" src="jeu.js?v=14"></script>
   </body>
 </html>
 
