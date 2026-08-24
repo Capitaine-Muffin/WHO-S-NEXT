@@ -921,7 +921,7 @@ function afficherTable(historiquesSimules = null) {
     if (!historiquesSimules && !etat.tutoriel && etat.premierTour && !etat.choixSens && etat.sens) {
       const direction = document.createElement('i');
       direction.className = `direction-joueur ${etat.sens > 0 ? 'horaire' : 'antihoraire'}`;
-      direction.textContent = etat.sens > 0 ? '→' : '←';
+      direction.textContent = etat.sens > 0 ? '←' : '→';
       direction.setAttribute('aria-label', etat.sens > 0 ? 'Sens horaire' : 'Sens antihoraire');
       carte.append(direction);
     }
@@ -952,12 +952,15 @@ function afficherParcoursTutoriel({ depart, valeur, sens }) {
     const repere = document.createElement('b');
     repere.className = 'compte-tutoriel';
     repere.textContent = `${sensEffectif > 0 ? '→' : '←'} ${pas}`;
+    repere.style.setProperty('--delai-compte', `${.25 + (pas - 1) * .7}s`);
     joueur.append(repere);
   }
 }
 
 function afficherMain() {
   elements.main.replaceChildren();
+  const carteAttendue = etat.tutoriel?.etape === 3 ? parcoursTutoriels[etat.tutoriel.type].attendu : null;
+  elements.main.classList.toggle('aide-active', Boolean(carteAttendue));
   const nombreCartes = etat.joueurs[0].main.length;
   elements.main.style.gridTemplateColumns = `repeat(${nombreCartes >= 5 ? 3 : nombreCartes}, 66px)`;
   elements.flip.hidden = !aRegle('whootchi');
@@ -966,6 +969,7 @@ function afficherMain() {
   etat.joueurs[0].main.forEach((carte, index) => {
     const bouton = document.createElement('button');
     bouton.className = 'carte';
+    if (carteAttendue && carte.valeur === carteAttendue.valeur && etat.faceMainWhootchi === carteAttendue.whootchi) bouton.classList.add('carte-a-jouer');
     bouton.disabled = !etat.enCours || etat.choixSens || etat.joueurs[0].elimine;
     appliquerFaceCarte(bouton, carte.valeur, etat.faceMainWhootchi);
     bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, etat.faceMainWhootchi)}</span>`;
