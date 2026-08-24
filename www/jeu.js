@@ -4,10 +4,10 @@ const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
 const profils = {
-  debutant: { regles: [], ia: 3, chrono: 8, animation: 'normale' },
-  intermediaire: { regles: ['whootchi'], ia: 5, chrono: 5, animation: 'normale' },
+  debutant: { regles: [], ia: 4, chrono: 8, animation: 'normale' },
+  intermediaire: { regles: ['whootchi'], ia: 6, chrono: 5, animation: 'normale' },
   expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 3, animation: 'rapide' },
-  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 10, chrono: 2, animation: 'rapide' },
+  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 9, chrono: 2, animation: 'rapide' },
 };
 const elements = {
   accueil: document.querySelector('#accueil'),
