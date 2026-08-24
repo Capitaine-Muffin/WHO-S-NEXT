@@ -278,7 +278,7 @@ select {
 .sens-tutoriel.antihoraire span::after { border-left-color: #df1738; }
 .sens-tutoriel.antihoraire strong { background: #df1738; }
 .fleche-j1-tutoriel { position: absolute; z-index: 10; left: 50%; bottom: -30px; display: grid; place-items: center; width: 48px; height: 27px; border: 3px solid white; border-radius: 999px; background: #df1738; color: white; font-size: 1.45rem; font-style: normal; font-weight: 950; line-height: 1; box-shadow: 0 3px 0 #8d0d24; transform: translateX(-50%); animation: glissement-fleche 1.15s ease-in-out infinite alternate; }
-.direction-joueur { position: absolute; z-index: 10; left: 50%; top: -23px; display: grid; place-items: center; width: 31px; height: 31px; border: 3px solid white; border-radius: 50%; background: #167aa9; color: white; font-size: 1.35rem; font-style: normal; font-weight: 950; line-height: 1; box-shadow: 0 3px 0 #0b5c82; transform: translateX(-50%); animation: apparition-repere .3s ease both; }
+.direction-joueur { position: absolute; z-index: 10; left: 50%; top: -23px; display: grid; place-items: center; width: 42px; height: 28px; border: 3px solid white; border-radius: 999px; background: #167aa9; color: white; font-size: 1.35rem; font-style: normal; font-weight: 950; line-height: 1; box-shadow: 0 3px 0 #0b5c82; transform: translateX(-50%); animation: apparition-repere .3s ease both; }
 .direction-joueur.antihoraire { background: #df1738; box-shadow: 0 3px 0 #8d0d24; }
 .badge-premier { position: absolute; left: 50%; top: -14px; padding: .25rem .42rem; border-radius: 999px; background: var(--rose); color: white; font-size: .52rem; letter-spacing: .06em; transform: translateX(-50%) rotate(-3deg); }
 .pile-cartes { position: absolute; z-index: 1; left: 50%; top: 29px; width: 66px; height: 82px; pointer-events: none; transform: translate(calc(-50% + var(--pile-x)), calc(-50% + var(--pile-y))); }
@@ -310,6 +310,8 @@ select {
 }
 
 .pose-carte.erreur-pose strong { background: #df1738; box-shadow: 0 4px 0 #8d0d24; animation: secousse .18s 2; }
+.pose-carte.rapport-pose strong { background: var(--bleu-fonce); box-shadow: 0 4px 0 #0b5c82; }
+.pose-carte.rapport-pose.erreur-pose strong { background: #df1738; box-shadow: 0 4px 0 #8d0d24; }
 
 .pose-carte .carte-animee {
   width: 156px;
@@ -328,11 +330,11 @@ select {
   font-weight: 900;
   text-align: center;
 }
-.guide-tutoriel { position: relative; z-index: 12; margin: -1rem auto 0; width: min(94%, 480px); padding: .8rem; border: 3px solid var(--rose); border-radius: 18px; background: #fffdf2f7; text-align: center; box-shadow: 0 7px 0 #b74d0b55, 0 12px 24px #28212733; }
-.guide-tutoriel .surtitre { color: var(--rose); }
-.guide-tutoriel > strong { display: block; margin-top: .2rem; font-size: 1.1rem; }
-.guide-tutoriel > p:not(.surtitre) { margin: .35rem 0 .6rem; color: var(--muet); font-size: .8rem; line-height: 1.35; }
-.guide-tutoriel .primaire { min-height: 42px; margin: 0; padding: .5rem 1rem; border-radius: 12px; box-shadow: 0 4px 0 #b74d0b; }
+.guide-tutoriel { position: relative; z-index: 12; margin: -1rem auto 0; width: min(96%, 520px); min-height: 190px; padding: 1rem; border: 4px solid var(--rose); border-radius: 20px; background: #fffdf2fa; text-align: center; box-shadow: 0 7px 0 #b74d0b55, 0 12px 24px #28212733; }
+.guide-tutoriel .surtitre { color: var(--rose); font-size: .82rem; letter-spacing: .08em; }
+.guide-tutoriel > strong { display: block; margin-top: .3rem; font-size: 1.5rem; line-height: 1.12; }
+.guide-tutoriel > p:not(.surtitre) { margin: .65rem 0 .85rem; color: #40383e; font-size: 1.08rem; font-weight: 750; line-height: 1.42; }
+.guide-tutoriel .primaire { min-height: 52px; margin: 0; padding: .7rem 1.2rem; border-radius: 14px; font-size: 1rem; box-shadow: 0 4px 0 #b74d0b; }
 .liste-tutoriels { display: grid; gap: .55rem; margin: .8rem 0; }
 .liste-tutoriels button { width: 100%; min-height: 58px; padding: .65rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--texte); text-align: left; }
 .liste-tutoriels button strong, .liste-tutoriels button small { display: block; }
