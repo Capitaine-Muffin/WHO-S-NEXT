@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=19" />
+    <link rel="stylesheet" href="style.css?v=20" />
   </head>
   <body>
     <main id="jeu">
@@ -149,6 +149,7 @@
           <div class="tuile-regle"><button class="aide-regle" type="button" data-info="repetition">?</button><button type="button" data-regle="repetition"><strong>Gare au rappel</strong><small>RÉPÉTITION</small></button><p class="bulle-info" data-bulle="repetition" hidden>Un joueur ne peut pas rejouer exactement la même carte. Whoot et Whootchi sont différents.</p></div>
           <div class="tuile-regle"><button class="aide-regle" type="button" data-info="trio">?</button><button type="button" data-regle="trio"><strong>Jamais trois sans faute</strong><small>TRIO INTERDIT</small></button><p class="bulle-info" data-bulle="trio" hidden>Une troisième carte identique ne peut pas être présente devant les joueurs.</p></div>
           <div class="tuile-regle"><button class="aide-regle" type="button" data-info="point-faible">?</button><button type="button" data-regle="point-faible"><strong>Protège le point faible</strong><small>MAILLON FAIBLE</small></button><p class="bulle-info" data-bulle="point-faible" hidden>Les joueurs les moins pénalisés ne peuvent pas viser l’unique joueur qui a le plus de fausses notes.</p></div>
+          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="mort-subite">?</button><button type="button" data-regle="mort-subite"><strong>Dernier rappel</strong><small>MORT SUBITE</small></button><p class="bulle-info" data-bulle="mort-subite" hidden>À 7 fausses notes, le musicien est éliminé. La partie continue jusqu’à ce qu’il n’en reste plus que deux.</p></div>
         </div>
         <div class="champ chrono-difficulte choix-centre">
           <span>Niveau des adversaires <button class="aide-inline" type="button" data-info="ia">?</button></span>
@@ -184,11 +185,12 @@
           <section><strong>5 · Gare au rappel</strong><p>Un joueur ne peut pas rejouer exactement sa carte précédente. Whoot et Whootchi sont deux faces différentes.</p></section>
           <section><strong>6 · Jamais trois sans faute</strong><p>Il ne peut jamais y avoir une troisième carte identique devant les musiciens.</p></section>
           <section><strong>7 · Protège le point faible</strong><p>Un joueur ayant le moins de fausses notes ne peut pas viser l’unique joueur qui en possède le plus.</p></section>
+          <section><strong>8 · Mort subite</strong><p>À 7 fausses notes, un musicien est éliminé. Les survivants continuent jusqu’aux deux derniers ; celui qui possède le moins de fausses notes gagne.</p></section>
         </div>
         <button id="fermer-tutoriel" class="primaire" type="button">J’ai compris !</button>
       </dialog>
     </main>
-    <script type="module" src="jeu.js?v=27"></script>
+    <script type="module" src="jeu.js?v=28"></script>
   </body>
 </html>
 
