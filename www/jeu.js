@@ -194,13 +194,17 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (auteur !== etat.actif) {
     arreterTemps();
     etat.animation = true;
-    await animerCarteErreur(joueur, carte);
+    await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
     etat.animation = false;
     sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
     return;
   }
 
   if (estPoseInterdite(joueur, carte)) {
+    arreterTemps();
+    etat.animation = true;
+    await animerCarteErreur(joueur, carte, `${joueur.nom} joue une carte interdite !`);
+    etat.animation = false;
     sanctionner(joueur, 'Cette carte ne pouvait pas être jouée.');
     return;
   }
@@ -223,12 +227,12 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   commencerTour();
 }
 
-async function animerCarteErreur(joueur, carte) {
+async function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une fausse note !`) {
   if (etat.vitesseAnimation === 'aucune') return;
   const rapide = etat.vitesseAnimation === 'rapide';
   const animation = document.createElement('div');
   animation.className = 'pose-carte erreur-pose';
-  animation.innerHTML = `<strong>${joueur.nom} joue trop tôt !</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
+  animation.innerHTML = `<strong>${texte}</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
   appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
   document.body.append(animation);
   await attendre(rapide ? 450 : 1200);
@@ -335,7 +339,7 @@ function relancerChrono() {
   elements.chronoBloc.classList.add('relance');
 }
 
-function jouerIA(joueur) {
+async function jouerIA(joueur) {
   if (!etat?.enCours || etat.joueurs[etat.actif] !== joueur) return;
 
   const faces = aRegle('whootchi') ? [false, true] : [false];
@@ -344,6 +348,12 @@ function jouerIA(joueur) {
   ).filter(({ carte }) => !estPoseInterdite(joueur, carte));
 
   if (Math.random() < probabiliteErreur()) {
+    const carteErreur = joueur.main[Math.floor(Math.random() * joueur.main.length)];
+    const carteAnimee = { ...carteErreur, whootchi: aRegle('whootchi') && Math.random() < .5 };
+    arreterTemps();
+    etat.animation = true;
+    await animerCarteErreur(joueur, carteAnimee, `${joueur.nom} se trompe !`);
+    etat.animation = false;
     sanctionner(joueur, `${joueur.nom} s'est emmêlé dans le rythme.`);
     return;
   }
@@ -390,7 +400,7 @@ function ouvrirDialogue(surtitre, titre, texte) {
   elements.finTitre.textContent = titre;
   elements.finTexte.textContent = texte;
   elements.continuer.textContent = etat.joueurs.some((j) => j.notes >= 7) ? 'Retour au menu' : 'Manche suivante';
-  elements.dialogue.showModal();
+  elements.dialogue.show();
 }
 
 function afficher() {
