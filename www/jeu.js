@@ -575,6 +575,7 @@ function estPoseInterdite(joueur, carte) {
 
 function visePointFaible(joueur, carte) {
   const actifs = joueursActifs();
+  if (actifs.length <= 2) return false;
   const maximum = Math.max(...actifs.map(({ notes }) => notes));
   const pointsFaibles = actifs.filter(({ notes }) => notes === maximum);
   if (pointsFaibles.length !== 1) return false;
