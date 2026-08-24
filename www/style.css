@@ -314,6 +314,18 @@ select {
   font-weight: 900;
   text-align: center;
 }
+.guide-tutoriel { position: relative; z-index: 12; margin: -1rem auto 0; width: min(94%, 480px); padding: .8rem; border: 3px solid var(--rose); border-radius: 18px; background: #fffdf2f7; text-align: center; box-shadow: 0 7px 0 #b74d0b55, 0 12px 24px #28212733; }
+.guide-tutoriel .surtitre { color: var(--rose); }
+.guide-tutoriel > strong { display: block; margin-top: .2rem; font-size: 1.1rem; }
+.guide-tutoriel > p:not(.surtitre) { margin: .35rem 0 .6rem; color: var(--muet); font-size: .8rem; line-height: 1.35; }
+.guide-tutoriel .primaire { min-height: 42px; margin: 0; padding: .5rem 1rem; border-radius: 12px; box-shadow: 0 4px 0 #b74d0b; }
+.liste-tutoriels { display: grid; gap: .55rem; margin: .8rem 0; }
+.liste-tutoriels button { width: 100%; min-height: 58px; padding: .65rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--texte); text-align: left; }
+.liste-tutoriels button strong, .liste-tutoriels button small { display: block; }
+.liste-tutoriels button small { margin-top: .2rem; color: var(--muet); }
+.liste-tutoriels .primaire { border: 0; background: var(--rose); color: white; text-align: center; }
+.liste-tutoriels .primaire small { color: white; }
+#menu-tutoriels { max-height: 90dvh; overflow-y: auto; }
 
 .zone-joueur { position: relative; z-index: 3; display: grid; gap: .55rem; margin-top: -1.3rem; padding: .9rem .8rem .35rem; border: 3px solid var(--bleu); border-bottom: 0; border-radius: 22px 22px 0 0; background: linear-gradient(180deg, #fffffffa, #e8f7fb); box-shadow: 0 -12px 30px #167aa933; }
 .infos-joueur { display: flex; justify-content: space-between; color: var(--muet); font-size: .78rem; font-weight: 800; }
