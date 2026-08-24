@@ -1,6 +1,5 @@
-import { initialiserMultijoueur } from './multijoueur.js?v=2';
+import { initialiserMultijoueur } from './multijoueur.js?v=3';
 
-const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
 const profils = {
@@ -10,12 +9,12 @@ const profils = {
   impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 9, chrono: 2, animation: 'rapide' },
 };
 const parcoursTutoriels = {
-  base: { regles: [], intro: 'Voici la table : toi en bas, les autres musiciens autour et la pendule au centre.', notion: 'La valeur d’une carte indique combien de musiciens avancer dans le sens du jeu.', demo: { valeur: 2, whootchi: false }, resultat: 'Double Whoot avance de deux musiciens : c’est donc à Jazz de jouer.', attendu: { valeur: 1, whootchi: false }, essai: 'Touche la carte Whoot avant la fin du chrono.' },
-  whootchi: { regles: ['whootchi'], intro: 'Whootchi permet de renverser le concert avec l’autre face des cartes.', notion: 'Le bouton Flip retourne toute ta main. Une carte Whootchi inverse immédiatement le sens du jeu.', demo: { valeur: 1, whootchi: true }, resultat: 'Mélodie joue Whootchi : le sens vient de s’inverser.', attendu: { valeur: 1, whootchi: true }, essai: 'Touche Flip, puis joue la carte Whootchi.' },
-  repetition: { regles: ['repetition'], intro: 'Chaque musicien doit varier ce qu’il joue.', notion: 'Rejouer exactement sa propre carte précédente provoque une fausse note.', demo: { valeur: 1, whootchi: false }, resultat: 'Mélodie vient de jouer Whoot. À son prochain tour, elle devra choisir autre chose.', attendu: { valeur: 2, whootchi: false }, essai: 'Tu avais joué Whoot : joue maintenant Double Whoot.' },
+  base: { regles: [], intro: 'Voici la table : J1 en bas, les autres joueurs autour et la pendule au centre.', notion: 'La valeur d’une carte indique combien de joueurs avancer dans le sens du jeu.', demo: { valeur: 2, whootchi: false }, resultat: 'Double Whoot avance de deux joueurs : c’est donc à J4 de jouer.', attendu: { valeur: 1, whootchi: false }, essai: 'Touche la carte Whoot avant la fin du chrono.' },
+  whootchi: { regles: ['whootchi'], intro: 'Whootchi permet de renverser le concert avec l’autre face des cartes.', notion: 'Le bouton Flip retourne toute ta main. Une carte Whootchi inverse immédiatement le sens du jeu.', demo: { valeur: 1, whootchi: true }, resultat: 'J2 joue Whootchi : le sens vient de s’inverser.', attendu: { valeur: 1, whootchi: true }, essai: 'Touche Flip, puis joue la carte Whootchi.' },
+  repetition: { regles: ['repetition'], intro: 'Chaque musicien doit varier ce qu’il joue.', notion: 'Rejouer exactement sa propre carte précédente provoque une fausse note.', demo: { valeur: 1, whootchi: false }, resultat: 'J2 vient de jouer Whoot. À son prochain tour, il devra choisir autre chose.', attendu: { valeur: 2, whootchi: false }, essai: 'Tu avais joué Whoot : joue maintenant Double Whoot.' },
   trio: { regles: ['trio'], intro: 'Pour garder le concert varié, surveille aussi les cartes des autres.', notion: 'Deux cartes identiques peuvent être visibles, mais poser la troisième est interdit.', demo: { valeur: 1, whootchi: false }, resultat: 'Deux cartes Whoot sont maintenant visibles sur la table : une troisième serait une faute.', attendu: { valeur: 2, whootchi: false }, essai: 'Évite la troisième Whoot et joue Double Whoot.' },
-  'point-faible': { regles: ['point-faible'], intro: 'Les musiciens en tête doivent protéger celui qui accumule les fausses notes.', notion: 'Si un seul joueur possède le maximum de fausses notes, les joueurs au minimum ne peuvent pas le viser.', demo: { valeur: 1, whootchi: false }, resultat: 'Mélodie est le point faible : il faut choisir une carte qui ne tombe pas sur elle.', attendu: { valeur: 2, whootchi: false }, essai: 'Joue Double Whoot pour passer au-delà de Mélodie.' },
-  'mort-subite': { regles: ['mort-subite'], intro: 'En Mort subite, atteindre 7 fausses notes élimine le musicien.', notion: 'Les éliminés restent visibles mais les cartes sautent leur place. La finale commence à deux survivants.', demo: { valeur: 1, whootchi: false }, resultat: 'Jazz vient d’atteindre 7 fausses notes : il est grisé et quitte le concert.', attendu: { valeur: 1, whootchi: false }, essai: 'Continue le concert en jouant Whoot.' },
+  'point-faible': { regles: ['point-faible'], intro: 'Les musiciens en tête doivent protéger celui qui accumule les fausses notes.', notion: 'Si un seul joueur possède le maximum de fausses notes, les joueurs au minimum ne peuvent pas le viser.', demo: { valeur: 1, whootchi: false }, resultat: 'J2 est le point faible : il faut choisir une carte qui ne tombe pas sur lui.', attendu: { valeur: 2, whootchi: false }, essai: 'Joue Double Whoot pour passer au-delà de J2.' },
+  'mort-subite': { regles: ['mort-subite'], intro: 'En Mort subite, atteindre 7 fausses notes élimine le musicien.', notion: 'Les éliminés restent visibles mais les cartes sautent leur place. La finale commence à deux survivants.', demo: { valeur: 1, whootchi: false }, resultat: 'J4 vient d’atteindre 7 fausses notes : il est grisé et quitte le concert.', attendu: { valeur: 1, whootchi: false }, essai: 'Continue le concert en jouant Whoot.' },
 };
 const elements = {
   accueil: document.querySelector('#accueil'),
@@ -52,7 +51,6 @@ const elements = {
   etapeRapport: document.querySelector('#etape-rapport'),
   rapportPrecedent: document.querySelector('#rapport-precedent'),
   rapportSuivant: document.querySelector('#rapport-suivant'),
-  listeRapportDialogue: document.querySelector('#liste-rapport-dialogue'),
   guide: document.querySelector('#guide-tutoriel'),
   titreGuide: document.querySelector('#titre-guide'),
   texteGuide: document.querySelector('#texte-guide'),
@@ -63,6 +61,7 @@ let etat = null;
 let minuterie = null;
 let actionIA = null;
 let indexRapport = 0;
+let rapportDepuisDialogue = false;
 
 elements.jouer.addEventListener('click', demarrerPartie);
 elements.quitter.addEventListener('click', quitterPartie);
@@ -78,6 +77,11 @@ document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.addEventLi
 document.querySelectorAll('[data-info]').forEach((bouton) => bouton.addEventListener('click', (event) => afficherAide(event, bouton.dataset.info)));
 document.querySelector('#ouvrir-rapport').addEventListener('click', () => basculerRapport(true));
 document.querySelector('#fermer-rapport').addEventListener('click', () => basculerRapport(false));
+document.querySelector('#ouvrir-rapport-dialogue').addEventListener('click', () => {
+  rapportDepuisDialogue = true;
+  elements.dialogue.close();
+  basculerRapport(true);
+});
 elements.rapportPrecedent.addEventListener('click', () => deplacerRapport(-1));
 elements.rapportSuivant.addEventListener('click', () => deplacerRapport(1));
 document.querySelector('#retour-en-ligne').addEventListener('click', changerPortraitMenu);
@@ -112,11 +116,9 @@ function demarrerPartie() {
   const dureeChrono = Math.max(1, Math.min(8, Number(elements.dureeChrono.value) || 8));
   const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
   elements.nomJoueur.value = nomHumain;
-  const nomsDisponibles = [...nomsIA, ...nomsDeScene].filter((nom, index, liste) =>
-    nom.toLocaleLowerCase('fr') !== nomHumain.toLocaleLowerCase('fr') && liste.indexOf(nom) === index
-  );
   const joueurs = Array.from({ length: nombre }, (_, index) => ({
-    nom: index === 0 ? nomHumain : nomsDisponibles[index - 1],
+    nom: `J${index + 1}`,
+    nomDeScene: index === 0 ? nomHumain : null,
     humain: index === 0,
     avatar: avatars[index],
     notes: 0,
@@ -199,9 +201,10 @@ function changerPortraitMenu() {
 function demarrerTutoriel(type = 'base') {
   const parcours = parcoursTutoriels[type] ?? parcoursTutoriels.base;
   const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
-  const noms = [nomHumain, 'Mélodie', 'Tempo', 'Jazz'];
+  const noms = ['J1', 'J2', 'J3', 'J4'];
   const joueurs = noms.map((nom, index) => ({
     nom,
+    nomDeScene: index === 0 ? nomHumain : null,
     humain: index === 0,
     avatar: avatars[index],
     notes: 0,
@@ -262,10 +265,12 @@ async function avancerTutoriel() {
     const joueur = etat.joueurs[1];
     const parcours = parcoursTutoriels[tutoriel.type];
     const carte = { ...parcours.demo };
+    const sensMontre = carte.whootchi ? -etat.sens : etat.sens;
+    tutoriel.parcours = { depart: 1, valeur: carte.valeur, sens: sensMontre };
     joueur.derniere = { ...carte };
     joueur.historique.push({ ...carte });
     ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
-    elements.titreGuide.textContent = 'Regarde Mélodie';
+    elements.titreGuide.textContent = 'Regarde J2';
     elements.texteGuide.textContent = `${joueur.nom} joue ${nomCarte(carte.valeur, carte.whootchi)}…`;
     elements.suiteGuide.hidden = true;
     afficher();
@@ -319,6 +324,8 @@ function jouerCarteTutoriel(indexCarte, retourner = false) {
   arreterTemps();
   const joueur = etat.joueurs[0];
   const carte = { valeur, whootchi };
+  const sensMontre = carte.whootchi ? -etat.sens : etat.sens;
+  etat.tutoriel.parcours = { depart: 0, valeur: carte.valeur, sens: sensMontre };
   joueur.derniere = { ...carte };
   joueur.historique.push({ ...carte });
   ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
@@ -510,6 +517,7 @@ async function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une 
 async function animerCarteJouee(indexJoueur, joueur, carte) {
   if (etat.vitesseAnimation === 'aucune') return;
   const rapide = etat.vitesseAnimation === 'rapide';
+  const animationTutoriel = Boolean(etat.tutoriel);
   const animation = document.createElement('div');
   animation.className = 'pose-carte';
   animation.innerHTML = `<strong>${joueur.nom} joue</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
@@ -521,7 +529,7 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   const cadre = cible?.getBoundingClientRect();
   cible?.classList.add('cible-animation');
 
-  await attendre(rapide ? 350 : 1000);
+  await attendre(animationTutoriel ? 1450 : (rapide ? 350 : 1000));
 
   if (cadre) {
     const etiquette = animation.querySelector('strong');
@@ -533,7 +541,7 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
     await animation.animate([
       { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
       { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: `translate(-50%, -50%) scale(.3333) rotate(${angleFinal}deg)`, opacity: 1 },
-    ], { duration: rapide ? 240 : 620, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
+    ], { duration: animationTutoriel ? 900 : (rapide ? 240 : 620), easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
   }
 
   animation.remove();
@@ -727,11 +735,14 @@ function basculerRapport(ouvert) {
     afficherRapport();
   } else {
     afficherTable();
+    if (rapportDepuisDialogue) {
+      rapportDepuisDialogue = false;
+      elements.dialogue.show();
+    }
   }
 }
 
 function afficherRapport() {
-  construireRapport(elements.listeRapportDialogue);
   if (!elements.rapport.hidden) afficherEtapeRapport();
 }
 
@@ -858,6 +869,25 @@ function afficherTable(historiquesSimules = null) {
     });
     elements.table.append(carte);
   });
+  if (!historiquesSimules && etat.tutoriel?.parcours) afficherParcoursTutoriel(etat.tutoriel.parcours);
+}
+
+function afficherParcoursTutoriel({ depart, valeur, sens }) {
+  const sensEffectif = sens || 1;
+  const flecheSens = document.createElement('div');
+  flecheSens.className = `sens-tutoriel ${sensEffectif > 0 ? 'horaire' : 'antihoraire'}`;
+  flecheSens.innerHTML = `<span>${sensEffectif > 0 ? '↻' : '↺'}</span><strong>SENS DU JEU</strong>`;
+  elements.table.append(flecheSens);
+
+  for (let pas = 1; pas <= valeur; pas += 1) {
+    const cible = avancerActif(depart, pas * sensEffectif);
+    const joueur = elements.table.querySelector(`[data-joueur-index="${cible}"]`);
+    if (!joueur) continue;
+    const repere = document.createElement('b');
+    repere.className = 'compte-tutoriel';
+    repere.textContent = `${sensEffectif > 0 ? '→' : '←'} ${pas}`;
+    joueur.append(repere);
+  }
 }
 
 function afficherMain() {
