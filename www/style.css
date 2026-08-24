@@ -331,9 +331,14 @@ select {
 .infos-joueur { display: flex; justify-content: space-between; color: var(--muet); font-size: .78rem; font-weight: 800; }
 .infos-joueur > div { display: flex; align-items: center; gap: .55rem; }
 .ouvrir-rapport { padding: .25rem .5rem; border: 0; border-radius: 999px; background: var(--bleu); color: white; font-size: .68rem; font-weight: 950; }
-.rapport-partie { max-height: 180px; padding: .6rem; border: 2px solid var(--bleu); border-radius: 14px; background: #fffdf6; overflow: hidden; }
+.rapport-partie { position: absolute; z-index: 20; inset: 0; min-height: 100%; padding: .6rem; border: 3px solid var(--bleu); border-radius: 18px 18px 0 0; background: #fffdf6; overflow: hidden; }
 .entete-rapport { display: flex; align-items: center; justify-content: space-between; }
 .entete-rapport button { width: 26px; height: 26px; border: 0; border-radius: 50%; background: var(--rose); color: white; font-size: 1.1rem; }
+.navigation-rapport { display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; align-items: center; gap: .45rem; min-height: 102px; }
+.navigation-rapport > button { width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--bleu); color: white; font-size: 1.4rem; font-weight: 950; box-shadow: 0 4px 0 #17819a; }
+.navigation-rapport > button:disabled { opacity: .28; box-shadow: none; }
+.etape-rapport { display: grid; grid-template-columns: auto 1fr; align-items: center; justify-content: center; gap: .55rem; color: var(--texte); font-size: .75rem; font-weight: 850; text-align: left; }
+.etape-rapport .icone-rapport { width: 30px; height: 34px; }
 .liste-rapport { display: grid; gap: .35rem; max-height: 130px; margin-top: .4rem; overflow-y: auto; }
 .ligne-rapport { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: .45rem; min-height: 38px; padding: .25rem .4rem; border-radius: 10px; background: var(--surface-2); color: var(--texte); font-size: .7rem; text-align: left; }
 .ligne-rapport.faute { grid-template-columns: 32px 1fr; background: #ffe3e8; color: #a90e2a; }
