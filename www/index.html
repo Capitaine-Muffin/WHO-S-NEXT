@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=20" />
+    <link rel="stylesheet" href="style.css?v=21" />
   </head>
   <body>
     <main id="jeu">
@@ -107,6 +107,13 @@
 
         <div class="message" id="message">À toi de jouer !</div>
 
+        <aside id="guide-tutoriel" class="guide-tutoriel" hidden>
+          <p class="surtitre">TUTORIEL GUIDÉ</p>
+          <strong id="titre-guide">Bienvenue sur scène !</strong>
+          <p id="texte-guide"></p>
+          <button id="suite-guide" class="primaire" type="button">Suivant</button>
+        </aside>
+
         <section class="zone-joueur">
           <div class="infos-joueur">
             <span>Ta main</span>
@@ -174,23 +181,22 @@
         <button id="valider-difficulte" class="primaire" type="button">C'est parti !</button>
       </dialog>
 
-      <dialog id="tutoriel">
-        <p class="surtitre">APPRENDRE À JOUER</p>
-        <h2>Tutoriel</h2>
-        <div class="contenu-tutoriel">
-          <section><strong>1 · Trouve le prochain musicien</strong><p>La valeur de la carte indique combien de places avancer autour de la table. Personne ne t’indique à qui est le tour : à toi de suivre.</p></section>
-          <section><strong>2 · Joue avant la fin du chrono</strong><p>Quand c’est à toi, touche une carte. Jouer hors tour ou laisser le temps s’écouler donne une fausse note.</p></section>
-          <section><strong>3 · Choisis le sens</strong><p>Le premier joueur désigne son voisin de droite ou de gauche. Le joueur qui fait une fausse note choisira le sens de la manche suivante.</p></section>
-          <section><strong>4 · Sens dessus dessous</strong><p>Avec Whootchi, retourne ta main avec Flip. Une carte Whootchi inverse immédiatement le sens du jeu.</p></section>
-          <section><strong>5 · Gare au rappel</strong><p>Un joueur ne peut pas rejouer exactement sa carte précédente. Whoot et Whootchi sont deux faces différentes.</p></section>
-          <section><strong>6 · Jamais trois sans faute</strong><p>Il ne peut jamais y avoir une troisième carte identique devant les musiciens.</p></section>
-          <section><strong>7 · Protège le point faible</strong><p>Un joueur ayant le moins de fausses notes ne peut pas viser l’unique joueur qui en possède le plus.</p></section>
-          <section><strong>8 · Mort subite</strong><p>À 7 fausses notes, un musicien est éliminé. Les survivants continuent jusqu’aux deux derniers ; celui qui possède le moins de fausses notes gagne.</p></section>
+      <dialog id="menu-tutoriels">
+        <p class="surtitre">ÉCOLE DU RYTHME</p>
+        <h2>Choisis un tutoriel</h2>
+        <div class="liste-tutoriels">
+          <button class="primaire" type="button" data-tutoriel="base"><strong>NOUVEAU JOUEUR</strong><small>Clique ici !</small></button>
+          <button type="button" data-tutoriel="whootchi"><strong>Sens dessus dessous</strong><small>Apprendre Whootchi et Flip</small></button>
+          <button type="button" data-tutoriel="repetition"><strong>Gare au rappel</strong><small>Éviter deux cartes identiques</small></button>
+          <button type="button" data-tutoriel="trio"><strong>Jamais trois sans faute</strong><small>Repérer les cartes sur la table</small></button>
+          <button type="button" data-tutoriel="point-faible"><strong>Protège le point faible</strong><small>Comprendre qui peut être visé</small></button>
+          <button type="button" data-tutoriel="mort-subite"><strong>Dernier rappel</strong><small>Survivre à la mort subite</small></button>
         </div>
-        <button id="fermer-tutoriel" class="primaire" type="button">J’ai compris !</button>
+        <button id="fermer-menu-tutoriels" class="secondaire" type="button">Retour</button>
       </dialog>
+
     </main>
-    <script type="module" src="jeu.js?v=28"></script>
+    <script type="module" src="jeu.js?v=30"></script>
   </body>
 </html>
 
