@@ -204,8 +204,8 @@ select {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 128px;
-  height: 128px;
+  width: 108px;
+  height: 108px;
   padding: 7px;
   border: 0;
   border-radius: 50%;
@@ -242,7 +242,7 @@ select {
 }
 
 .cadran span, .cadran small { position: relative; z-index: 2; }
-.cadran span { font-size: 2.5rem; font-weight: 1000; line-height: .9; }
+.cadran span { font-size: 2.15rem; font-weight: 1000; line-height: .9; }
 .cadran small { margin-top: .25rem; font-size: .52rem; font-weight: 950; letter-spacing: .09em; }
 .aiguille { position: absolute; z-index: 1; left: calc(50% - 2px); top: 10px; width: 4px; height: 45%; border-radius: 5px; background: var(--rose); transform-origin: 50% 100%; animation: tic 1s steps(1) infinite; }
 .pendule.urgent { background: var(--rose); animation: vibration-pendule 1s infinite; }
@@ -427,6 +427,6 @@ dialog .primaire { width: 100%; }
   #partie { padding-inline: 2rem; }
   .table { min-height: 430px; }
   .musicien { width: 112px; }
-  .pendule { width: 160px; height: 160px; }
+  .pendule { width: 132px; height: 132px; }
 }
 
