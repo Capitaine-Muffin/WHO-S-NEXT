@@ -4,9 +4,9 @@ const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
 const profils = {
-  debutant: { regles: [], ia: 3, chrono: 18, animation: 'normale' },
-  intermediaire: { regles: ['whootchi'], ia: 5, chrono: 14, animation: 'normale' },
-  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 10, animation: 'rapide' },
+  debutant: { regles: [], ia: 3, chrono: 8, animation: 'normale' },
+  intermediaire: { regles: ['whootchi'], ia: 5, chrono: 7, animation: 'normale' },
+  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 6, animation: 'rapide' },
   impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 10, chrono: 5, animation: 'rapide' },
 };
 const elements = {
@@ -86,7 +86,7 @@ function demarrerPartie() {
   const nombre = Number(elements.nombreJoueurs.value);
   const regles = obtenirRegles();
   const niveauIA = Number(elements.niveauIA.value);
-  const dureeChrono = Math.max(1, Math.min(60, Number(elements.dureeChrono.value) || 14));
+  const dureeChrono = Math.max(1, Math.min(8, Number(elements.dureeChrono.value) || 8));
   const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
   elements.nomJoueur.value = nomHumain;
   const nomsDisponibles = [...nomsIA, ...nomsDeScene].filter((nom, index, liste) =>
