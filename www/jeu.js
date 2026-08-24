@@ -13,7 +13,7 @@ const parcoursTutoriels = {
   whootchi: { regles: ['whootchi'], intro: 'Whootchi permet de renverser le concert avec l’autre face des cartes.', notion: 'Le bouton Flip retourne toute ta main. Une carte Whootchi inverse immédiatement le sens du jeu.', demo: { valeur: 1, whootchi: true }, resultat: 'J2 joue Whootchi : le sens vient de s’inverser.', attendu: { valeur: 1, whootchi: true }, essai: 'Touche Flip, puis joue la carte Whootchi.' },
   repetition: { regles: ['repetition'], intro: 'Ici, on regarde un seul joueur à la fois : uniquement ce qu’il a joué lors de ses deux tours.', notion: 'Quand le tour d’un joueur revient, il ne peut pas rejouer exactement la carte de son propre tour précédent. Les cartes des autres joueurs ne comptent pas.', demo: { valeur: 1, whootchi: false }, resultat: 'J2 vient de jouer Whoot. À son prochain tour à lui, J2 devra choisir une autre carte, même si plusieurs joueurs ont joué entre-temps.', attendu: { valeur: 2, whootchi: false }, essai: 'Lors de ton tour précédent, tu avais joué Whoot : joue maintenant Double Whoot.' },
   trio: { regles: ['trio'], intro: 'Ici, on regarde tous les joueurs à la fois : toute la table compte.', notion: 'Si deux cartes exactement identiques sont déjà visibles devant n’importe quels joueurs, celui qui pose la troisième identique fait une fausse note.', demo: { valeur: 1, whootchi: false }, resultat: 'Deux Whoot sont visibles sur la table, même si elles appartiennent à deux joueurs différents. Personne ne peut poser une troisième Whoot.', attendu: { valeur: 2, whootchi: false }, essai: 'Toute la table possède déjà deux Whoot : joue Double Whoot.' },
-  'point-faible': { regles: ['point-faible'], intro: 'Les musiciens en tête doivent protéger celui qui accumule les fausses notes.', notion: 'Si un seul joueur possède le maximum de fausses notes, les joueurs au minimum ne peuvent pas le viser.', demo: { valeur: 1, whootchi: false }, resultat: 'J2 est le point faible : il faut choisir une carte qui ne tombe pas sur lui.', attendu: { valeur: 2, whootchi: false }, essai: 'Joue Double Whoot pour passer au-delà de J2.' },
+  'point-faible': { regles: ['point-faible'], intro: 'Le Maillon faible existe uniquement lorsqu’un joueur mène seul et qu’un autre possède seul le plus de fausses notes.', notion: 'L’unique leader ne peut pas viser l’unique point faible. S’il y a plusieurs leaders ou plusieurs joueurs au maximum, cette règle ne s’applique pas.', demo: { valeur: 1, whootchi: false }, resultat: 'J2 est l’unique point faible : l’unique leader doit choisir une carte qui ne tombe pas sur lui.', attendu: { valeur: 2, whootchi: false }, essai: 'Joue Double Whoot pour passer au-delà de J2.' },
   'mort-subite': { regles: ['mort-subite'], intro: 'En Mort subite, atteindre 7 fausses notes élimine le musicien.', notion: 'Les éliminés restent visibles mais les cartes sautent leur place. La finale commence à deux survivants.', demo: { valeur: 1, whootchi: false }, resultat: 'J4 vient d’atteindre 7 fausses notes : il est grisé et quitte le concert.', attendu: { valeur: 1, whootchi: false }, essai: 'Continue le concert en jouant Whoot.' },
 };
 const elements = {
@@ -581,7 +581,8 @@ function visePointFaible(joueur, carte) {
   if (pointsFaibles.length !== 1) return false;
 
   const minimum = Math.min(...actifs.map(({ notes }) => notes));
-  if (joueur.notes !== minimum) return false;
+  const leaders = actifs.filter(({ notes }) => notes === minimum);
+  if (leaders.length !== 1 || leaders[0] !== joueur) return false;
 
   const indexJoueur = etat.joueurs.indexOf(joueur);
   const sensApresCarte = carte.whootchi ? -etat.sens : etat.sens;
