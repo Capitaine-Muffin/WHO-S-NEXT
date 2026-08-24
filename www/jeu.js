@@ -52,6 +52,7 @@ const elements = {
   rapportPrecedent: document.querySelector('#rapport-precedent'),
   rapportSuivant: document.querySelector('#rapport-suivant'),
   guide: document.querySelector('#guide-tutoriel'),
+  etapeGuide: document.querySelector('#etape-guide'),
   titreGuide: document.querySelector('#titre-guide'),
   texteGuide: document.querySelector('#texte-guide'),
   suiteGuide: document.querySelector('#suite-guide'),
@@ -62,6 +63,7 @@ let minuterie = null;
 let actionIA = null;
 let indexRapport = 0;
 let rapportDepuisDialogue = false;
+let animationRapport = false;
 
 elements.jouer.addEventListener('click', demarrerPartie);
 elements.quitter.addEventListener('click', quitterPartie);
@@ -245,6 +247,7 @@ function demarrerTutoriel(type = 'base') {
   elements.guide.hidden = false;
   elements.suiteGuide.hidden = false;
   elements.suiteGuide.textContent = 'Suivant';
+  elements.etapeGuide.textContent = 'ÉTAPE 1 SUR 5';
   elements.titreGuide.textContent = 'Bienvenue sur scène !';
   elements.texteGuide.textContent = parcours.intro;
   elements.message.textContent = 'Observe la table de jeu';
@@ -256,12 +259,14 @@ async function avancerTutoriel() {
   const tutoriel = etat.tutoriel;
   if (tutoriel.etape === 0) {
     tutoriel.etape = 1;
+    elements.etapeGuide.textContent = 'ÉTAPE 2 SUR 5';
     elements.titreGuide.textContent = 'Suis le rythme';
     elements.texteGuide.textContent = parcoursTutoriels[tutoriel.type].notion;
     return;
   }
   if (tutoriel.etape === 1) {
     tutoriel.etape = 2;
+    elements.etapeGuide.textContent = 'ÉTAPE 3 SUR 5';
     const joueur = etat.joueurs[1];
     const parcours = parcoursTutoriels[tutoriel.type];
     const carte = { ...parcours.demo };
@@ -291,6 +296,7 @@ async function avancerTutoriel() {
     const parcours = parcoursTutoriels[tutoriel.type];
     if (tutoriel.type === 'repetition') etat.joueurs[0].derniere = { valeur: 1, whootchi: false };
     tutoriel.etape = 3;
+    elements.etapeGuide.textContent = 'ÉTAPE 4 SUR 5';
     etat.actif = 0;
     etat.enCours = true;
     etat.temps = 8;
@@ -333,6 +339,7 @@ function jouerCarteTutoriel(indexCarte, retourner = false) {
   afficher();
   animerCarteJouee(0, joueur, carte);
   etat.tutoriel.etape = 4;
+  elements.etapeGuide.textContent = 'ÉTAPE 5 SUR 5';
   elements.titreGuide.textContent = 'Bravo, tu es prêt à jouer !';
   elements.texteGuide.textContent = etat.tutoriel.type === 'base' ? 'Tu sais suivre le sens, lire une carte et jouer avant la fin du chrono. Le concert peut commencer !' : 'Tu maîtrises cette règle. Tu peux maintenant l’activer dans une vraie partie !';
   elements.message.textContent = 'TUTORIEL TERMINÉ';
@@ -731,7 +738,7 @@ function ajouterRapport(entree) {
 function basculerRapport(ouvert) {
   elements.rapport.hidden = !ouvert;
   if (ouvert) {
-    indexRapport = Math.max(0, (etat?.rapport.length ?? 1) - 1);
+    indexRapport = debutMancheRapport();
     afficherRapport();
   } else {
     afficherTable();
@@ -742,13 +749,57 @@ function basculerRapport(ouvert) {
   }
 }
 
+function debutMancheRapport() {
+  const entrees = etat?.rapport ?? [];
+  for (let index = entrees.length - 1; index >= 0; index -= 1) {
+    if (entrees[index].type === 'manche') return index;
+  }
+  return 0;
+}
+
 function afficherRapport() {
   if (!elements.rapport.hidden) afficherEtapeRapport();
 }
 
-function deplacerRapport(direction) {
+async function deplacerRapport(direction) {
+  if (animationRapport) return;
   const maximum = Math.max(0, (etat?.rapport.length ?? 1) - 1);
-  indexRapport = Math.max(0, Math.min(maximum, indexRapport + direction));
+  const prochainIndex = Math.max(debutMancheRapport(), Math.min(maximum, indexRapport + direction));
+  if (prochainIndex === indexRapport) return;
+  indexRapport = prochainIndex;
+  afficherEtapeRapport();
+  const entree = etat?.rapport[indexRapport];
+  if (entree?.carte) await animerCarteRapport(entree);
+}
+
+async function animerCarteRapport(entree) {
+  const indexJoueur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
+  const joueur = etat.joueurs[indexJoueur];
+  if (!joueur) return;
+  animationRapport = true;
+  elements.rapportPrecedent.disabled = true;
+  elements.rapportSuivant.disabled = true;
+  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`)
+    ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
+  const cadre = cible?.getBoundingClientRect();
+  const animation = document.createElement('div');
+  animation.className = `pose-carte rapport-pose${entree.type === 'carte-faute' ? ' erreur-pose' : ''}`;
+  animation.innerHTML = `<strong>${entree.joueur} joue</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(entree.carte.valeur, entree.carte.whootchi)}</span></div>`;
+  appliquerFaceCarte(animation.querySelector('.carte-animee'), entree.carte.valeur, entree.carte.whootchi);
+  document.body.append(animation);
+  cible?.classList.add('cible-animation');
+  await attendre(650);
+  if (cadre) {
+    const arriveeX = cadre.left + cadre.width / 2;
+    const arriveeY = cadre.top + cadre.height / 2;
+    await animation.animate([
+      { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: 'translate(-50%, -50%) scale(.3333) rotate(7deg)', opacity: 1 },
+    ], { duration: 520, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
+  }
+  animation.remove();
+  cible?.classList.remove('cible-animation');
+  animationRapport = false;
   afficherEtapeRapport();
 }
 
@@ -756,7 +807,7 @@ function afficherEtapeRapport() {
   elements.etapeRapport.replaceChildren();
   const entrees = etat?.rapport ?? [];
   const entree = entrees[indexRapport];
-  elements.rapportPrecedent.disabled = indexRapport <= 0;
+  elements.rapportPrecedent.disabled = indexRapport <= debutMancheRapport();
   elements.rapportSuivant.disabled = indexRapport >= entrees.length - 1;
   if (!entree) {
     elements.etapeRapport.textContent = 'Aucune action enregistrée.';
@@ -870,7 +921,7 @@ function afficherTable(historiquesSimules = null) {
     if (!historiquesSimules && !etat.tutoriel && etat.premierTour && !etat.choixSens && etat.sens) {
       const direction = document.createElement('i');
       direction.className = `direction-joueur ${etat.sens > 0 ? 'horaire' : 'antihoraire'}`;
-      direction.textContent = etat.sens > 0 ? '↻' : '↺';
+      direction.textContent = etat.sens > 0 ? '→' : '←';
       direction.setAttribute('aria-label', etat.sens > 0 ? 'Sens horaire' : 'Sens antihoraire');
       carte.append(direction);
     }
