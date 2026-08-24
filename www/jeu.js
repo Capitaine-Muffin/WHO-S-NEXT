@@ -141,6 +141,8 @@ function demarrerPartie() {
     faceMainWhootchi: false,
     vitesseAnimation: elements.vitesseAnimation.value,
     animationErreur: false,
+    fautifIndex: null,
+    carteFaute: null,
     rapport: [],
   };
 
@@ -224,6 +226,8 @@ function demarrerTutoriel(type = 'base') {
     faceMainWhootchi: false,
     vitesseAnimation: 'rapide',
     animationErreur: false,
+    fautifIndex: null,
+    carteFaute: null,
     rapport: [{ type: 'manche', texte: 'Début du tutoriel', manche: 1 }],
     tutoriel: { etape: 0, type },
   };
@@ -361,6 +365,8 @@ function nouvelleManche() {
   }
 
   etat.manche += 1;
+  etat.fautifIndex = null;
+  etat.carteFaute = null;
   ajouterRapport({ type: 'manche', texte: `Début de la manche ${etat.manche}` });
   etat.chef = etat.actif;
   etat.sens = 0;
@@ -469,19 +475,36 @@ async function tenterErreurIA(dernierAuteur) {
 }
 
 async function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une fausse note !`) {
-  if (etat.vitesseAnimation === 'aucune') return;
+  const indexJoueur = etat.joueurs.indexOf(joueur);
+  etat.fautifIndex = indexJoueur;
+  etat.carteFaute = { ...carte };
+  afficher();
+  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`)
+    ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
+  const cadre = cible?.getBoundingClientRect();
+  cible?.classList.add('cible-animation');
+  if (etat.vitesseAnimation === 'aucune') {
+    cible?.classList.remove('cible-animation');
+    return;
+  }
   const rapide = etat.vitesseAnimation === 'rapide';
   const animation = document.createElement('div');
   animation.className = 'pose-carte erreur-pose';
   animation.innerHTML = `<strong>${texte}</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
   appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
   document.body.append(animation);
-  await attendre(rapide ? 450 : 1200);
-  await animation.animate([
-    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-    { transform: 'translate(-50%, -50%) scale(.9)', opacity: 0 },
-  ], { duration: rapide ? 100 : 220, easing: 'ease-in', fill: 'forwards' }).finished;
+  await attendre(rapide ? 500 : 1350);
+  if (cadre) {
+    const arriveeX = cadre.left + cadre.width / 2;
+    const arriveeY = cadre.top + cadre.height / 2;
+    await animation.animate([
+      { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: 'translate(-50%, -50%) scale(.3333) rotate(7deg)', opacity: 1 },
+    ], { duration: rapide ? 220 : 560, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
+  }
   animation.remove();
+  cible?.classList.remove('cible-animation');
+  await attendre(rapide ? 180 : 350);
 }
 
 async function animerCarteJouee(indexJoueur, joueur, carte) {
@@ -810,7 +833,8 @@ function afficherTable(historiquesSimules = null) {
     const carte = document.createElement('article');
     const choisitSens = etat.choixSens && index === etat.chef;
     const commence = !etat.choixSens && etat.premierTour && index === etat.actif;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}`;
+    const fautif = index === etat.fautifIndex;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
@@ -820,7 +844,8 @@ function afficherTable(historiquesSimules = null) {
     const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
     carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
-    const historiqueAffiche = historiquesSimules?.[index] ?? joueur.historique;
+    let historiqueAffiche = historiquesSimules?.[index] ?? joueur.historique;
+    if (!historiquesSimules && fautif && etat.carteFaute) historiqueAffiche = [...historiqueAffiche.slice(-1), etat.carteFaute];
     historiqueAffiche.forEach((carteJouee, position) => {
       const conteneur = document.createElement('div');
       conteneur.className = 'derniere-carte';
