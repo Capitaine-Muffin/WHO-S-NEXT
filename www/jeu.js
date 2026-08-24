@@ -101,6 +101,7 @@ function demarrerPartie() {
     derniere: null,
     historique: [],
     erreurConsecutive: 0,
+    elimine: false,
   }));
 
   etat = {
@@ -190,9 +191,13 @@ function aRegle(regle) {
 function nouvelleManche() {
   elements.dialogue.close();
   if (!etat) return;
+  if (etat.terminee) {
+    quitterPartie();
+    return;
+  }
 
   const perdant = etat.joueurs.find((joueur) => joueur.notes >= 7);
-  if (perdant) {
+  if (perdant && !aRegle('mort-subite')) {
     quitterPartie();
     return;
   }
@@ -204,7 +209,7 @@ function nouvelleManche() {
   etat.choixSens = true;
   etat.premierTour = true;
   etat.joueurs.forEach((joueur) => {
-    joueur.main = creerMain(etat.joueurs.length);
+    joueur.main = joueur.elimine ? [] : creerMain(joueursActifs().length);
     joueur.derniere = null;
     joueur.historique = [];
   });
@@ -230,7 +235,7 @@ function appliquerSens(sens) {
   if (elements.choixSens.open) elements.choixSens.close();
   etat.sens = sens;
   etat.choixSens = false;
-  etat.actif = (etat.chef + sens + etat.joueurs.length) % etat.joueurs.length;
+  etat.actif = avancerActif(etat.chef, sens);
   afficher();
   commencerTour();
 }
@@ -281,7 +286,7 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
 
   if (carte.whootchi) etat.sens *= -1;
   const distance = carte.valeur * etat.sens;
-  etat.actif = (etat.actif + distance + etat.joueurs.length * 10) % etat.joueurs.length;
+  etat.actif = avancerActif(etat.actif, distance);
 
   afficher();
   animerCarteJouee(auteur, joueur, carte);
@@ -290,7 +295,7 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
 }
 
 async function tenterErreurIA(dernierAuteur) {
-  const candidats = etat.joueurs.filter((joueur, index) => !joueur.humain && index !== dernierAuteur && index !== etat.actif);
+  const candidats = etat.joueurs.filter((joueur, index) => !joueur.humain && !joueur.elimine && index !== dernierAuteur && index !== etat.actif);
   if (!candidats.length || Math.random() >= probabiliteErreur()) return false;
   const joueur = candidats[Math.floor(Math.random() * candidats.length)];
   const carteBase = joueur.main[Math.floor(Math.random() * joueur.main.length)];
@@ -372,17 +377,32 @@ function estPoseInterdite(joueur, carte) {
 }
 
 function visePointFaible(joueur, carte) {
-  const maximum = Math.max(...etat.joueurs.map(({ notes }) => notes));
-  const pointsFaibles = etat.joueurs.filter(({ notes }) => notes === maximum);
+  const actifs = joueursActifs();
+  const maximum = Math.max(...actifs.map(({ notes }) => notes));
+  const pointsFaibles = actifs.filter(({ notes }) => notes === maximum);
   if (pointsFaibles.length !== 1) return false;
 
-  const minimum = Math.min(...etat.joueurs.map(({ notes }) => notes));
+  const minimum = Math.min(...actifs.map(({ notes }) => notes));
   if (joueur.notes !== minimum) return false;
 
   const indexJoueur = etat.joueurs.indexOf(joueur);
   const sensApresCarte = carte.whootchi ? -etat.sens : etat.sens;
-  const indexCible = (indexJoueur + carte.valeur * sensApresCarte + etat.joueurs.length * 10) % etat.joueurs.length;
+  const indexCible = avancerActif(indexJoueur, carte.valeur * sensApresCarte);
   return etat.joueurs[indexCible] === pointsFaibles[0];
+}
+
+function joueursActifs() {
+  return etat.joueurs.filter((joueur) => !joueur.elimine);
+}
+
+function avancerActif(indexDepart, distance) {
+  const direction = Math.sign(distance) || 1;
+  let index = indexDepart;
+  for (let pas = 0; pas < Math.abs(distance); pas += 1) {
+    do index = (index + direction + etat.joueurs.length) % etat.joueurs.length;
+    while (etat.joueurs[index].elimine);
+  }
+  return index;
 }
 
 function commencerTour() {
@@ -390,6 +410,11 @@ function commencerTour() {
   if (!etat?.enCours) return;
 
   const joueur = etat.joueurs[etat.actif];
+  if (joueur.elimine) {
+    etat.actif = avancerActif(etat.actif, etat.sens || 1);
+    commencerTour();
+    return;
+  }
   etat.temps = etat.dureeChrono;
   elements.message.textContent = 'Qui doit jouer maintenant ?';
   afficher();
@@ -446,12 +471,33 @@ function sanctionner(joueur, raison) {
   joueur.notes += penalite;
   ajouterRapport({ type: 'faute', joueur: joueur.nom, texte: raison });
   etat.actif = etat.joueurs.indexOf(joueur);
-  afficher();
 
   if (joueur.notes >= 7) {
-    const gagnants = etat.joueurs.filter((candidat) => candidat.notes === Math.min(...etat.joueurs.map((j) => j.notes))).map((j) => j.nom).join(' et ');
-    ouvrirDialogue('FIN DU CONCERT', `${joueur.nom} atteint 7 fausses notes`, `${raison} ${gagnants} remporte${gagnants.includes(' et ') ? 'nt' : ''} la partie.`);
+    if (aRegle('mort-subite')) {
+      joueur.elimine = true;
+      joueur.main = [];
+      ajouterRapport({ type: 'elimination', joueur: joueur.nom, texte: 'Éliminé à 7 fausses notes' });
+      const survivants = joueursActifs();
+      if (survivants.length <= 2) {
+        const minimum = Math.min(...survivants.map(({ notes }) => notes));
+        const gagnants = survivants.filter(({ notes }) => notes === minimum).map(({ nom }) => nom).join(' et ');
+        etat.terminee = true;
+        afficher();
+        ouvrirDialogue('FIN DU CONCERT', 'Les deux derniers musiciens !', `${gagnants} remporte${gagnants.includes(' et ') ? 'nt' : ''} la partie avec le moins de fausses notes.`);
+      } else {
+        etat.actif = avancerActif(etat.actif, etat.sens || 1);
+        afficher();
+        ouvrirDialogue('ÉLIMINATION', `${joueur.nom} quitte la scène`, `${raison} Il reste ${survivants.length} musiciens.`);
+      }
+    } else {
+      const minimum = Math.min(...etat.joueurs.map(({ notes }) => notes));
+      const gagnants = etat.joueurs.filter(({ notes }) => notes === minimum).map(({ nom }) => nom).join(' et ');
+      etat.terminee = true;
+      afficher();
+      ouvrirDialogue('FIN DU CONCERT', `${joueur.nom} atteint 7 fausses notes`, `${raison} ${gagnants} remporte${gagnants.includes(' et ') ? 'nt' : ''} la partie.`);
+    }
   } else {
+    afficher();
     ouvrirDialogue('FAUSSE NOTE', `${penalite} fausse note${penalite > 1 ? 's' : ''} pour ${joueur.nom}`, raison);
   }
 }
@@ -466,7 +512,7 @@ function ouvrirDialogue(surtitre, titre, texte) {
   elements.finSurtitre.textContent = surtitre;
   elements.finTitre.textContent = titre;
   elements.finTexte.textContent = texte;
-  elements.continuer.textContent = etat.joueurs.some((j) => j.notes >= 7) ? 'Retour au menu' : 'Manche suivante';
+  elements.continuer.textContent = etat.terminee ? 'Retour au menu' : 'Manche suivante';
   elements.dialogue.show();
 }
 
@@ -502,7 +548,7 @@ function afficherRapport() {
   }
   entrees.forEach((entree) => {
     const ligne = document.createElement('div');
-    ligne.className = `ligne-rapport${entree.type.includes('faute') ? ' faute' : ''}`;
+    ligne.className = `ligne-rapport${entree.type.includes('faute') || entree.type === 'elimination' ? ' faute' : ''}`;
     if (entree.carte) {
       const icone = document.createElement('i');
       icone.className = 'icone-rapport';
@@ -543,14 +589,14 @@ function afficherTable() {
     const carte = document.createElement('article');
     const choisitSens = etat.choixSens && index === etat.chef;
     const commence = !etat.choixSens && etat.premierTour && index === etat.actif;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${choisitSens || commence ? ' premier' : ''}`;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
     carte.style.setProperty('--pile-x', `${-Math.sin(angle) * distancePile}px`);
     carte.style.setProperty('--pile-y', `${Math.cos(angle) * distancePile}px`);
     carte.dataset.joueurIndex = index;
-    const badge = choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : '');
+    const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
     carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
     joueur.historique.forEach((carteJouee, position) => {
@@ -577,7 +623,7 @@ function afficherMain() {
   etat.joueurs[0].main.forEach((carte, index) => {
     const bouton = document.createElement('button');
     bouton.className = 'carte';
-    bouton.disabled = !etat.enCours || etat.choixSens;
+    bouton.disabled = !etat.enCours || etat.choixSens || etat.joueurs[0].elimine;
     appliquerFaceCarte(bouton, carte.valeur, etat.faceMainWhootchi);
     bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, etat.faceMainWhootchi)}</span>`;
     bouton.addEventListener('click', () => jouerCarte(index, etat.faceMainWhootchi, 0));
