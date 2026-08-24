@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=18" />
+    <link rel="stylesheet" href="style.css?v=19" />
   </head>
   <body>
     <main id="jeu">
@@ -35,22 +35,24 @@
           </div>
         </div>
 
-        <div class="champ">
-          <span>Règles de la partie</span>
-          <button id="ouvrir-difficulte" class="bouton-difficulte" type="button">
-            <strong>1 règle active</strong>
-            <small>Whootchi</small>
-          </button>
+        <div class="champ choix-centre">
+          <span>Choisis ton niveau</span>
+          <div class="niveaux-prets" role="group" aria-label="Niveau de la partie">
+            <button type="button" class="actif" data-preset="debutant"><strong>Débutant</strong><small>Découvrir le rythme</small></button>
+            <button type="button" data-preset="intermediaire"><strong>Intermédiaire</strong><small>Garder la cadence</small></button>
+            <button type="button" data-preset="expert"><strong>Expert</strong><small>Le concert total</small></button>
+            <button type="button" data-preset="impossible"><strong>Impossible</strong><small>Pour les virtuoses</small></button>
+          </div>
         </div>
 
-        <div class="champ choix-centre">
-          <span>Niveau des adversaires <button class="aide-inline" type="button" data-info="ia">?</button></span>
-          <input id="niveau-ia" type="hidden" value="5" />
-          <div class="pastilles-ia" role="group" aria-label="Niveau des adversaires">
-            <button type="button" data-ia="1">1</button><button type="button" data-ia="2">2</button><button type="button" data-ia="3">3</button><button type="button" data-ia="4">4</button><button type="button" class="actif" data-ia="5">5</button><button type="button" data-ia="6">6</button><button type="button" data-ia="7">7</button><button type="button" data-ia="8">8</button><button type="button" data-ia="9">9</button><button type="button" data-ia="10">10</button>
-          </div>
-          <p class="bulle-info" data-bulle="ia" hidden>De 55 % de réussite au niveau 1 à 100 % au niveau 10. Une erreur peut venir de n’importe quel bot qui joue hors tour, sauf celui qui vient de poser.</p>
-        </div>
+        <button id="ouvrir-difficulte" class="bouton-difficulte avance" type="button">
+          <strong>Paramètres avancés</strong>
+          <small>Fais tes propres règles !</small>
+        </button>
+        <button id="ouvrir-tutoriel" class="bouton-difficulte tutoriel" type="button">
+          <strong>Tutoriel</strong>
+          <small>Toutes les règles expliquées !</small>
+        </button>
 
         <button id="jouer" class="primaire">Jouer contre l'IA</button>
         <button id="jouer-en-ligne" class="secondaire" type="button">Jouer en ligne</button>
@@ -140,18 +142,26 @@
 
       <dialog id="difficulte">
         <p class="surtitre">RÈGLES DE LA PARTIE</p>
-        <h2>Règles à la carte</h2>
-        <p>Active uniquement les contraintes que tu veux jouer.</p>
+        <h2>Paramètres avancés</h2>
+        <p>Compose librement ta propre partie.</p>
         <div class="liste-niveaux">
-          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="whootchi">?</button><button type="button" class="actif" data-regle="whootchi"><strong>Sens dessus dessous</strong><small>WHOOTCHI</small></button><p class="bulle-info" data-bulle="whootchi" hidden>Les cartes peuvent être retournées en Whootchi et inversent le sens du jeu.</p></div>
+          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="whootchi">?</button><button type="button" data-regle="whootchi"><strong>Sens dessus dessous</strong><small>WHOOTCHI</small></button><p class="bulle-info" data-bulle="whootchi" hidden>Les cartes peuvent être retournées en Whootchi et inversent le sens du jeu.</p></div>
           <div class="tuile-regle"><button class="aide-regle" type="button" data-info="repetition">?</button><button type="button" data-regle="repetition"><strong>Gare au rappel</strong><small>RÉPÉTITION</small></button><p class="bulle-info" data-bulle="repetition" hidden>Un joueur ne peut pas rejouer exactement la même carte. Whoot et Whootchi sont différents.</p></div>
           <div class="tuile-regle"><button class="aide-regle" type="button" data-info="trio">?</button><button type="button" data-regle="trio"><strong>Jamais trois sans faute</strong><small>TRIO INTERDIT</small></button><p class="bulle-info" data-bulle="trio" hidden>Une troisième carte identique ne peut pas être présente devant les joueurs.</p></div>
           <div class="tuile-regle"><button class="aide-regle" type="button" data-info="point-faible">?</button><button type="button" data-regle="point-faible"><strong>Protège le point faible</strong><small>MAILLON FAIBLE</small></button><p class="bulle-info" data-bulle="point-faible" hidden>Les joueurs les moins pénalisés ne peuvent pas viser l’unique joueur qui a le plus de fausses notes.</p></div>
         </div>
+        <div class="champ chrono-difficulte choix-centre">
+          <span>Niveau des adversaires <button class="aide-inline" type="button" data-info="ia">?</button></span>
+          <input id="niveau-ia" type="hidden" value="3" />
+          <div class="pastilles-ia" role="group" aria-label="Niveau des adversaires">
+            <button type="button" data-ia="1">1</button><button type="button" data-ia="2">2</button><button type="button" class="actif" data-ia="3">3</button><button type="button" data-ia="4">4</button><button type="button" data-ia="5">5</button><button type="button" data-ia="6">6</button><button type="button" data-ia="7">7</button><button type="button" data-ia="8">8</button><button type="button" data-ia="9">9</button><button type="button" data-ia="10">10</button>
+          </div>
+          <p class="bulle-info" data-bulle="ia" hidden>De 55 % de réussite au niveau 1 à 100 % au niveau 10. Une erreur peut venir de n’importe quel bot qui joue hors tour, sauf celui qui vient de poser.</p>
+        </div>
         <label class="champ chrono-difficulte">
           <span>Temps pour jouer</span>
           <div class="reglage-chrono">
-            <input id="duree-chrono" type="number" min="1" max="60" value="14" inputmode="numeric" />
+            <input id="duree-chrono" type="number" min="1" max="60" value="18" inputmode="numeric" />
             <span>secondes</span>
           </div>
         </label>
@@ -162,8 +172,23 @@
         </div>
         <button id="valider-difficulte" class="primaire" type="button">C'est parti !</button>
       </dialog>
+
+      <dialog id="tutoriel">
+        <p class="surtitre">APPRENDRE À JOUER</p>
+        <h2>Tutoriel</h2>
+        <div class="contenu-tutoriel">
+          <section><strong>1 · Trouve le prochain musicien</strong><p>La valeur de la carte indique combien de places avancer autour de la table. Personne ne t’indique à qui est le tour : à toi de suivre.</p></section>
+          <section><strong>2 · Joue avant la fin du chrono</strong><p>Quand c’est à toi, touche une carte. Jouer hors tour ou laisser le temps s’écouler donne une fausse note.</p></section>
+          <section><strong>3 · Choisis le sens</strong><p>Le premier joueur désigne son voisin de droite ou de gauche. Le joueur qui fait une fausse note choisira le sens de la manche suivante.</p></section>
+          <section><strong>4 · Sens dessus dessous</strong><p>Avec Whootchi, retourne ta main avec Flip. Une carte Whootchi inverse immédiatement le sens du jeu.</p></section>
+          <section><strong>5 · Gare au rappel</strong><p>Un joueur ne peut pas rejouer exactement sa carte précédente. Whoot et Whootchi sont deux faces différentes.</p></section>
+          <section><strong>6 · Jamais trois sans faute</strong><p>Il ne peut jamais y avoir une troisième carte identique devant les musiciens.</p></section>
+          <section><strong>7 · Protège le point faible</strong><p>Un joueur ayant le moins de fausses notes ne peut pas viser l’unique joueur qui en possède le plus.</p></section>
+        </div>
+        <button id="fermer-tutoriel" class="primaire" type="button">J’ai compris !</button>
+      </dialog>
     </main>
-    <script type="module" src="jeu.js?v=22"></script>
+    <script type="module" src="jeu.js?v=24"></script>
   </body>
 </html>
 
