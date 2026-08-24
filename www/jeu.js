@@ -279,7 +279,14 @@ async function avancerTutoriel() {
     elements.texteGuide.textContent = `${joueur.nom} joue ${nomCarte(carte.valeur, carte.whootchi)}…`;
     elements.suiteGuide.hidden = true;
     afficher();
-    await animerCarteJouee(1, joueur, carte);
+    const animationCarte = animerCarteJouee(1, joueur, carte);
+    if (tutoriel.type === 'base') {
+      await attendre(250);
+      elements.texteGuide.textContent = 'J2 joue Double Whoot. On compte deux joueurs après lui… 1 : J3.';
+      await attendre(700);
+      elements.texteGuide.textContent = '1 : J3… puis 2 : J4. C’est donc à J4 de jouer !';
+    }
+    await animationCarte;
     if (tutoriel.type === 'whootchi') etat.sens = -1;
     if (tutoriel.type === 'mort-subite') {
       etat.joueurs[3].notes = 7;
@@ -953,7 +960,7 @@ function afficherParcoursTutoriel({ depart, valeur, sens }) {
     if (!joueur) continue;
     const repere = document.createElement('b');
     repere.className = 'compte-tutoriel';
-    repere.textContent = `${sensEffectif > 0 ? '→' : '←'} ${pas}`;
+    repere.textContent = `${sensEffectif > 0 ? '→' : '←'} ${pas} · ${etat.joueurs[cible].nom}`;
     repere.style.setProperty('--delai-compte', `${.25 + (pas - 1) * .7}s`);
     joueur.append(repere);
   }
