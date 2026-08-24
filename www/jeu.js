@@ -3,6 +3,12 @@ import { initialiserMultijoueur } from './multijoueur.js?v=2';
 const nomsIA = ['Mélodie', 'Tempo', 'Jazz', 'Riff', 'Punk', 'Bongo'];
 const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Beat', 'Miss Décibel', 'DJ Moustache', 'Rocky Banjo', 'Saxo Kid', 'Major Bongo', 'Funky Mozart', 'Queen Cymbale', 'El Trompette'];
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
+const profils = {
+  debutant: { regles: [], ia: 3, chrono: 18, animation: 'normale' },
+  intermediaire: { regles: ['whootchi'], ia: 5, chrono: 14, animation: 'normale' },
+  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 10, animation: 'rapide' },
+  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 10, chrono: 5, animation: 'rapide' },
+};
 const elements = {
   accueil: document.querySelector('#accueil'),
   partie: document.querySelector('#partie'),
@@ -52,10 +58,14 @@ elements.validerDifficulte.addEventListener('click', () => elements.difficulte.c
 document.querySelectorAll('[data-joueurs]').forEach((bouton) => bouton.addEventListener('click', () => choisirPastille('joueurs', bouton)));
 document.querySelectorAll('[data-ia]').forEach((bouton) => bouton.addEventListener('click', () => choisirPastille('ia', bouton)));
 document.querySelectorAll('[data-animation]').forEach((bouton) => bouton.addEventListener('click', () => choisirPastille('animation', bouton)));
+document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.addEventListener('click', () => appliquerProfil(bouton.dataset.preset)));
 document.querySelectorAll('[data-info]').forEach((bouton) => bouton.addEventListener('click', (event) => afficherAide(event, bouton.dataset.info)));
 document.querySelector('#ouvrir-rapport').addEventListener('click', () => basculerRapport(true));
 document.querySelector('#fermer-rapport').addEventListener('click', () => basculerRapport(false));
 document.querySelector('#retour-en-ligne').addEventListener('click', changerPortraitMenu);
+document.querySelector('#ouvrir-tutoriel').addEventListener('click', () => document.querySelector('#tutoriel').showModal());
+document.querySelector('#fermer-tutoriel').addEventListener('click', () => document.querySelector('#tutoriel').close());
+elements.dureeChrono.addEventListener('change', marquerPersonnalise);
 elements.difficulte.querySelectorAll('[data-regle]').forEach((bouton) => {
   bouton.addEventListener('click', () => basculerRegle(bouton));
 });
@@ -119,11 +129,30 @@ function nomDeSceneAleatoire() {
   return nomsDeScene[Math.floor(Math.random() * nomsDeScene.length)];
 }
 
-function choisirPastille(type, bouton) {
+function choisirPastille(type, bouton, personnaliser = true) {
   const attribut = type === 'joueurs' ? 'data-joueurs' : `data-${type}`;
   document.querySelectorAll(`[${attribut}]`).forEach((candidat) => candidat.classList.toggle('actif', candidat === bouton));
   const cible = type === 'joueurs' ? elements.nombreJoueurs : (type === 'ia' ? elements.niveauIA : elements.vitesseAnimation);
   cible.value = bouton.dataset[type];
+  if (personnaliser && type !== 'joueurs') marquerPersonnalise();
+}
+
+function appliquerProfil(nom) {
+  const profil = profils[nom];
+  if (!profil) return;
+  elements.difficulte.querySelectorAll('[data-regle]').forEach((bouton) => bouton.classList.toggle('actif', profil.regles.includes(bouton.dataset.regle)));
+  choisirPastille('ia', document.querySelector(`[data-ia="${profil.ia}"]`), false);
+  choisirPastille('animation', document.querySelector(`[data-animation="${profil.animation}"]`), false);
+  elements.dureeChrono.value = profil.chrono;
+  document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.classList.toggle('actif', bouton.dataset.preset === nom));
+  elements.ouvrirDifficulte.classList.remove('personnalise');
+  elements.ouvrirDifficulte.innerHTML = '<strong>Paramètres avancés</strong><small>Fais tes propres règles !</small>';
+}
+
+function marquerPersonnalise() {
+  document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.classList.remove('actif'));
+  elements.ouvrirDifficulte.classList.add('personnalise');
+  elements.ouvrirDifficulte.innerHTML = '<strong>Paramètres personnalisés</strong><small>Ta propre combinaison est active</small>';
 }
 
 function afficherAide(event, nom) {
@@ -147,7 +176,7 @@ function ouvrirDifficulte() {
 
 function basculerRegle(bouton) {
   bouton.classList.toggle('actif');
-  afficherResumeRegles();
+  marquerPersonnalise();
 }
 
 function obtenirRegles() {
@@ -156,11 +185,6 @@ function obtenirRegles() {
 
 function aRegle(regle) {
   return etat.regles.includes(regle);
-}
-
-function afficherResumeRegles() {
-  const noms = [...elements.difficulte.querySelectorAll('[data-regle].actif strong')].map(({ textContent }) => textContent);
-  elements.ouvrirDifficulte.innerHTML = `<strong>${noms.length} règle${noms.length > 1 ? 's' : ''} active${noms.length > 1 ? 's' : ''}</strong><small>${noms.join(' · ') || 'Whoot uniquement'}</small>`;
 }
 
 function nouvelleManche() {
