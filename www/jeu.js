@@ -649,7 +649,7 @@ async function jouerIA(joueur) {
 }
 
 function probabiliteErreur() {
-  return etat.niveauIA >= 10 ? 0 : (10 - etat.niveauIA) * .05;
+  return etat.niveauIA >= 10 ? .01 : (10 - etat.niveauIA) * .05;
 }
 
 function sanctionner(joueur, raison) {
