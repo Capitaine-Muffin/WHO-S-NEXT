@@ -867,6 +867,13 @@ function afficherTable(historiquesSimules = null) {
       conteneur.append(miniature);
       pile.append(conteneur);
     });
+    if (!historiquesSimules && !etat.tutoriel && etat.premierTour && !etat.choixSens && etat.sens) {
+      const direction = document.createElement('i');
+      direction.className = `direction-joueur ${etat.sens > 0 ? 'horaire' : 'antihoraire'}`;
+      direction.textContent = etat.sens > 0 ? '↻' : '↺';
+      direction.setAttribute('aria-label', etat.sens > 0 ? 'Sens horaire' : 'Sens antihoraire');
+      carte.append(direction);
+    }
     elements.table.append(carte);
   });
   if (!historiquesSimules && etat.tutoriel?.parcours) afficherParcoursTutoriel(etat.tutoriel.parcours);
