@@ -3,7 +3,7 @@ create table public.salles (
   hote uuid not null references auth.users(id) on delete cascade,
   statut text not null default 'attente',
   regles jsonb not null default '["whootchi"]'::jsonb,
-  chrono smallint not null default 14 check (chrono between 1 and 60),
+  chrono smallint not null default 8 check (chrono between 1 and 8),
   animation text not null default 'normale' check (animation in ('normale', 'rapide', 'aucune')),
   creee_le timestamptz not null default now()
 );
@@ -44,7 +44,7 @@ create or replace function public.creer_salle(nom_joueur text, reglages jsonb) r
 language plpgsql security definer set search_path = public as $$
 declare nouveau_code text := code_salle_aleatoire();
 declare v_regles jsonb := coalesce(reglages->'regles', '["whootchi"]'::jsonb);
-declare v_chrono smallint := least(60, greatest(1, coalesce((reglages->>'chrono')::smallint, 14)));
+declare v_chrono smallint := least(8, greatest(1, coalesce((reglages->>'chrono')::smallint, 8)));
 declare v_animation text := case when reglages->>'animation' in ('normale', 'rapide', 'aucune') then reglages->>'animation' else 'normale' end;
 begin
   insert into salles(code, hote, regles, chrono, animation) values (nouveau_code, auth.uid(), v_regles, v_chrono, v_animation);
@@ -75,7 +75,7 @@ language plpgsql security definer set search_path = public as $$
 begin
   update salles set
     regles = coalesce(reglages->'regles', regles),
-    chrono = least(60, greatest(1, coalesce((reglages->>'chrono')::smallint, chrono))),
+    chrono = least(8, greatest(1, coalesce((reglages->>'chrono')::smallint, chrono))),
     animation = case when reglages->>'animation' in ('normale', 'rapide', 'aucune') then reglages->>'animation' else animation end
   where code = upper(p_code_salle) and hote = auth.uid() and statut = 'attente';
   if not found then raise exception 'Seul l’hôte peut modifier cette partie.'; end if;
