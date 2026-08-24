@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=17" />
+    <link rel="stylesheet" href="style.css?v=18" />
   </head>
   <body>
     <main id="jeu">
@@ -14,22 +14,26 @@
         <h1><img src="assets/logo-vertical.webp" alt="Who's Next ?" /></h1>
         <p class="accroche">Garde le rythme. Trouve qui joue. Ne fais pas de fausse note.</p>
 
-        <label class="champ">
-          <span>Ton nom de scène</span>
-          <input id="nom-joueur" type="text" maxlength="18" autocomplete="nickname" />
-        </label>
+        <div class="identite-menu">
+          <div id="portrait-menu" class="portrait-menu" aria-hidden="true"></div>
+          <label class="champ">
+            <span>Ton nom de scène</span>
+            <input id="nom-joueur" type="text" maxlength="18" autocomplete="nickname" />
+          </label>
+        </div>
 
-        <label class="champ">
+        <div class="champ choix-centre">
           <span>Nombre de musiciens</span>
-          <select id="nombre-joueurs">
-            <option value="2">2 joueurs</option>
-            <option value="3">3 joueurs</option>
-            <option value="4" selected>4 joueurs</option>
-            <option value="5">5 joueurs</option>
-            <option value="6">6 joueurs</option>
-            <option value="7">7 joueurs</option>
-          </select>
-        </label>
+          <input id="nombre-joueurs" type="hidden" value="4" />
+          <div class="pastilles-joueurs" role="group" aria-label="Nombre de musiciens">
+            <button type="button" data-joueurs="2"><b>2</b><small>DUO</small></button>
+            <button type="button" data-joueurs="3"><b>3</b><small>TRIO</small></button>
+            <button type="button" class="actif" data-joueurs="4"><b>4</b><small>QUATUOR</small></button>
+            <button type="button" data-joueurs="5"><b>5</b><small>QUINTET</small></button>
+            <button type="button" data-joueurs="6"><b>6</b><small>SEXTET</small></button>
+            <button type="button" data-joueurs="7"><b>7</b><small>GROUPE</small></button>
+          </div>
+        </div>
 
         <div class="champ">
           <span>Règles de la partie</span>
@@ -39,21 +43,14 @@
           </button>
         </div>
 
-        <label class="champ">
-          <span>Niveau des adversaires</span>
-          <select id="niveau-ia">
-            <option value="1">Niveau 1 · 55 % de réussite</option>
-            <option value="2">Niveau 2 · 60 % de réussite</option>
-            <option value="3">Niveau 3 · 65 % de réussite</option>
-            <option value="4">Niveau 4 · 70 % de réussite</option>
-            <option value="5" selected>Niveau 5 · 75 % de réussite</option>
-            <option value="6">Niveau 6 · 80 % de réussite</option>
-            <option value="7">Niveau 7 · 85 % de réussite</option>
-            <option value="8">Niveau 8 · 90 % de réussite</option>
-            <option value="9">Niveau 9 · 95 % de réussite</option>
-            <option value="10">Niveau 10 · aucune erreur</option>
-          </select>
-        </label>
+        <div class="champ choix-centre">
+          <span>Niveau des adversaires <button class="aide-inline" type="button" data-info="ia">?</button></span>
+          <input id="niveau-ia" type="hidden" value="5" />
+          <div class="pastilles-ia" role="group" aria-label="Niveau des adversaires">
+            <button type="button" data-ia="1">1</button><button type="button" data-ia="2">2</button><button type="button" data-ia="3">3</button><button type="button" data-ia="4">4</button><button type="button" class="actif" data-ia="5">5</button><button type="button" data-ia="6">6</button><button type="button" data-ia="7">7</button><button type="button" data-ia="8">8</button><button type="button" data-ia="9">9</button><button type="button" data-ia="10">10</button>
+          </div>
+          <p class="bulle-info" data-bulle="ia" hidden>De 55 % de réussite au niveau 1 à 100 % au niveau 10. Une erreur peut venir de n’importe quel bot qui joue hors tour, sauf celui qui vient de poser.</p>
+        </div>
 
         <button id="jouer" class="primaire">Jouer contre l'IA</button>
         <button id="jouer-en-ligne" class="secondaire" type="button">Jouer en ligne</button>
@@ -111,8 +108,12 @@
         <section class="zone-joueur">
           <div class="infos-joueur">
             <span>Ta main</span>
-            <span id="notes-joueur">0 fausse note</span>
+            <div><button id="ouvrir-rapport" class="ouvrir-rapport" type="button">Rapport</button><span id="notes-joueur">0 fausse note</span></div>
           </div>
+          <section id="rapport-partie" class="rapport-partie" hidden aria-live="polite">
+            <div class="entete-rapport"><strong>Rapport de partie</strong><button id="fermer-rapport" type="button" aria-label="Fermer le rapport">×</button></div>
+            <div id="liste-rapport" class="liste-rapport"></div>
+          </section>
           <div class="main-et-flip">
             <div id="main-joueur" class="main-cartes"></div>
             <button id="flip" class="flip" type="button" aria-pressed="false"><span>↻</span> FLIP</button>
@@ -142,10 +143,10 @@
         <h2>Règles à la carte</h2>
         <p>Active uniquement les contraintes que tu veux jouer.</p>
         <div class="liste-niveaux">
-          <button type="button" class="actif" data-regle="whootchi"><strong>Sens dessus dessous</strong><small>Les cartes Whootchi rejoignent la partie</small></button>
-          <button type="button" data-regle="repetition"><strong>Gare au rappel</strong><small>Un joueur ne peut pas rejouer exactement la même carte</small></button>
-          <button type="button" data-regle="trio"><strong>Jamais trois sans faute</strong><small>Pas de troisième carte identique sur la table</small></button>
-          <button type="button" data-regle="point-faible"><strong>Protège le point faible</strong><small>Les meilleurs ne peuvent pas jouer sur l'unique joueur le plus pénalisé</small></button>
+          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="whootchi">?</button><button type="button" class="actif" data-regle="whootchi"><strong>Sens dessus dessous</strong><small>WHOOTCHI</small></button><p class="bulle-info" data-bulle="whootchi" hidden>Les cartes peuvent être retournées en Whootchi et inversent le sens du jeu.</p></div>
+          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="repetition">?</button><button type="button" data-regle="repetition"><strong>Gare au rappel</strong><small>RÉPÉTITION</small></button><p class="bulle-info" data-bulle="repetition" hidden>Un joueur ne peut pas rejouer exactement la même carte. Whoot et Whootchi sont différents.</p></div>
+          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="trio">?</button><button type="button" data-regle="trio"><strong>Jamais trois sans faute</strong><small>TRIO INTERDIT</small></button><p class="bulle-info" data-bulle="trio" hidden>Une troisième carte identique ne peut pas être présente devant les joueurs.</p></div>
+          <div class="tuile-regle"><button class="aide-regle" type="button" data-info="point-faible">?</button><button type="button" data-regle="point-faible"><strong>Protège le point faible</strong><small>MAILLON FAIBLE</small></button><p class="bulle-info" data-bulle="point-faible" hidden>Les joueurs les moins pénalisés ne peuvent pas viser l’unique joueur qui a le plus de fausses notes.</p></div>
         </div>
         <label class="champ chrono-difficulte">
           <span>Temps pour jouer</span>
@@ -154,18 +155,15 @@
             <span>secondes</span>
           </div>
         </label>
-        <label class="champ chrono-difficulte">
+        <div class="champ chrono-difficulte choix-centre">
           <span>Animation des cartes</span>
-          <select id="vitesse-animation">
-            <option value="normale">Normale · bien visible</option>
-            <option value="rapide">Rapide · joueurs confirmés</option>
-            <option value="aucune">Désactivée · jeu instantané</option>
-          </select>
-        </label>
+          <input id="vitesse-animation" type="hidden" value="normale" />
+          <div class="pastilles-animation" role="group" aria-label="Vitesse des animations"><button class="actif" type="button" data-animation="normale">Normale</button><button type="button" data-animation="rapide">Rapide</button><button type="button" data-animation="aucune">Sans</button></div>
+        </div>
         <button id="valider-difficulte" class="primaire" type="button">C'est parti !</button>
       </dialog>
     </main>
-    <script type="module" src="jeu.js?v=20"></script>
+    <script type="module" src="jeu.js?v=22"></script>
   </body>
 </html>
 
