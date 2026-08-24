@@ -5,9 +5,9 @@ const nomsDeScene = ['Docteur Groove', 'Lady Tempo', 'Captain Riff', 'Mister Bea
 const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
 const profils = {
   debutant: { regles: [], ia: 3, chrono: 8, animation: 'normale' },
-  intermediaire: { regles: ['whootchi'], ia: 5, chrono: 7, animation: 'normale' },
-  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 6, animation: 'rapide' },
-  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 10, chrono: 5, animation: 'rapide' },
+  intermediaire: { regles: ['whootchi'], ia: 5, chrono: 5, animation: 'normale' },
+  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 3, animation: 'rapide' },
+  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 10, chrono: 2, animation: 'rapide' },
 };
 const elements = {
   accueil: document.querySelector('#accueil'),
