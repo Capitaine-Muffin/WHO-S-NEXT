@@ -33,6 +33,9 @@ const elements = {
   difficulte: document.querySelector('#difficulte'),
   validerDifficulte: document.querySelector('#valider-difficulte'),
   vitesseAnimation: document.querySelector('#vitesse-animation'),
+  portraitMenu: document.querySelector('#portrait-menu'),
+  rapport: document.querySelector('#rapport-partie'),
+  listeRapport: document.querySelector('#liste-rapport'),
 };
 
 let etat = null;
@@ -46,6 +49,13 @@ elements.relancerChrono.addEventListener('click', relancerChrono);
 elements.flip.addEventListener('click', retournerMain);
 elements.ouvrirDifficulte.addEventListener('click', ouvrirDifficulte);
 elements.validerDifficulte.addEventListener('click', () => elements.difficulte.close());
+document.querySelectorAll('[data-joueurs]').forEach((bouton) => bouton.addEventListener('click', () => choisirPastille('joueurs', bouton)));
+document.querySelectorAll('[data-ia]').forEach((bouton) => bouton.addEventListener('click', () => choisirPastille('ia', bouton)));
+document.querySelectorAll('[data-animation]').forEach((bouton) => bouton.addEventListener('click', () => choisirPastille('animation', bouton)));
+document.querySelectorAll('[data-info]').forEach((bouton) => bouton.addEventListener('click', (event) => afficherAide(event, bouton.dataset.info)));
+document.querySelector('#ouvrir-rapport').addEventListener('click', () => basculerRapport(true));
+document.querySelector('#fermer-rapport').addEventListener('click', () => basculerRapport(false));
+document.querySelector('#retour-en-ligne').addEventListener('click', changerPortraitMenu);
 elements.difficulte.querySelectorAll('[data-regle]').forEach((bouton) => {
   bouton.addEventListener('click', () => basculerRegle(bouton));
 });
@@ -54,6 +64,7 @@ elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => {
 });
 document.addEventListener('keydown', gererClavier);
 elements.nomJoueur.value = nomDeSceneAleatoire();
+changerPortraitMenu();
 initialiserMultijoueur({
   elements,
   obtenirNom: () => elements.nomJoueur.value.trim() || nomDeSceneAleatoire(),
@@ -95,6 +106,8 @@ function demarrerPartie() {
     premierTour: true,
     faceMainWhootchi: false,
     vitesseAnimation: elements.vitesseAnimation.value,
+    animationErreur: false,
+    rapport: [],
   };
 
   elements.accueil.classList.remove('actif');
@@ -104,6 +117,28 @@ function demarrerPartie() {
 
 function nomDeSceneAleatoire() {
   return nomsDeScene[Math.floor(Math.random() * nomsDeScene.length)];
+}
+
+function choisirPastille(type, bouton) {
+  const attribut = type === 'joueurs' ? 'data-joueurs' : `data-${type}`;
+  document.querySelectorAll(`[${attribut}]`).forEach((candidat) => candidat.classList.toggle('actif', candidat === bouton));
+  const cible = type === 'joueurs' ? elements.nombreJoueurs : (type === 'ia' ? elements.niveauIA : elements.vitesseAnimation);
+  cible.value = bouton.dataset[type];
+}
+
+function afficherAide(event, nom) {
+  event.stopPropagation();
+  const bulle = document.querySelector(`[data-bulle="${nom}"]`);
+  if (!bulle) return;
+  document.querySelectorAll('[data-bulle]').forEach((autre) => { if (autre !== bulle) autre.hidden = true; });
+  bulle.hidden = !bulle.hidden;
+}
+
+function changerPortraitMenu() {
+  const index = Math.floor(Math.random() * 12);
+  const colonnes = [36, 382, 728, 1074, 1420, 1766];
+  elements.portraitMenu.style.setProperty('--portrait-x', `${-colonnes[index % 6] * .41}px`);
+  elements.portraitMenu.style.setProperty('--portrait-y', `${(index < 6 ? -36 : -384) * .41}px`);
 }
 
 function ouvrirDifficulte() {
@@ -139,6 +174,7 @@ function nouvelleManche() {
   }
 
   etat.manche += 1;
+  ajouterRapport({ type: 'manche', texte: `Début de la manche ${etat.manche}` });
   etat.chef = etat.actif;
   etat.sens = 0;
   etat.choixSens = true;
@@ -184,7 +220,7 @@ function creerMain(nombreJoueurs) {
 }
 
 async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
-  if (!etat?.enCours || etat.animation || etat.choixSens) return;
+  if (!etat?.enCours || etat.animationErreur || etat.choixSens) return;
   const joueur = etat.joueurs[auteur];
   if (!joueur) return;
   const carteBase = joueur.main[indexCarte];
@@ -193,38 +229,55 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
 
   if (auteur !== etat.actif) {
     arreterTemps();
-    etat.animation = true;
+    etat.animationErreur = true;
+    ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, carte });
     await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
-    etat.animation = false;
+    etat.animationErreur = false;
     sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
     return;
   }
 
   if (estPoseInterdite(joueur, carte)) {
     arreterTemps();
-    etat.animation = true;
+    etat.animationErreur = true;
+    ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, carte });
     await animerCarteErreur(joueur, carte, `${joueur.nom} joue une carte interdite !`);
-    etat.animation = false;
+    etat.animationErreur = false;
     sanctionner(joueur, 'Cette carte ne pouvait pas être jouée.');
     return;
   }
 
   arreterTemps();
-  etat.animation = true;
   joueur.derniere = { ...carte };
   joueur.historique.push({ ...carte });
   joueur.historique = joueur.historique.slice(-2);
   joueur.erreurConsecutive = 0;
   etat.premierTour = false;
+  ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
 
   if (carte.whootchi) etat.sens *= -1;
   const distance = carte.valeur * etat.sens;
   etat.actif = (etat.actif + distance + etat.joueurs.length * 10) % etat.joueurs.length;
 
   afficher();
-  await animerCarteJouee(auteur, joueur, carte);
-  etat.animation = false;
+  animerCarteJouee(auteur, joueur, carte);
+  if (await tenterErreurIA(auteur)) return;
   commencerTour();
+}
+
+async function tenterErreurIA(dernierAuteur) {
+  const candidats = etat.joueurs.filter((joueur, index) => !joueur.humain && index !== dernierAuteur && index !== etat.actif);
+  if (!candidats.length || Math.random() >= probabiliteErreur()) return false;
+  const joueur = candidats[Math.floor(Math.random() * candidats.length)];
+  const carteBase = joueur.main[Math.floor(Math.random() * joueur.main.length)];
+  const carte = { ...carteBase, whootchi: aRegle('whootchi') && Math.random() < .5 };
+  arreterTemps();
+  etat.animationErreur = true;
+  ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, carte });
+  await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
+  etat.animationErreur = false;
+  sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
+  return true;
 }
 
 async function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une fausse note !`) {
@@ -253,6 +306,7 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
   document.body.append(animation);
 
   const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
+  const positionPile = Math.max(0, joueur.historique.length - 1);
   cible?.classList.add('cible-animation');
 
   await attendre(rapide ? 350 : 1000);
@@ -264,7 +318,6 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
     etiquette.style.display = 'none';
     const arriveeX = cadre.left + cadre.width / 2;
     const arriveeY = cadre.top + cadre.height / 2;
-    const positionPile = Math.max(0, joueur.historique.length - 1);
     const angleFinal = -7 + positionPile * 10;
     await animation.animate([
       { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
@@ -347,17 +400,6 @@ async function jouerIA(joueur) {
     faces.map((whootchi) => ({ carte: { ...carte, whootchi }, index, retourner: whootchi }))
   ).filter(({ carte }) => !estPoseInterdite(joueur, carte));
 
-  if (Math.random() < probabiliteErreur()) {
-    const carteErreur = joueur.main[Math.floor(Math.random() * joueur.main.length)];
-    const carteAnimee = { ...carteErreur, whootchi: aRegle('whootchi') && Math.random() < .5 };
-    arreterTemps();
-    etat.animation = true;
-    await animerCarteErreur(joueur, carteAnimee, `${joueur.nom} se trompe !`);
-    etat.animation = false;
-    sanctionner(joueur, `${joueur.nom} s'est emmêlé dans le rythme.`);
-    return;
-  }
-
   const choix = options[Math.floor(Math.random() * options.length)];
   if (!choix) {
     sanctionner(joueur, `${joueur.nom} n'avait aucun coup valable.`);
@@ -378,6 +420,7 @@ function sanctionner(joueur, raison) {
   joueur.erreurConsecutive += 1;
   const penalite = 1;
   joueur.notes += penalite;
+  ajouterRapport({ type: 'faute', joueur: joueur.nom, texte: raison });
   etat.actif = etat.joueurs.indexOf(joueur);
   afficher();
 
@@ -412,6 +455,55 @@ function afficher() {
   afficherChrono();
   afficherTable();
   afficherMain();
+  if (!elements.rapport.hidden) afficherRapport();
+}
+
+function ajouterRapport(entree) {
+  if (!etat) return;
+  etat.rapport.push({ ...entree, manche: etat.manche });
+  if (!elements.rapport.hidden) afficherRapport();
+}
+
+function basculerRapport(ouvert) {
+  elements.rapport.hidden = !ouvert;
+  if (ouvert) afficherRapport();
+}
+
+function afficherRapport() {
+  elements.listeRapport.replaceChildren();
+  const entrees = etat?.rapport ?? [];
+  if (!entrees.length) {
+    elements.listeRapport.innerHTML = '<div class="ligne-rapport">Le concert n’a pas encore commencé.</div>';
+    return;
+  }
+  entrees.forEach((entree) => {
+    const ligne = document.createElement('div');
+    ligne.className = `ligne-rapport${entree.type.includes('faute') ? ' faute' : ''}`;
+    if (entree.carte) {
+      const icone = document.createElement('i');
+      icone.className = 'icone-rapport';
+      appliquerMiniatureRapport(icone, entree.carte);
+      ligne.append(icone);
+    } else {
+      const icone = document.createElement('span');
+      icone.textContent = entree.type === 'manche' ? '🎬' : '♪';
+      ligne.append(icone);
+    }
+    const texte = document.createElement('span');
+    texte.textContent = entree.carte
+      ? `${entree.joueur} · ${nomCarte(entree.carte.valeur, entree.carte.whootchi)}${entree.type === 'carte-faute' ? ' · FAUSSE NOTE' : ''}`
+      : (entree.joueur ? `${entree.joueur} · ${entree.texte}` : entree.texte);
+    ligne.append(texte);
+    elements.listeRapport.append(ligne);
+  });
+  elements.listeRapport.scrollTop = elements.listeRapport.scrollHeight;
+}
+
+function appliquerMiniatureRapport(element, carte) {
+  const colonnes = [36, 382, 728, 1074, 1420, 1766];
+  const index = (carte.valeur - 1) * 2 + (carte.whootchi ? 1 : 0);
+  element.style.setProperty('--rapport-x', `${-colonnes[index % 6] * .15}px`);
+  element.style.setProperty('--rapport-y', `${(index < 6 ? -36 : -384) * .15}px`);
 }
 
 function afficherChrono() {
@@ -524,6 +616,8 @@ function quitterPartie() {
   if (elements.choixSens.open) elements.choixSens.close();
   if (elements.difficulte.open) elements.difficulte.close();
   etat = null;
+  elements.rapport.hidden = true;
+  changerPortraitMenu();
   elements.partie.classList.remove('actif');
   elements.accueil.classList.add('actif');
 }
