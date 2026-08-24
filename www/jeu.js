@@ -49,7 +49,9 @@ const elements = {
   vitesseAnimation: document.querySelector('#vitesse-animation'),
   portraitMenu: document.querySelector('#portrait-menu'),
   rapport: document.querySelector('#rapport-partie'),
-  listeRapport: document.querySelector('#liste-rapport'),
+  etapeRapport: document.querySelector('#etape-rapport'),
+  rapportPrecedent: document.querySelector('#rapport-precedent'),
+  rapportSuivant: document.querySelector('#rapport-suivant'),
   listeRapportDialogue: document.querySelector('#liste-rapport-dialogue'),
   guide: document.querySelector('#guide-tutoriel'),
   titreGuide: document.querySelector('#titre-guide'),
@@ -60,6 +62,7 @@ const elements = {
 let etat = null;
 let minuterie = null;
 let actionIA = null;
+let indexRapport = 0;
 
 elements.jouer.addEventListener('click', demarrerPartie);
 elements.quitter.addEventListener('click', quitterPartie);
@@ -75,6 +78,8 @@ document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.addEventLi
 document.querySelectorAll('[data-info]').forEach((bouton) => bouton.addEventListener('click', (event) => afficherAide(event, bouton.dataset.info)));
 document.querySelector('#ouvrir-rapport').addEventListener('click', () => basculerRapport(true));
 document.querySelector('#fermer-rapport').addEventListener('click', () => basculerRapport(false));
+elements.rapportPrecedent.addEventListener('click', () => deplacerRapport(-1));
+elements.rapportSuivant.addEventListener('click', () => deplacerRapport(1));
 document.querySelector('#retour-en-ligne').addEventListener('click', changerPortraitMenu);
 document.querySelector('#ouvrir-tutoriel').addEventListener('click', () => document.querySelector('#menu-tutoriels').showModal());
 document.querySelector('#fermer-menu-tutoriels').addEventListener('click', () => document.querySelector('#menu-tutoriels').close());
@@ -686,17 +691,69 @@ function afficher() {
 function ajouterRapport(entree) {
   if (!etat) return;
   etat.rapport.push({ ...entree, manche: etat.manche });
-  if (!elements.rapport.hidden) afficherRapport();
+  if (!elements.rapport.hidden) {
+    indexRapport = etat.rapport.length - 1;
+    afficherRapport();
+  }
 }
 
 function basculerRapport(ouvert) {
   elements.rapport.hidden = !ouvert;
-  if (ouvert) afficherRapport();
+  if (ouvert) {
+    indexRapport = Math.max(0, (etat?.rapport.length ?? 1) - 1);
+    afficherRapport();
+  } else {
+    afficherTable();
+  }
 }
 
 function afficherRapport() {
-  construireRapport(elements.listeRapport);
   construireRapport(elements.listeRapportDialogue);
+  if (!elements.rapport.hidden) afficherEtapeRapport();
+}
+
+function deplacerRapport(direction) {
+  const maximum = Math.max(0, (etat?.rapport.length ?? 1) - 1);
+  indexRapport = Math.max(0, Math.min(maximum, indexRapport + direction));
+  afficherEtapeRapport();
+}
+
+function afficherEtapeRapport() {
+  elements.etapeRapport.replaceChildren();
+  const entrees = etat?.rapport ?? [];
+  const entree = entrees[indexRapport];
+  elements.rapportPrecedent.disabled = indexRapport <= 0;
+  elements.rapportSuivant.disabled = indexRapport >= entrees.length - 1;
+  if (!entree) {
+    elements.etapeRapport.textContent = 'Aucune action enregistrée.';
+    afficherTable(etat.joueurs.map(() => []));
+    return;
+  }
+  const icone = document.createElement(entree.carte ? 'i' : 'span');
+  if (entree.carte) {
+    icone.className = 'icone-rapport';
+    appliquerMiniatureRapport(icone, entree.carte);
+  } else {
+    icone.textContent = entree.type === 'manche' ? '🎬' : '♪';
+  }
+  const texte = document.createElement('span');
+  texte.textContent = `${indexRapport + 1}/${entrees.length} · ${texteRapport(entree)}`;
+  elements.etapeRapport.append(icone, texte);
+  afficherTable(reconstruirePoses(indexRapport));
+}
+
+function reconstruirePoses(jusqua) {
+  const historiques = etat.joueurs.map(() => []);
+  for (let index = 0; index <= jusque; index += 1) {
+    const entree = etat.rapport[index];
+    if (entree.type === 'manche') historiques.forEach((historique) => historique.splice(0));
+    if (entree.type !== 'carte' || !entree.carte) continue;
+    const indexJoueur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
+    if (indexJoueur < 0) continue;
+    historiques[indexJoueur].push({ ...entree.carte });
+    historiques[indexJoueur] = historiques[indexJoueur].slice(-2);
+  }
+  return historiques;
 }
 
 function construireRapport(conteneur) {
@@ -720,13 +777,17 @@ function construireRapport(conteneur) {
       ligne.append(icone);
     }
     const texte = document.createElement('span');
-    texte.textContent = entree.carte
-      ? `${entree.joueur} · ${nomCarte(entree.carte.valeur, entree.carte.whootchi)}${entree.type === 'carte-faute' ? ' · FAUSSE NOTE' : ''}`
-      : (entree.joueur ? `${entree.joueur} · ${entree.texte}` : entree.texte);
+    texte.textContent = texteRapport(entree);
     ligne.append(texte);
     conteneur.append(ligne);
   });
   conteneur.scrollTop = conteneur.scrollHeight;
+}
+
+function texteRapport(entree) {
+  return entree.carte
+    ? `${entree.joueur} · ${nomCarte(entree.carte.valeur, entree.carte.whootchi)}${entree.type === 'carte-faute' ? ' · FAUSSE NOTE' : ''}`
+    : (entree.joueur ? `${entree.joueur} · ${entree.texte}` : entree.texte);
 }
 
 function appliquerMiniatureRapport(element, carte) {
@@ -741,7 +802,7 @@ function afficherChrono() {
   elements.chronoBloc.classList.toggle('urgent', Boolean(etat && etat.temps <= 3));
 }
 
-function afficherTable() {
+function afficherTable(historiquesSimules = null) {
   elements.table.replaceChildren();
   const nombre = etat.joueurs.length;
   etat.joueurs.forEach((joueur, index) => {
@@ -759,7 +820,8 @@ function afficherTable() {
     const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
     carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
-    joueur.historique.forEach((carteJouee, position) => {
+    const historiqueAffiche = historiquesSimules?.[index] ?? joueur.historique;
+    historiqueAffiche.forEach((carteJouee, position) => {
       const conteneur = document.createElement('div');
       conteneur.className = 'derniere-carte';
       conteneur.style.setProperty('--position-pile', position);
