@@ -275,6 +275,8 @@ select {
 .sens-tutoriel strong { position: absolute; left: 50%; bottom: -10px; padding: .25rem .45rem; border-radius: 999px; background: #167aa9; color: white; font-size: .52rem; white-space: nowrap; transform: translateX(-50%); }
 .sens-tutoriel.antihoraire span { color: #df1738; }
 .sens-tutoriel.antihoraire strong { background: #df1738; }
+.direction-joueur { position: absolute; z-index: 10; left: 50%; top: -23px; display: grid; place-items: center; width: 31px; height: 31px; border: 3px solid white; border-radius: 50%; background: #167aa9; color: white; font-size: 1.35rem; font-style: normal; font-weight: 950; line-height: 1; box-shadow: 0 3px 0 #0b5c82; transform: translateX(-50%); animation: apparition-repere .3s ease both; }
+.direction-joueur.antihoraire { background: #df1738; box-shadow: 0 3px 0 #8d0d24; }
 .badge-premier { position: absolute; left: 50%; top: -14px; padding: .25rem .42rem; border-radius: 999px; background: var(--rose); color: white; font-size: .52rem; letter-spacing: .06em; transform: translateX(-50%) rotate(-3deg); }
 .pile-cartes { position: absolute; z-index: 1; left: 50%; top: 29px; width: 66px; height: 82px; pointer-events: none; transform: translate(calc(-50% + var(--pile-x)), calc(-50% + var(--pile-y))); }
 .derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
