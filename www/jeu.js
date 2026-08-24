@@ -50,6 +50,7 @@ const elements = {
   portraitMenu: document.querySelector('#portrait-menu'),
   rapport: document.querySelector('#rapport-partie'),
   listeRapport: document.querySelector('#liste-rapport'),
+  listeRapportDialogue: document.querySelector('#liste-rapport-dialogue'),
   guide: document.querySelector('#guide-tutoriel'),
   titreGuide: document.querySelector('#titre-guide'),
   texteGuide: document.querySelector('#texte-guide'),
@@ -489,11 +490,11 @@ async function animerCarteJouee(indexJoueur, joueur, carte) {
 
   const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
   const positionPile = Math.max(0, joueur.historique.length - 1);
+  const cadre = cible?.getBoundingClientRect();
   cible?.classList.add('cible-animation');
 
   await attendre(rapide ? 350 : 1000);
 
-  const cadre = cible?.getBoundingClientRect();
   if (cadre) {
     const etiquette = animation.querySelector('strong');
     await etiquette.animate([{ opacity: 1 }, { opacity: 0 }], { duration: rapide ? 70 : 140, fill: 'forwards' }).finished;
@@ -666,6 +667,7 @@ function ouvrirDialogue(surtitre, titre, texte) {
   elements.finTitre.textContent = titre;
   elements.finTexte.textContent = texte;
   elements.continuer.textContent = etat.terminee ? 'Retour au menu' : 'Manche suivante';
+  afficherRapport();
   elements.dialogue.show();
 }
 
@@ -693,10 +695,15 @@ function basculerRapport(ouvert) {
 }
 
 function afficherRapport() {
-  elements.listeRapport.replaceChildren();
+  construireRapport(elements.listeRapport);
+  construireRapport(elements.listeRapportDialogue);
+}
+
+function construireRapport(conteneur) {
+  conteneur.replaceChildren();
   const entrees = etat?.rapport ?? [];
   if (!entrees.length) {
-    elements.listeRapport.innerHTML = '<div class="ligne-rapport">Le concert n’a pas encore commencé.</div>';
+    conteneur.innerHTML = '<div class="ligne-rapport">Le concert n’a pas encore commencé.</div>';
     return;
   }
   entrees.forEach((entree) => {
@@ -717,9 +724,9 @@ function afficherRapport() {
       ? `${entree.joueur} · ${nomCarte(entree.carte.valeur, entree.carte.whootchi)}${entree.type === 'carte-faute' ? ' · FAUSSE NOTE' : ''}`
       : (entree.joueur ? `${entree.joueur} · ${entree.texte}` : entree.texte);
     ligne.append(texte);
-    elements.listeRapport.append(ligne);
+    conteneur.append(ligne);
   });
-  elements.listeRapport.scrollTop = elements.listeRapport.scrollHeight;
+  conteneur.scrollTop = conteneur.scrollHeight;
 }
 
 function appliquerMiniatureRapport(element, carte) {
