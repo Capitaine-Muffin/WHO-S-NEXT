@@ -874,6 +874,14 @@ function afficherTable(historiquesSimules = null) {
       direction.setAttribute('aria-label', etat.sens > 0 ? 'Sens horaire' : 'Sens antihoraire');
       carte.append(direction);
     }
+    if (!historiquesSimules && etat.tutoriel && index === 0) {
+      const sensTutoriel = etat.tutoriel.parcours?.sens || etat.sens || 1;
+      const directionJ1 = document.createElement('i');
+      directionJ1.className = 'fleche-j1-tutoriel';
+      directionJ1.textContent = sensTutoriel > 0 ? '←' : '→';
+      directionJ1.setAttribute('aria-label', sensTutoriel > 0 ? 'Le jeu part vers la gauche' : 'Le jeu part vers la droite');
+      carte.append(directionJ1);
+    }
     elements.table.append(carte);
   });
   if (!historiquesSimules && etat.tutoriel?.parcours) afficherParcoursTutoriel(etat.tutoriel.parcours);
