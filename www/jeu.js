@@ -157,7 +157,7 @@ function demanderSens() {
   const chef = etat.joueurs[etat.chef];
   elements.message.textContent = `${chef.nom} choisit le sens du jeu…`;
   if (chef.humain) {
-    elements.choixSens.showModal();
+    elements.choixSens.show();
     return;
   }
 
