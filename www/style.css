@@ -269,6 +269,12 @@ select {
 .musicien.fautif .derniere-carte:last-child { filter: drop-shadow(0 0 5px #df1738); }
 .musicien.elimine { opacity: .42; filter: grayscale(1); }
 .musicien.elimine .avatar { outline-color: #6e666b; }
+.compte-tutoriel { position: absolute; z-index: 9; left: 50%; top: -20px; min-width: 42px; padding: .25rem .42rem; border: 3px solid white; border-radius: 999px; background: #df1738; color: white; font-size: .8rem; line-height: 1; box-shadow: 0 4px 0 #8d0d24; transform: translateX(-50%); animation: apparition-repere .3s ease both; }
+.sens-tutoriel { position: absolute; z-index: 8; left: 50%; top: 50%; width: 148px; height: 148px; pointer-events: none; transform: translate(-50%, -50%); }
+.sens-tutoriel span { display: block; color: #167aa9; font-size: 9.2rem; font-weight: 900; line-height: .82; text-shadow: 0 2px 0 white, 0 0 8px white; }
+.sens-tutoriel strong { position: absolute; left: 50%; bottom: -10px; padding: .25rem .45rem; border-radius: 999px; background: #167aa9; color: white; font-size: .52rem; white-space: nowrap; transform: translateX(-50%); }
+.sens-tutoriel.antihoraire span { color: #df1738; }
+.sens-tutoriel.antihoraire strong { background: #df1738; }
 .badge-premier { position: absolute; left: 50%; top: -14px; padding: .25rem .42rem; border-radius: 999px; background: var(--rose); color: white; font-size: .52rem; letter-spacing: .06em; transform: translateX(-50%) rotate(-3deg); }
 .pile-cartes { position: absolute; z-index: 1; left: 50%; top: 29px; width: 66px; height: 82px; pointer-events: none; transform: translate(calc(-50% + var(--pile-x)), calc(-50% + var(--pile-y))); }
 .derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
@@ -406,9 +412,7 @@ dialog .primaire { width: 100%; }
 #fin-manche h2 { margin: .2rem 0; font-size: 1.35rem; }
 #fin-manche p { margin: .3rem 0 .65rem; font-size: .82rem; }
 #fin-manche .primaire { min-height: 44px; margin: 0; padding: .55rem; border-radius: 12px; box-shadow: 0 4px 0 #b74d0b; }
-.rapport-dialogue { margin: .55rem 0 .75rem; padding: .45rem; border: 2px solid var(--bleu); border-radius: 12px; background: white; }
-.rapport-dialogue summary { color: var(--bleu-fonce); font-size: .78rem; font-weight: 950; cursor: pointer; }
-.rapport-dialogue .liste-rapport { max-height: 130px; margin-top: .45rem; }
+.rapport-dialogue { width: 100%; margin: .55rem 0 .75rem; padding: .55rem; border: 2px solid var(--bleu); border-radius: 12px; background: white; color: var(--bleu-fonce); font-size: .78rem; font-weight: 950; cursor: pointer; }
 .liste-niveaux { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: 1rem 0; }
 .tuile-regle { position: relative; }
 .liste-niveaux [data-regle] { width: 100%; height: 100%; min-height: 82px; padding: .8rem .45rem; border: 2px solid #c8e9f0; border-radius: 14px; background: white; color: var(--texte); text-align: center; }
@@ -431,6 +435,7 @@ dialog .primaire { width: 100%; }
 @keyframes relance { 50% { transform: translate(-50%, -50%) scale(1.1); } }
 @keyframes secousse { 25% { transform: translateX(-5px) rotate(-2deg); } 75% { transform: translateX(5px) rotate(2deg); } }
 @keyframes pulsation-faute { to { transform: scale(1.06); } }
+@keyframes apparition-repere { from { opacity: 0; transform: translateX(-50%) scale(.5); } }
 
 @media (min-width: 700px) {
   #partie { padding-inline: 2rem; }
