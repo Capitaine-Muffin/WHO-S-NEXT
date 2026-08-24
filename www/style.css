@@ -45,6 +45,7 @@ button { touch-action: manipulation; }
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
+  text-align: center;
 }
 
 .surtitre {
@@ -79,6 +80,20 @@ h1 img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
   font-weight: 800;
   letter-spacing: .03em;
 }
+
+.identite-menu { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: .8rem; text-align: center; }
+.identite-menu .champ { text-align: center; }
+.portrait-menu { width: 82px; height: 108px; border: 3px solid white; border-radius: 18px; background: white url('assets/cartes.webp') no-repeat; background-size: 820px 293.5px; background-position: var(--portrait-x) var(--portrait-y); box-shadow: 0 7px 0 #8f8178, 0 10px 18px #28212733; }
+.choix-centre { justify-items: center; text-align: center; }
+.pastilles-joueurs { display: grid; grid-template-columns: repeat(6, 1fr); gap: .35rem; width: 100%; }
+.pastilles-joueurs button { min-width: 0; aspect-ratio: .78; padding: .25rem .1rem; border: 3px solid white; border-radius: 13px; background: var(--couleur-pastille, var(--bleu)); color: white; box-shadow: 0 4px 0 #746a65; }
+.pastilles-joueurs button:nth-child(2) { --couleur-pastille: #d31338; }.pastilles-joueurs button:nth-child(3) { --couleur-pastille: #edae25; }.pastilles-joueurs button:nth-child(4) { --couleur-pastille: #906a8d; }.pastilles-joueurs button:nth-child(5) { --couleur-pastille: #78a916; }.pastilles-joueurs button:nth-child(6) { --couleur-pastille: #109f8b; }
+.pastilles-joueurs b, .pastilles-joueurs small { display: block; }.pastilles-joueurs b { font-size: 1.2rem; }.pastilles-joueurs small { font-size: .42rem; }
+.pastilles-joueurs button.actif, .pastilles-ia button.actif, .pastilles-animation button.actif { outline: 3px solid var(--rose); outline-offset: 2px; transform: translateY(-2px); }
+.pastilles-ia { display: grid; grid-template-columns: repeat(10, 1fr); gap: .25rem; width: 100%; }
+.pastilles-ia button { min-width: 0; aspect-ratio: 1; padding: 0; border: 2px solid white; border-radius: 50%; background: var(--bleu); color: white; font-size: .72rem; font-weight: 950; box-shadow: 0 3px 0 #17819a; }
+.aide-inline, .aide-regle { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: var(--rose); color: white; font-weight: 950; }
+.bulle-info { width: 100%; margin: .45rem 0 0; padding: .6rem; border-radius: 12px; background: #fff4cf; color: var(--texte) !important; font-size: .72rem; line-height: 1.35; text-align: left; }
 
 select {
   width: 100%;
@@ -292,6 +307,15 @@ select {
 
 .zone-joueur { position: relative; z-index: 3; display: grid; gap: .55rem; margin-top: -1.3rem; padding: .9rem .8rem .35rem; border: 3px solid var(--bleu); border-bottom: 0; border-radius: 22px 22px 0 0; background: linear-gradient(180deg, #fffffffa, #e8f7fb); box-shadow: 0 -12px 30px #167aa933; }
 .infos-joueur { display: flex; justify-content: space-between; color: var(--muet); font-size: .78rem; font-weight: 800; }
+.infos-joueur > div { display: flex; align-items: center; gap: .55rem; }
+.ouvrir-rapport { padding: .25rem .5rem; border: 0; border-radius: 999px; background: var(--bleu); color: white; font-size: .68rem; font-weight: 950; }
+.rapport-partie { max-height: 180px; padding: .6rem; border: 2px solid var(--bleu); border-radius: 14px; background: #fffdf6; overflow: hidden; }
+.entete-rapport { display: flex; align-items: center; justify-content: space-between; }
+.entete-rapport button { width: 26px; height: 26px; border: 0; border-radius: 50%; background: var(--rose); color: white; font-size: 1.1rem; }
+.liste-rapport { display: grid; gap: .35rem; max-height: 130px; margin-top: .4rem; overflow-y: auto; }
+.ligne-rapport { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: .45rem; min-height: 38px; padding: .25rem .4rem; border-radius: 10px; background: var(--surface-2); color: var(--texte); font-size: .7rem; text-align: left; }
+.ligne-rapport.faute { grid-template-columns: 32px 1fr; background: #ffe3e8; color: #a90e2a; }
+.icone-rapport { display: grid; place-items: center; width: 30px; height: 34px; border-radius: 5px; background: white url('assets/cartes.webp') no-repeat; background-size: 300px 107.4px; background-position: var(--rapport-x) var(--rapport-y); box-shadow: 0 2px 0 #8f8178; }
 .main-et-flip { display: grid; grid-template-columns: minmax(0, 1fr) 50px; align-items: center; gap: .35rem; }
 .main-cartes { display: grid; justify-content: center; gap: .35rem; padding: .3rem .1rem .65rem; }
 
@@ -328,6 +352,7 @@ dialog {
   color: var(--texte);
   text-align: center;
 }
+#difficulte { max-height: 90dvh; overflow-y: auto; }
 
 dialog::backdrop { background: #08050cbb; backdrop-filter: blur(5px); }
 dialog h2 { margin: .5rem 0; font-size: 2rem; }
@@ -345,12 +370,17 @@ dialog .primaire { width: 100%; }
 #fin-manche h2 { margin: .2rem 0; font-size: 1.35rem; }
 #fin-manche p { margin: .3rem 0 .65rem; font-size: .82rem; }
 #fin-manche .primaire { min-height: 44px; margin: 0; padding: .55rem; border-radius: 12px; box-shadow: 0 4px 0 #b74d0b; }
-.liste-niveaux { display: grid; gap: .65rem; margin: 1rem 0; }
-.liste-niveaux button { padding: .8rem 1rem; border: 2px solid #c8e9f0; border-radius: 14px; background: white; color: var(--texte); text-align: left; }
+.liste-niveaux { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: 1rem 0; }
+.tuile-regle { position: relative; }
+.liste-niveaux [data-regle] { width: 100%; height: 100%; min-height: 82px; padding: .8rem .45rem; border: 2px solid #c8e9f0; border-radius: 14px; background: white; color: var(--texte); text-align: center; }
 .liste-niveaux button strong, .liste-niveaux button small { display: block; }
 .liste-niveaux button small { margin-top: .25rem; color: var(--muet); line-height: 1.25; }
-.liste-niveaux button.actif { border-color: var(--rose); background: #fff3e9; box-shadow: 0 0 0 2px #f47b2133; }
+.liste-niveaux [data-regle].actif { border-color: var(--rose); background: #fff3e9; box-shadow: 0 0 0 2px #f47b2133; }
+.aide-regle { position: absolute; z-index: 2; right: -.25rem; top: -.25rem; }
+.tuile-regle .bulle-info { position: absolute; z-index: 4; left: 0; top: 100%; box-shadow: 0 8px 18px #28212744; }
 .chrono-difficulte { margin-top: 1rem; text-align: left; }
+.pastilles-animation { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; width: 100%; }
+.pastilles-animation button { min-height: 42px; border: 2px solid var(--bleu); border-radius: 999px; background: white; color: var(--bleu-fonce); font-size: .75rem; font-weight: 900; }
 
 @keyframes pulse { to { transform: scale(1.06); } }
 @keyframes tic { to { transform: rotate(6deg); } }
