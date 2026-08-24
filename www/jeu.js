@@ -9,6 +9,14 @@ const profils = {
   expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 3, animation: 'rapide' },
   impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 9, chrono: 2, animation: 'rapide' },
 };
+const parcoursTutoriels = {
+  base: { regles: [], intro: 'Voici la table : toi en bas, les autres musiciens autour et la pendule au centre.', notion: 'La valeur d’une carte indique combien de musiciens avancer dans le sens du jeu.', demo: { valeur: 2, whootchi: false }, resultat: 'Double Whoot avance de deux musiciens : c’est donc à Jazz de jouer.', attendu: { valeur: 1, whootchi: false }, essai: 'Touche la carte Whoot avant la fin du chrono.' },
+  whootchi: { regles: ['whootchi'], intro: 'Whootchi permet de renverser le concert avec l’autre face des cartes.', notion: 'Le bouton Flip retourne toute ta main. Une carte Whootchi inverse immédiatement le sens du jeu.', demo: { valeur: 1, whootchi: true }, resultat: 'Mélodie joue Whootchi : le sens vient de s’inverser.', attendu: { valeur: 1, whootchi: true }, essai: 'Touche Flip, puis joue la carte Whootchi.' },
+  repetition: { regles: ['repetition'], intro: 'Chaque musicien doit varier ce qu’il joue.', notion: 'Rejouer exactement sa propre carte précédente provoque une fausse note.', demo: { valeur: 1, whootchi: false }, resultat: 'Mélodie vient de jouer Whoot. À son prochain tour, elle devra choisir autre chose.', attendu: { valeur: 2, whootchi: false }, essai: 'Tu avais joué Whoot : joue maintenant Double Whoot.' },
+  trio: { regles: ['trio'], intro: 'Pour garder le concert varié, surveille aussi les cartes des autres.', notion: 'Deux cartes identiques peuvent être visibles, mais poser la troisième est interdit.', demo: { valeur: 1, whootchi: false }, resultat: 'Deux cartes Whoot sont maintenant visibles sur la table : une troisième serait une faute.', attendu: { valeur: 2, whootchi: false }, essai: 'Évite la troisième Whoot et joue Double Whoot.' },
+  'point-faible': { regles: ['point-faible'], intro: 'Les musiciens en tête doivent protéger celui qui accumule les fausses notes.', notion: 'Si un seul joueur possède le maximum de fausses notes, les joueurs au minimum ne peuvent pas le viser.', demo: { valeur: 1, whootchi: false }, resultat: 'Mélodie est le point faible : il faut choisir une carte qui ne tombe pas sur elle.', attendu: { valeur: 2, whootchi: false }, essai: 'Joue Double Whoot pour passer au-delà de Mélodie.' },
+  'mort-subite': { regles: ['mort-subite'], intro: 'En Mort subite, atteindre 7 fausses notes élimine le musicien.', notion: 'Les éliminés restent visibles mais les cartes sautent leur place. La finale commence à deux survivants.', demo: { valeur: 1, whootchi: false }, resultat: 'Jazz vient d’atteindre 7 fausses notes : il est grisé et quitte le concert.', attendu: { valeur: 1, whootchi: false }, essai: 'Continue le concert en jouant Whoot.' },
+};
 const elements = {
   accueil: document.querySelector('#accueil'),
   partie: document.querySelector('#partie'),
@@ -42,6 +50,10 @@ const elements = {
   portraitMenu: document.querySelector('#portrait-menu'),
   rapport: document.querySelector('#rapport-partie'),
   listeRapport: document.querySelector('#liste-rapport'),
+  guide: document.querySelector('#guide-tutoriel'),
+  titreGuide: document.querySelector('#titre-guide'),
+  texteGuide: document.querySelector('#texte-guide'),
+  suiteGuide: document.querySelector('#suite-guide'),
 };
 
 let etat = null;
@@ -63,8 +75,13 @@ document.querySelectorAll('[data-info]').forEach((bouton) => bouton.addEventList
 document.querySelector('#ouvrir-rapport').addEventListener('click', () => basculerRapport(true));
 document.querySelector('#fermer-rapport').addEventListener('click', () => basculerRapport(false));
 document.querySelector('#retour-en-ligne').addEventListener('click', changerPortraitMenu);
-document.querySelector('#ouvrir-tutoriel').addEventListener('click', () => document.querySelector('#tutoriel').showModal());
-document.querySelector('#fermer-tutoriel').addEventListener('click', () => document.querySelector('#tutoriel').close());
+document.querySelector('#ouvrir-tutoriel').addEventListener('click', () => document.querySelector('#menu-tutoriels').showModal());
+document.querySelector('#fermer-menu-tutoriels').addEventListener('click', () => document.querySelector('#menu-tutoriels').close());
+document.querySelectorAll('[data-tutoriel]').forEach((bouton) => bouton.addEventListener('click', () => {
+  document.querySelector('#menu-tutoriels').close();
+  demarrerTutoriel(bouton.dataset.tutoriel);
+}));
+elements.suiteGuide.addEventListener('click', avancerTutoriel);
 elements.dureeChrono.addEventListener('change', marquerPersonnalise);
 elements.difficulte.querySelectorAll('[data-regle]').forEach((bouton) => {
   bouton.addEventListener('click', () => basculerRegle(bouton));
@@ -171,6 +188,141 @@ function changerPortraitMenu() {
   elements.portraitMenu.style.setProperty('--portrait-y', `${(index < 6 ? -36 : -384) * .41}px`);
 }
 
+function demarrerTutoriel(type = 'base') {
+  const parcours = parcoursTutoriels[type] ?? parcoursTutoriels.base;
+  const nomHumain = elements.nomJoueur.value.trim() || nomDeSceneAleatoire();
+  const noms = [nomHumain, 'Mélodie', 'Tempo', 'Jazz'];
+  const joueurs = noms.map((nom, index) => ({
+    nom,
+    humain: index === 0,
+    avatar: avatars[index],
+    notes: 0,
+    main: creerMain(4),
+    derniere: null,
+    historique: [],
+    erreurConsecutive: 0,
+    elimine: false,
+  }));
+  etat = {
+    joueurs,
+    regles: parcours.regles,
+    niveauIA: 10,
+    manche: 1,
+    sens: 1,
+    actif: 1,
+    chef: 0,
+    dureeChrono: 8,
+    temps: 8,
+    enCours: false,
+    premierTour: false,
+    faceMainWhootchi: false,
+    vitesseAnimation: 'rapide',
+    animationErreur: false,
+    rapport: [{ type: 'manche', texte: 'Début du tutoriel', manche: 1 }],
+    tutoriel: { etape: 0, type },
+  };
+  if (type === 'trio') {
+    etat.joueurs[2].derniere = { valeur: 1, whootchi: false };
+    etat.joueurs[2].historique.push({ valeur: 1, whootchi: false });
+  }
+  if (type === 'point-faible') etat.joueurs[1].notes = 4;
+  if (type === 'mort-subite') etat.joueurs[3].notes = 6;
+  elements.accueil.classList.remove('actif');
+  elements.partie.classList.add('actif');
+  elements.guide.hidden = false;
+  elements.suiteGuide.hidden = false;
+  elements.suiteGuide.textContent = 'Suivant';
+  elements.titreGuide.textContent = 'Bienvenue sur scène !';
+  elements.texteGuide.textContent = parcours.intro;
+  elements.message.textContent = 'Observe la table de jeu';
+  afficher();
+}
+
+async function avancerTutoriel() {
+  if (!etat?.tutoriel) return;
+  const tutoriel = etat.tutoriel;
+  if (tutoriel.etape === 0) {
+    tutoriel.etape = 1;
+    elements.titreGuide.textContent = 'Suis le rythme';
+    elements.texteGuide.textContent = parcoursTutoriels[tutoriel.type].notion;
+    return;
+  }
+  if (tutoriel.etape === 1) {
+    tutoriel.etape = 2;
+    const joueur = etat.joueurs[1];
+    const parcours = parcoursTutoriels[tutoriel.type];
+    const carte = { ...parcours.demo };
+    joueur.derniere = { ...carte };
+    joueur.historique.push({ ...carte });
+    ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
+    elements.titreGuide.textContent = 'Regarde Mélodie';
+    elements.texteGuide.textContent = `${joueur.nom} joue ${nomCarte(carte.valeur, carte.whootchi)}…`;
+    elements.suiteGuide.hidden = true;
+    afficher();
+    await animerCarteJouee(1, joueur, carte);
+    if (tutoriel.type === 'whootchi') etat.sens = -1;
+    if (tutoriel.type === 'mort-subite') {
+      etat.joueurs[3].notes = 7;
+      etat.joueurs[3].elimine = true;
+      etat.joueurs[3].main = [];
+      afficher();
+    }
+    elements.titreGuide.textContent = tutoriel.type === 'base' ? 'Deux places plus loin' : 'Observe la règle';
+    elements.texteGuide.textContent = `${parcours.resultat} À toi d’essayer maintenant !`;
+    elements.suiteGuide.hidden = false;
+    return;
+  }
+  if (tutoriel.etape === 2) {
+    const parcours = parcoursTutoriels[tutoriel.type];
+    if (tutoriel.type === 'repetition') etat.joueurs[0].derniere = { valeur: 1, whootchi: false };
+    tutoriel.etape = 3;
+    etat.actif = 0;
+    etat.enCours = true;
+    etat.temps = 8;
+    elements.titreGuide.textContent = 'À toi de jouer en direct !';
+    elements.texteGuide.textContent = parcours.essai;
+    elements.suiteGuide.hidden = true;
+    elements.message.textContent = tutoriel.type === 'whootchi' ? 'FLIP, PUIS JOUE WHOOTCHI !' : `JOUE ${nomCarte(parcours.attendu.valeur, parcours.attendu.whootchi).toUpperCase()} !`;
+    afficher();
+    minuterie = setInterval(() => {
+      etat.temps -= 1;
+      if (etat.temps <= 0) {
+        etat.temps = 8;
+        elements.texteGuide.textContent = `Presque ! Le chrono repart : ${parcours.essai}`;
+      }
+      afficherChrono();
+    }, 1000);
+    return;
+  }
+  quitterPartie();
+}
+
+function jouerCarteTutoriel(indexCarte, retourner = false) {
+  if (etat.tutoriel.etape !== 3) return;
+  const parcours = parcoursTutoriels[etat.tutoriel.type];
+  const valeur = indexCarte + 1;
+  const whootchi = retourner && aRegle('whootchi');
+  if (valeur !== parcours.attendu.valeur || whootchi !== parcours.attendu.whootchi) {
+    elements.texteGuide.textContent = `Pas celle-ci : ${parcours.essai}`;
+    return;
+  }
+  arreterTemps();
+  const joueur = etat.joueurs[0];
+  const carte = { valeur, whootchi };
+  joueur.derniere = { ...carte };
+  joueur.historique.push({ ...carte });
+  ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
+  etat.enCours = false;
+  afficher();
+  animerCarteJouee(0, joueur, carte);
+  etat.tutoriel.etape = 4;
+  elements.titreGuide.textContent = 'Bravo, tu es prêt à jouer !';
+  elements.texteGuide.textContent = etat.tutoriel.type === 'base' ? 'Tu sais suivre le sens, lire une carte et jouer avant la fin du chrono. Le concert peut commencer !' : 'Tu maîtrises cette règle. Tu peux maintenant l’activer dans une vraie partie !';
+  elements.message.textContent = 'TUTORIEL TERMINÉ';
+  elements.suiteGuide.textContent = 'Retour au menu';
+  elements.suiteGuide.hidden = false;
+}
+
 function ouvrirDifficulte() {
   elements.difficulte.showModal();
 }
@@ -250,6 +402,7 @@ function creerMain(nombreJoueurs) {
 
 async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (!etat?.enCours || etat.animationErreur || etat.choixSens) return;
+  if (etat.tutoriel) return jouerCarteTutoriel(indexCarte, retourner);
   const joueur = etat.joueurs[auteur];
   if (!joueur) return;
   const carteBase = joueur.main[indexCarte];
@@ -685,8 +838,10 @@ function quitterPartie() {
   if (elements.dialogue.open) elements.dialogue.close();
   if (elements.choixSens.open) elements.choixSens.close();
   if (elements.difficulte.open) elements.difficulte.close();
+  if (document.querySelector('#menu-tutoriels').open) document.querySelector('#menu-tutoriels').close();
   etat = null;
   elements.rapport.hidden = true;
+  elements.guide.hidden = true;
   changerPortraitMenu();
   elements.partie.classList.remove('actif');
   elements.accueil.classList.add('actif');
