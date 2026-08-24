@@ -398,6 +398,9 @@ dialog .primaire { width: 100%; }
 #fin-manche h2 { margin: .2rem 0; font-size: 1.35rem; }
 #fin-manche p { margin: .3rem 0 .65rem; font-size: .82rem; }
 #fin-manche .primaire { min-height: 44px; margin: 0; padding: .55rem; border-radius: 12px; box-shadow: 0 4px 0 #b74d0b; }
+.rapport-dialogue { margin: .55rem 0 .75rem; padding: .45rem; border: 2px solid var(--bleu); border-radius: 12px; background: white; }
+.rapport-dialogue summary { color: var(--bleu-fonce); font-size: .78rem; font-weight: 950; cursor: pointer; }
+.rapport-dialogue .liste-rapport { max-height: 130px; margin-top: .45rem; }
 .liste-niveaux { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: 1rem 0; }
 .tuile-regle { position: relative; }
 .liste-niveaux [data-regle] { width: 100%; height: 100%; min-height: 82px; padding: .8rem .45rem; border: 2px solid #c8e9f0; border-radius: 14px; background: white; color: var(--texte); text-align: center; }
