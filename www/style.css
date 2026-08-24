@@ -123,6 +123,14 @@ select {
 .bouton-difficulte { width: 100%; min-height: 64px; padding: .7rem 1rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--texte); text-align: left; }
 .bouton-difficulte strong, .bouton-difficulte small { display: block; }
 .bouton-difficulte small { margin-top: .25rem; color: var(--muet); }
+.bouton-difficulte.avance { text-align: center; border-style: dashed; }
+.bouton-difficulte.personnalise { border-style: solid; border-color: var(--rose); background: #fff3e9; }
+.bouton-difficulte.tutoriel { text-align: center; border-color: var(--rose); background: #fff8d7; }
+.niveaux-prets { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; width: 100%; }
+.niveaux-prets button { min-height: 72px; padding: .65rem .45rem; border: 3px solid white; border-radius: 16px; background: var(--bleu); color: white; box-shadow: 0 5px 0 #17819a; }
+.niveaux-prets button:nth-child(2) { background: #41bf91; box-shadow-color: #248866; }.niveaux-prets button:nth-child(3) { background: #edae25; box-shadow-color: #ad7410; }.niveaux-prets button:nth-child(4) { background: var(--rose); box-shadow-color: #b74d0b; }
+.niveaux-prets strong, .niveaux-prets small { display: block; }.niveaux-prets strong { text-transform: uppercase; }.niveaux-prets small { margin-top: .2rem; font-size: .66rem; }
+.niveaux-prets button.actif { outline: 4px solid #282127; outline-offset: 2px; transform: translateY(-2px); }
 
 .primaire {
   min-height: 56px;
@@ -353,6 +361,12 @@ dialog {
   text-align: center;
 }
 #difficulte { max-height: 90dvh; overflow-y: auto; }
+#tutoriel { max-height: 90dvh; overflow-y: auto; text-align: left; }
+#tutoriel h2, #tutoriel > .surtitre { text-align: center; }
+.contenu-tutoriel { display: grid; gap: .65rem; }
+.contenu-tutoriel section { padding: .7rem; border-radius: 14px; background: var(--surface-2); }
+.contenu-tutoriel section strong { color: var(--bleu-fonce); }
+.contenu-tutoriel section p { margin: .3rem 0 0; font-size: .8rem; }
 
 dialog::backdrop { background: #08050cbb; backdrop-filter: blur(5px); }
 dialog h2 { margin: .5rem 0; font-size: 2rem; }
