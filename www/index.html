@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffea6d" />
     <title>Who's Next?</title>
-    <link rel="stylesheet" href="style.css?v=24" />
+    <link rel="stylesheet" href="style.css?v=25" />
   </head>
   <body>
     <main id="jeu">
@@ -121,7 +121,11 @@
           </div>
           <section id="rapport-partie" class="rapport-partie" hidden aria-live="polite">
             <div class="entete-rapport"><strong>Rapport de partie</strong><button id="fermer-rapport" type="button" aria-label="Fermer le rapport">×</button></div>
-            <div id="liste-rapport" class="liste-rapport"></div>
+            <div class="navigation-rapport">
+              <button id="rapport-precedent" type="button" aria-label="Action précédente">←</button>
+              <div id="etape-rapport" class="etape-rapport"></div>
+              <button id="rapport-suivant" type="button" aria-label="Action suivante">→</button>
+            </div>
           </section>
           <div class="main-et-flip">
             <div id="main-joueur" class="main-cartes"></div>
@@ -200,7 +204,7 @@
       </dialog>
 
     </main>
-    <script type="module" src="jeu.js?v=31"></script>
+    <script type="module" src="jeu.js?v=32"></script>
   </body>
 </html>
 
