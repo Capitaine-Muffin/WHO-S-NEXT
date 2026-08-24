@@ -245,7 +245,7 @@ select {
 .cadran span { font-size: 2.5rem; font-weight: 1000; line-height: .9; }
 .cadran small { margin-top: .25rem; font-size: .52rem; font-weight: 950; letter-spacing: .09em; }
 .aiguille { position: absolute; z-index: 1; left: calc(50% - 2px); top: 10px; width: 4px; height: 45%; border-radius: 5px; background: var(--rose); transform-origin: 50% 100%; animation: tic 1s steps(1) infinite; }
-.pendule.urgent { background: var(--rose); animation: pulse .45s infinite alternate; }
+.pendule.urgent { background: var(--rose); animation: vibration-pendule 1s infinite; }
 
 .musicien {
   position: absolute;
@@ -413,7 +413,12 @@ dialog .primaire { width: 100%; }
 .pastilles-animation { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; width: 100%; }
 .pastilles-animation button { min-height: 42px; border: 2px solid var(--bleu); border-radius: 999px; background: white; color: var(--bleu-fonce); font-size: .75rem; font-weight: 900; }
 
-@keyframes pulse { to { transform: scale(1.06); } }
+@keyframes vibration-pendule {
+  0%, 70%, 100% { transform: translate(-50%, -50%) rotate(0); }
+  78% { transform: translate(calc(-50% - 1px), -50%) rotate(-.35deg); }
+  86% { transform: translate(calc(-50% + 1px), -50%) rotate(.35deg); }
+  94% { transform: translate(-50%, calc(-50% + 1px)) rotate(0); }
+}
 @keyframes tic { to { transform: rotate(6deg); } }
 @keyframes relance { 50% { transform: translate(-50%, -50%) scale(1.1); } }
 @keyframes secousse { 25% { transform: translateX(-5px) rotate(-2deg); } 75% { transform: translateX(5px) rotate(2deg); } }
