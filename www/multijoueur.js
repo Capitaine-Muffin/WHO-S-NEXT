@@ -107,7 +107,7 @@ function afficherReglages(ui) {
 }
 
 function rendreJoueurs(ui, joueurs) {
-  ui.joueurs.innerHTML = joueurs.map((joueur, index) => `<div class="joueur-salon"><span>${joueur.avatar || avatars[index]}</span>${echapper(joueur.nom)}${index === 0 ? ' · hôte' : ''}</div>`).join('');
+  ui.joueurs.innerHTML = joueurs.map((joueur, index) => `<div class="joueur-salon"><span>${joueur.avatar || avatars[index]}</span><strong>J${index + 1}</strong> · ${echapper(joueur.nom)}${index === 0 ? ' · hôte' : ''}</div>`).join('');
 }
 
 function quitterSalon(ui) {
