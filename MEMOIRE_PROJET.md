@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 24 août 2026 — version de test `v47`.
+Dernière mise à jour : 25 août 2026 — version de test `v48`.
 
 ## Référence et autorité
 
@@ -97,6 +97,8 @@ Les bots choisissent aléatoirement parmi leurs cartes légales et jouent à un 
 - Le replay commence au début de la manche concernée, pas à la dernière action.
 - Les flèches gauche et droite parcourent les actions.
 - À chaque étape contenant une carte, celle-ci est rejouée avec une animation vers son joueur.
+- La carte apparaît dans la pile exactement à la fin de son animation et le joueur qui agit est signalé en rouge.
+- Un anneau autour de la pendule reconstitue le sens du jeu et s'inverse au passage d'une carte Whootchi.
 - Fermer le rapport restaure la table en direct et, si nécessaire, le bilan de fausse note.
 
 ## Tutoriels
