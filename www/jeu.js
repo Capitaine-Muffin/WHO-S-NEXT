@@ -1033,7 +1033,8 @@ function afficherTable(historiquesSimules = null, options = {}) {
     const fautif = !historiquesSimules && index === etat.fautifIndex;
     const acteurRapport = historiquesSimules && index === options.indexActeur;
     const attenduRapport = historiquesSimules && index === options.indexAttendu;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}${attenduRapport ? ' attendu-rapport' : ''}`;
+    const nomAuDessus = nombre === 4 && index === 3;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}${attenduRapport ? ' attendu-rapport' : ''}${nomAuDessus ? ' nom-au-dessus' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
