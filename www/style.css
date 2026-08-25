@@ -376,8 +376,9 @@ select {
   display: grid;
   grid-template-rows: minmax(0, 40%) minmax(0, 60%);
   place-items: center;
-  width: 66px;
-  min-height: 66px;
+  width: 1em;
+  min-height: 1em;
+  aspect-ratio: 1;
   padding: 4px;
   border: 3px solid white;
   border-radius: 8px;
@@ -404,7 +405,11 @@ select {
 .carte[data-valeur="1"].whootchi .carte-chi { font-size: .28em; }
 .carte[data-valeur="4"] .carte-prefixe,
 .carte[data-valeur="5"] .carte-prefixe,
-.carte[data-valeur="6"] .carte-prefixe { font-size: .175em; }
+.carte[data-valeur="6"] .carte-prefixe {
+  font-family: "Arial Narrow", Impact, sans-serif;
+  font-size: .175em;
+  transform: scaleX(.8);
+}
 .carte-animee { font-size: 156px; border-radius: 15px; padding: 9px; }
 .carte-animee.whootchi .carte-whoot { font-size: .19em; }
 .carte-animee.whootchi .carte-chi { font-size: .27em; }
