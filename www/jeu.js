@@ -64,6 +64,13 @@ let actionIA = null;
 let indexRapport = 0;
 let rapportDepuisDialogue = false;
 let animationRapport = false;
+let fileAnimations = Promise.resolve();
+
+function mettreAnimationEnFile(animation) {
+  const suivante = fileAnimations.catch(() => {}).then(animation);
+  fileAnimations = suivante;
+  return suivante;
+}
 
 elements.jouer.addEventListener('click', demarrerPartie);
 elements.quitter.addEventListener('click', quitterPartie);
@@ -580,7 +587,11 @@ async function tenterErreurIA(dernierAuteur) {
   return true;
 }
 
-async function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une fausse note !`) {
+function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une fausse note !`) {
+  return mettreAnimationEnFile(() => executerAnimationCarteErreur(joueur, carte, texte));
+}
+
+async function executerAnimationCarteErreur(joueur, carte, texte) {
   const indexJoueur = etat.joueurs.indexOf(joueur);
   etat.fautifIndex = indexJoueur;
   etat.carteFaute = { ...carte };
@@ -613,7 +624,11 @@ async function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une 
   await attendre(rapide ? 180 : 350);
 }
 
-async function animerCarteJouee(indexJoueur, joueur, carte) {
+function animerCarteJouee(indexJoueur, joueur, carte) {
+  return mettreAnimationEnFile(() => executerAnimationCarteJouee(indexJoueur, joueur, carte));
+}
+
+async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
   if (etat.vitesseAnimation === 'aucune') return;
   const rapide = etat.vitesseAnimation === 'rapide';
   const animationTutoriel = Boolean(etat.tutoriel);
