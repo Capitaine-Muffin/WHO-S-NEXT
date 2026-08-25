@@ -543,7 +543,7 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
     ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, joueurAttendu: etat.joueurs[etat.actif].nom, carte });
     await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
     etat.animationErreur = false;
-    sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
+    sanctionner(joueur, `Ce n’était pas son tour !`);
     return;
   }
 
@@ -553,7 +553,7 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
     ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, carte });
     await animerCarteErreur(joueur, carte, `${joueur.nom} joue une carte interdite !`);
     etat.animationErreur = false;
-    sanctionner(joueur, 'Cette carte ne pouvait pas être jouée.');
+    sanctionner(joueur, 'Cette carte était interdite !');
     return;
   }
 
@@ -590,7 +590,7 @@ async function tenterErreurIA(dernierAuteur) {
   ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, joueurAttendu: etat.joueurs[etat.actif].nom, carte });
   await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
   etat.animationErreur = false;
-  sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
+  sanctionner(joueur, `Ce n’était pas son tour !`);
   return true;
 }
 
@@ -748,7 +748,7 @@ function commencerTour() {
   minuterie = setInterval(() => {
     etat.temps -= 1;
     afficherChrono();
-    if (etat.temps <= 0) sanctionner(joueur, `${joueur.nom} a dépassé le chrono.`);
+    if (etat.temps <= 0) sanctionner(joueur, `Il a oublié de jouer !`);
   }, 1000);
 
   if (!joueur.humain) {
@@ -777,7 +777,7 @@ async function jouerIA(joueur) {
 
   const choix = options[Math.floor(Math.random() * options.length)];
   if (!choix) {
-    sanctionner(joueur, `${joueur.nom} n'avait aucun coup valable.`);
+    sanctionner(joueur, `Il ne pouvait jouer aucune carte !`);
     return;
   }
 
@@ -824,7 +824,7 @@ function sanctionner(joueur, raison) {
     }
   } else {
     afficher();
-    ouvrirDialogue('FAUSSE NOTE', `${penalite} fausse note${penalite > 1 ? 's' : ''} pour ${joueur.nom}`, raison);
+    ouvrirDialogue('FAUSSE NOTE', joueur.nom.toUpperCase(), raison);
   }
 }
 
@@ -835,7 +835,11 @@ function terminerManche(reussie, texte) {
 }
 
 function ouvrirDialogue(surtitre, titre, texte) {
-  elements.finSurtitre.textContent = surtitre;
+  const estFausseNote = surtitre === 'FAUSSE NOTE';
+  elements.dialogue.classList.toggle('dialogue-fausse-note', estFausseNote);
+  elements.finSurtitre.innerHTML = estFausseNote
+    ? '<span class="clef-barree" aria-hidden="true">𝄞</span><span>FAUSSE NOTE</span><span class="clef-barree" aria-hidden="true">𝄞</span>'
+    : surtitre;
   elements.finTitre.textContent = titre;
   elements.finTexte.textContent = texte;
   elements.continuer.textContent = etat.terminee ? 'Retour au menu' : 'Manche suivante';
