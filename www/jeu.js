@@ -287,6 +287,20 @@ async function avancerTutoriel() {
       elements.texteGuide.textContent = '1 : J3… puis 2 : J4. C’est donc à J4 de jouer !';
     }
     await animationCarte;
+    if (tutoriel.type === 'base') {
+      const joueurSuivant = etat.joueurs[3];
+      const carteSuivante = { valeur: 1, whootchi: false };
+      tutoriel.parcours = { depart: 3, valeur: 1, sens: etat.sens };
+      joueurSuivant.derniere = { ...carteSuivante };
+      joueurSuivant.historique.push({ ...carteSuivante });
+      ajouterRapport({ type: 'carte', joueur: joueurSuivant.nom, carte: carteSuivante });
+      elements.titreGuide.textContent = 'J4 continue le rythme';
+      elements.texteGuide.textContent = 'J4 joue Whoot. On avance d’un joueur : 1 · J1.';
+      afficher();
+      await animerCarteJouee(3, joueurSuivant, carteSuivante);
+      elements.titreGuide.textContent = 'C’est maintenant à J1 !';
+      elements.texteGuide.textContent = 'J4 a joué Whoot : un joueur après lui, on arrive sur J1. À toi d’essayer.';
+    }
     if (tutoriel.type === 'whootchi') etat.sens = -1;
     if (tutoriel.type === 'mort-subite') {
       etat.joueurs[3].notes = 7;
@@ -294,8 +308,10 @@ async function avancerTutoriel() {
       etat.joueurs[3].main = [];
       afficher();
     }
-    elements.titreGuide.textContent = tutoriel.type === 'base' ? 'Deux places plus loin' : 'Observe la règle';
-    elements.texteGuide.textContent = `${parcours.resultat} À toi d’essayer maintenant !`;
+    elements.titreGuide.textContent = tutoriel.type === 'base' ? 'Le rythme arrive sur J1' : 'Observe la règle';
+    elements.texteGuide.textContent = tutoriel.type === 'base'
+      ? 'J2 joue Double Whoot : on arrive sur J4. J4 joue ensuite Whoot : on arrive sur J1. À toi de jouer Whoot !'
+      : `${parcours.resultat} À toi d’essayer maintenant !`;
     elements.suiteGuide.hidden = false;
     return;
   }
@@ -325,12 +341,13 @@ async function avancerTutoriel() {
   quitterPartie();
 }
 
-function jouerCarteTutoriel(indexCarte, retourner = false) {
+async function jouerCarteTutoriel(indexCarte, retourner = false) {
   if (etat.tutoriel.etape !== 3) return;
   const parcours = parcoursTutoriels[etat.tutoriel.type];
   const valeur = indexCarte + 1;
   const whootchi = retourner && aRegle('whootchi');
-  if (valeur !== parcours.attendu.valeur || whootchi !== parcours.attendu.whootchi) {
+  const choixLibre = etat.tutoriel.type === 'base' && etat.tutoriel.exemple === 2;
+  if (!choixLibre && (valeur !== parcours.attendu.valeur || whootchi !== parcours.attendu.whootchi)) {
     elements.texteGuide.textContent = `Pas celle-ci : ${parcours.essai}`;
     return;
   }
@@ -344,11 +361,54 @@ function jouerCarteTutoriel(indexCarte, retourner = false) {
   ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
   etat.enCours = false;
   afficher();
-  animerCarteJouee(0, joueur, carte);
+  await animerCarteJouee(0, joueur, carte);
+  if (etat.tutoriel.type === 'base' && etat.tutoriel.exemple !== 2) {
+    await lancerDeuxiemeExempleBase();
+    return;
+  }
+  terminerTutorielGuide();
+}
+
+async function lancerDeuxiemeExempleBase() {
+  const tutoriel = etat.tutoriel;
+  tutoriel.exemple = 2;
+  const joueur = etat.joueurs[1];
+  const carte = { valeur: 3, whootchi: false };
+  tutoriel.parcours = { depart: 1, valeur: 3, sens: etat.sens };
+  joueur.derniere = { ...carte };
+  joueur.historique.push({ ...carte });
+  ajouterRapport({ type: 'carte', joueur: joueur.nom, carte });
+  elements.titreGuide.textContent = 'Deuxième exemple';
+  elements.texteGuide.textContent = 'J2 joue Triple Whoot. Cette fois, on compte trois joueurs après lui…';
+  afficher();
+  const animationCarte = animerCarteJouee(1, joueur, carte);
+  await attendre(250);
+  elements.texteGuide.textContent = 'Triple Whoot : 1 · J3.';
+  await attendre(700);
+  elements.texteGuide.textContent = '1 · J3, puis 2 · J4…';
+  await attendre(700);
+  elements.texteGuide.textContent = '1 · J3, 2 · J4, 3 · J1. C’est donc à J1 de jouer !';
+  await animationCarte;
+  tutoriel.parcours = { depart: 1, valeur: 3, sens: etat.sens };
+  etat.actif = 0;
+  etat.enCours = true;
+  etat.temps = 8;
+  elements.titreGuide.textContent = 'À toi une deuxième fois !';
+  elements.texteGuide.textContent = 'Le Triple Whoot de J2 arrive sur J1. Joue maintenant la carte de ton choix.';
+  elements.message.textContent = 'JOUE LA CARTE DE TON CHOIX !';
+  afficher();
+  minuterie = setInterval(() => {
+    etat.temps -= 1;
+    if (etat.temps <= 0) etat.temps = 8;
+    afficherChrono();
+  }, 1000);
+}
+
+function terminerTutorielGuide() {
   etat.tutoriel.etape = 4;
   elements.etapeGuide.textContent = 'ÉTAPE 5 SUR 5';
   elements.titreGuide.textContent = 'Bravo, tu es prêt à jouer !';
-  elements.texteGuide.textContent = etat.tutoriel.type === 'base' ? 'Tu sais suivre le sens, lire une carte et jouer avant la fin du chrono. Le concert peut commencer !' : 'Tu maîtrises cette règle. Tu peux maintenant l’activer dans une vraie partie !';
+  elements.texteGuide.textContent = etat.tutoriel.type === 'base' ? 'Tu as suivi deux échanges complets, compté les joueurs et joué au bon moment. Le concert peut commencer !' : 'Tu maîtrises cette règle. Tu peux maintenant l’activer dans une vraie partie !';
   elements.message.textContent = 'TUTORIEL TERMINÉ';
   elements.suiteGuide.textContent = 'Retour au menu';
   elements.suiteGuide.hidden = false;
@@ -1009,7 +1069,8 @@ function afficherParcoursTutoriel({ depart, valeur, sens }) {
 
 function afficherMain() {
   elements.main.replaceChildren();
-  const carteAttendue = etat.tutoriel?.etape === 3 ? parcoursTutoriels[etat.tutoriel.type].attendu : null;
+  const choixLibreTutoriel = etat.tutoriel?.type === 'base' && etat.tutoriel?.exemple === 2;
+  const carteAttendue = etat.tutoriel?.etape === 3 && !choixLibreTutoriel ? parcoursTutoriels[etat.tutoriel.type].attendu : null;
   elements.main.classList.toggle('aide-active', Boolean(carteAttendue));
   const nombreCartes = etat.joueurs[0].main.length;
   elements.main.style.gridTemplateColumns = `repeat(${nombreCartes >= 5 ? 3 : nombreCartes}, 66px)`;
