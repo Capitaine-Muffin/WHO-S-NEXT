@@ -221,7 +221,7 @@ function demarrerTutoriel(type = 'base') {
     regles: parcours.regles,
     niveauIA: 10,
     manche: 1,
-    sens: 1,
+    sens: type === 'base' ? 0 : 1,
     actif: 1,
     chef: 0,
     dureeChrono: 8,
@@ -234,7 +234,8 @@ function demarrerTutoriel(type = 'base') {
     fautifIndex: null,
     carteFaute: null,
     rapport: [{ type: 'manche', texte: 'Début du tutoriel', manche: 1 }],
-    tutoriel: { etape: 0, type },
+    choixSens: type === 'base',
+    tutoriel: { etape: 0, type, attendChoixSens: type === 'base' },
   };
   if (type === 'trio') {
     etat.joueurs[2].derniere = { valeur: 1, whootchi: false };
@@ -252,6 +253,18 @@ function demarrerTutoriel(type = 'base') {
   elements.texteGuide.textContent = parcours.intro;
   elements.message.textContent = 'Observe la table de jeu';
   afficher();
+  if (type === 'base') {
+    const gauche = elements.choixSens.querySelector('[data-sens="1"]');
+    const droite = elements.choixSens.querySelector('[data-sens="-1"]');
+    gauche.disabled = false;
+    droite.disabled = true;
+    elements.choixSens.querySelector('h2').textContent = 'J1 choisit le sens';
+    elements.choixSens.querySelector('p:not(.surtitre)').textContent = 'Pour cet exercice, touche la flèche de gauche.';
+    elements.titreGuide.textContent = 'Commence par choisir le sens';
+    elements.texteGuide.textContent = 'Tu es J1. Touche « Voisin de gauche » pour décider qui jouera la première carte.';
+    elements.message.textContent = 'CLIQUE SUR LA FLÈCHE DE GAUCHE';
+    elements.choixSens.show();
+  }
 }
 
 async function avancerTutoriel() {
@@ -465,6 +478,9 @@ function nouvelleManche() {
 
 function demanderSens() {
   const chef = etat.joueurs[etat.chef];
+  elements.choixSens.querySelector('h2').textContent = 'Choisis le sens';
+  elements.choixSens.querySelector('p:not(.surtitre)').textContent = 'Quel voisin jouera la première carte ?';
+  elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => { bouton.disabled = false; });
   elements.message.textContent = `${chef.nom} choisit le sens du jeu…`;
   if (chef.humain) {
     elements.choixSens.show();
@@ -483,6 +499,14 @@ function appliquerSens(sens) {
   etat.actif = avancerActif(etat.chef, sens);
   ajouterRapport({ type: 'sens', sens, texte: `Sens ${sens > 0 ? 'horaire' : 'antihoraire'}` });
   afficher();
+  if (etat.tutoriel?.attendChoixSens) {
+    etat.tutoriel.attendChoixSens = false;
+    elements.choixSens.querySelector('[data-sens="-1"]').disabled = false;
+    elements.titreGuide.textContent = 'Parfait, le jeu part à gauche !';
+    elements.texteGuide.textContent = 'J1 a choisi son voisin de gauche : J2 jouera donc la première carte de cet exemple.';
+    elements.message.textContent = 'J2 COMMENCERA LE RYTHME';
+    return;
+  }
   commencerTour();
 }
 
@@ -787,7 +811,7 @@ function ouvrirDialogue(surtitre, titre, texte) {
 function afficher() {
   if (!etat) return;
   elements.niveauAffiche.textContent = `${etat.regles.length} règle${etat.regles.length > 1 ? 's' : ''}`;
-  elements.mancheAffiche.textContent = `Manche ${etat.manche} · sens ${etat.sens === 1 ? 'horaire' : 'antihoraire'}`;
+  elements.mancheAffiche.textContent = `Manche ${etat.manche} · ${etat.sens ? `sens ${etat.sens === 1 ? 'horaire' : 'antihoraire'}` : 'sens à choisir'}`;
   const notes = etat.joueurs[0].notes;
   elements.notesJoueur.textContent = `${notes} fausse note${notes === 1 ? '' : 's'}`;
   afficherChrono();
