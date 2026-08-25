@@ -568,10 +568,14 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (carte.whootchi) etat.sens *= -1;
   const distance = carte.valeur * etat.sens;
   etat.actif = avancerActif(etat.actif, distance);
+  etat.sequencePose = (etat.sequencePose ?? 0) + 1;
+  const sequencePose = etat.sequencePose;
 
   afficher();
-  animerCarteJouee(auteur, joueur, carte);
+  await animerCarteJouee(auteur, joueur, carte);
+  if (!etat?.enCours || etat.sequencePose !== sequencePose || etat.animationErreur) return;
   if (await tenterErreurIA(auteur)) return;
+  if (!etat?.enCours || etat.sequencePose !== sequencePose || etat.animationErreur) return;
   commencerTour();
 }
 
