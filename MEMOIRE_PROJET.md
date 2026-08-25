@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 25 août 2026 — version de test `v51`.
+Dernière mise à jour : 25 août 2026 — version de test `v52`.
 
 ## Référence et autorité
 
@@ -115,7 +115,7 @@ Principes d'affichage :
 - animation de pose plus lente que dans une vraie partie ;
 - la carte demandée tremble légèrement, est entourée et porte l'indication « TOUCHE ICI ».
 
-Le tutoriel de base contient deux échanges. D'abord, J2 joue Double Whoot : `1 · J3`, `2 · J4`; J4 joue ensuite Whoot et amène le jeu sur J1, qui joue Whoot. Puis J2 joue Triple Whoot : `1 · J3`, `2 · J4`, `3 · J1`; J1 termine en jouant librement la carte de son choix.
+Le tutoriel de base commence par faire choisir le sens à J1 : pour l'exercice, seule la flèche vers le voisin de gauche est active. Il contient ensuite deux échanges. D'abord, J2 joue Double Whoot : `1 · J3`, `2 · J4`; J4 joue ensuite Whoot et amène le jeu sur J1, qui joue Whoot. Puis J2 joue Triple Whoot : `1 · J3`, `2 · J4`, `3 · J1`; J1 termine en jouant librement la carte de son choix.
 
 ## État du multijoueur
 
