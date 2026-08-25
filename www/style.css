@@ -508,6 +508,12 @@ dialog .primaire { width: 100%; }
 #fin-manche[open] { position: fixed; z-index: 50; inset: auto 50% max(150px, calc(env(safe-area-inset-bottom) + 135px)) auto; width: min(86vw, 340px); margin: 0; padding: .9rem; border: 3px solid var(--rose); background: #fffdf2f5; box-shadow: 0 10px 0 #b74d0b55, 0 18px 35px #28212733; transform: translateX(50%); }
 #fin-manche h2 { margin: .2rem 0; font-size: 1.35rem; }
 #fin-manche p { margin: .3rem 0 .65rem; font-size: .82rem; }
+#fin-manche.dialogue-fausse-note { text-align: center; }
+#fin-manche.dialogue-fausse-note #fin-surtitre { display: flex; align-items: center; justify-content: center; gap: .45rem; margin: 0; color: #df1738; font-size: 1.35rem; font-weight: 1000; line-height: 1; }
+#fin-manche.dialogue-fausse-note #fin-titre { margin: .65rem 0 .35rem; font-size: 1.35rem; font-weight: 1000; line-height: 1.05; }
+#fin-manche.dialogue-fausse-note #fin-texte { margin: 0 0 .75rem; color: var(--texte); font-size: .98rem; font-weight: 800; line-height: 1.25; }
+.clef-barree { position: relative; display: inline-grid; place-items: center; width: 1.1em; font-family: "Segoe UI Symbol", serif; font-size: 1.2em; }
+.clef-barree::after { content: ''; position: absolute; width: 1.15em; height: 3px; border-radius: 99px; background: currentColor; transform: rotate(-42deg); }
 #fin-manche .primaire { min-height: 44px; margin: 0; padding: .55rem; border-radius: 12px; box-shadow: 0 4px 0 #b74d0b; }
 .rapport-dialogue { width: 100%; margin: .55rem 0 .75rem; padding: .55rem; border: 2px solid var(--bleu); border-radius: 12px; background: white; color: var(--bleu-fonce); font-size: .78rem; font-weight: 950; cursor: pointer; }
 .liste-niveaux { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin: 1rem 0; }
