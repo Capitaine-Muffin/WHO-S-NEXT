@@ -202,6 +202,7 @@ function afficherAide(event, nom) {
 }
 
 function changerPortraitMenu() {
+  if (!elements.portraitMenu) return;
   const index = Math.floor(Math.random() * 10);
   elements.portraitMenu.style.setProperty('--portrait-x', `${(index % 5) * 25}%`);
   elements.portraitMenu.style.setProperty('--portrait-y', index < 5 ? '0%' : '100%');
