@@ -202,9 +202,8 @@ function afficherAide(event, nom) {
 
 function changerPortraitMenu() {
   const index = Math.floor(Math.random() * 12);
-  const colonnes = [36, 382, 728, 1074, 1420, 1766];
-  elements.portraitMenu.style.setProperty('--portrait-x', `${-colonnes[index % 6] * .41}px`);
-  elements.portraitMenu.style.setProperty('--portrait-y', `${(index < 6 ? -36 : -384) * .41}px`);
+  elements.portraitMenu.style.setProperty('--portrait-x', `${(index % 6) * 20}%`);
+  elements.portraitMenu.style.setProperty('--portrait-y', index < 6 ? '0%' : '100%');
 }
 
 function demarrerTutoriel(type = 'base') {
