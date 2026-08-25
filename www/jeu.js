@@ -1026,10 +1026,8 @@ function texteRapport(entree) {
 }
 
 function appliquerMiniatureRapport(element, carte) {
-  const colonnes = [36, 382, 728, 1074, 1420, 1766];
-  const index = (carte.valeur - 1) * 2 + (carte.whootchi ? 1 : 0);
-  element.style.setProperty('--rapport-x', `${-colonnes[index % 6] * .15}px`);
-  element.style.setProperty('--rapport-y', `${(index < 6 ? -36 : -384) * .15}px`);
+  element.classList.add('carte-compacte');
+  appliquerFaceCarte(element, carte.valeur, carte.whootchi);
 }
 
 function afficherChrono() {
@@ -1133,7 +1131,6 @@ function afficherMain() {
     if (carteAttendue && carte.valeur === carteAttendue.valeur && etat.faceMainWhootchi === carteAttendue.whootchi) bouton.classList.add('carte-a-jouer');
     bouton.disabled = !etat.enCours || etat.choixSens || etat.joueurs[0].elimine;
     appliquerFaceCarte(bouton, carte.valeur, etat.faceMainWhootchi);
-    bouton.innerHTML = `<span class="visuellement-cache">${nomCarte(carte.valeur, etat.faceMainWhootchi)}</span>`;
     bouton.addEventListener('click', () => jouerCarte(index, etat.faceMainWhootchi, 0));
     elements.main.append(bouton);
   });
@@ -1146,12 +1143,19 @@ function retournerMain() {
 }
 
 function appliquerFaceCarte(element, valeur, whootchi) {
-  const colonnesBrutes = [36, 382, 728, 1074, 1420, 1766];
-  const index = (valeur - 1) * 2 + (whootchi ? 1 : 0);
-  element.style.setProperty('--sprite-x', `${-colonnesBrutes[index % 6] * .33}px`);
-  element.style.setProperty('--sprite-y', `${(index < 6 ? -36 : -384) * .33}px`);
-  element.style.setProperty('--sprite-x-grand', `${-colonnesBrutes[index % 6] * .75}px`);
-  element.style.setProperty('--sprite-y-grand', `${(index < 6 ? -36 : -384) * .75}px`);
+  const couleurs = ['#28abc1', '#d20a2e', '#edae2f', '#79556f', '#69a313', '#079d8c'];
+  const multiplicateurs = ['', 'DOUBLE', 'TRIPLE', 'QUADRUPLE', 'QUINTUPLE', 'SEXTUPLE'];
+  element.classList.toggle('whootchi', whootchi);
+  element.style.setProperty('--couleur-carte', couleurs[valeur - 1]);
+  element.dataset.valeur = String(valeur);
+  element.dataset.face = whootchi ? 'whootchi' : 'whoot';
+  element.innerHTML = `
+    <span class="carte-titre" aria-hidden="true">
+      ${valeur > 1 ? `<b class="carte-prefixe">${multiplicateurs[valeur - 1]}</b>` : ''}
+      <span class="carte-nom"><b class="carte-whoot">WHOOT${whootchi ? '/' : ''}</b>${whootchi ? '<b class="carte-chi">CHI</b>' : ''}</span>
+    </span>
+    <span class="carte-vinyle" aria-hidden="true"><b>${valeur}</b></span>
+    <span class="visuellement-cache">${nomCarte(valeur, whootchi)}</span>`;
 }
 
 function nomCarte(valeur, whootchi) {
