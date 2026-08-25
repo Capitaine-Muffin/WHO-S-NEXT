@@ -114,7 +114,7 @@ Principes d'affichage :
 - animation de pose plus lente que dans une vraie partie ;
 - la carte demandée tremble légèrement, est entourée et porte l'indication « TOUCHE ICI ».
 
-Pour expliquer Double Whoot, le comptage doit être progressif : J2 joue Double Whoot, puis `1 · J3`, puis `2 · J4`, et le tutoriel conclut que J4 doit jouer.
+Le tutoriel de base contient deux échanges. D'abord, J2 joue Double Whoot : `1 · J3`, `2 · J4`; J4 joue ensuite Whoot et amène le jeu sur J1, qui joue Whoot. Puis J2 joue Triple Whoot : `1 · J3`, `2 · J4`, `3 · J1`; J1 termine en jouant librement la carte de son choix.
 
 ## État du multijoueur
 
