@@ -261,6 +261,8 @@ select {
 .musicien strong, .musicien span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .musicien .avatar, .musicien strong, .musicien span, .badge-premier { position: relative; z-index: 2; }
 .musicien span { margin-top: .2rem; color: var(--muet); font-size: .7rem; }
+.musicien.nom-au-dessus > strong { position: absolute; left: 50%; top: -17px; width: 100%; overflow: visible; text-align: center; transform: translateX(-50%); }
+.musicien.nom-au-dessus .badge-premier { top: -43px; }
 .avatar { width: 58px; height: 58px; margin: auto; display: grid; place-items: center; border-radius: 50%; outline: 3px solid var(--bleu); background: #fff; font-size: 1.8rem; transition: .2s ease; }
 .musicien.humain .avatar { background: #fff2d1; }
 .musicien.premier .avatar { outline-color: var(--rose); box-shadow: 0 0 0 5px #ffea6d, 0 0 24px #f47b2188; }
