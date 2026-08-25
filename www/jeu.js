@@ -268,7 +268,7 @@ function demarrerTutoriel(type = 'base') {
     gauche.disabled = false;
     droite.disabled = true;
     elements.choixSens.querySelector('h2').textContent = 'J1 choisit le sens';
-    elements.choixSens.querySelector('p:not(.surtitre)').textContent = 'Pour cet exercice, touche la flèche de gauche.';
+    elements.choixSens.querySelector('.surtitre').textContent = 'TOUCHE LA FLÈCHE DE GAUCHE';
     elements.titreGuide.textContent = 'Commence par choisir le sens';
     elements.texteGuide.textContent = 'Tu es J1. Touche « Voisin de gauche » pour décider qui jouera la première carte.';
     elements.message.textContent = 'CLIQUE SUR LA FLÈCHE DE GAUCHE';
@@ -488,8 +488,8 @@ function nouvelleManche() {
 
 function demanderSens() {
   const chef = etat.joueurs[etat.chef];
+  elements.choixSens.querySelector('.surtitre').textContent = '3... 2... 1... MUSIQUE !';
   elements.choixSens.querySelector('h2').textContent = 'Choisis le sens';
-  elements.choixSens.querySelector('p:not(.surtitre)').textContent = 'Quel voisin jouera la première carte ?';
   elements.choixSens.querySelectorAll('[data-sens]').forEach((bouton) => { bouton.disabled = false; });
   elements.message.textContent = `${chef.nom} choisit le sens du jeu…`;
   if (chef.humain) {
