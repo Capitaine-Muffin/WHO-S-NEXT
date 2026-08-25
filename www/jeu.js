@@ -653,9 +653,15 @@ async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
   appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
   document.body.append(animation);
 
-  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
+  const pile = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .pile-cartes`);
   const positionPile = Math.min(1, joueur.posesVisibles?.length ?? 0);
-  const cadre = cible?.getBoundingClientRect();
+  const cible = document.createElement('div');
+  cible.className = 'derniere-carte cible-pose-vide';
+  cible.style.setProperty('--position-pile', positionPile);
+  pile?.append(cible);
+  const cadre = pile
+    ? cible.getBoundingClientRect()
+    : elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`)?.getBoundingClientRect();
 
   await attendre(animationTutoriel ? 1450 : (rapide ? 350 : 1000));
 
@@ -673,6 +679,7 @@ async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
   }
 
   animation.remove();
+  cible.remove();
 }
 
 function attendre(duree) {
