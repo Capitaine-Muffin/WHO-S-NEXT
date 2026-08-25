@@ -313,6 +313,7 @@ select {
 .mini-carte { width: 66px; height: 66px; transform: scale(.7879); transform-origin: top left; }
 .derniere-carte.cible-animation { opacity: 0; }
 .cible-rapport-vide { visibility: hidden; }
+.cible-pose-vide { visibility: hidden; }
 
 .pose-carte {
   position: fixed;
