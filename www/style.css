@@ -261,9 +261,9 @@ select {
 .musicien strong, .musicien span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .musicien .avatar, .musicien strong, .musicien span, .badge-premier { position: relative; z-index: 2; }
 .musicien span { margin-top: .2rem; color: var(--muet); font-size: .7rem; }
-.avatar { width: 58px; height: 58px; margin: auto; display: grid; place-items: center; border-radius: 50%; outline: 3px solid var(--bleu); background: #fff; font-size: 1.8rem; transition: .2s ease; }
+.avatar { width: 62px; height: 62px; margin: auto; display: flex; align-items: center; justify-content: center; gap: .22rem; border-radius: 50%; outline: 3px solid var(--bleu); background: #fff; transition: .2s ease; }
 .avatar .numero-joueur { color: var(--texte); font-size: 1.12rem; font-weight: 1000; letter-spacing: .02em; overflow: visible; }
-.instrument-joueur { position: absolute; z-index: 4; right: -9px; bottom: -7px; display: grid; place-items: center; width: 27px; height: 27px; border: 3px solid white; border-radius: 50%; background: var(--fond); font-size: .92rem; font-style: normal; line-height: 1; box-shadow: 0 2px 0 #b8a94f; }
+.instrument-joueur { position: static; display: inline-block; font-size: 1.05rem; font-style: normal; line-height: 1; filter: drop-shadow(0 1px 0 #ffffff); }
 .musicien.humain .avatar { background: #fff2d1; }
 .musicien.premier .avatar { outline-color: var(--rose); box-shadow: 0 0 0 5px #ffea6d, 0 0 24px #f47b2188; }
 .musicien.fautif .avatar { outline-color: #df1738; background: #ffe0e5; box-shadow: 0 0 0 6px #df173844, 0 0 28px #df1738aa; animation: pulsation-faute .55s ease-in-out infinite alternate; }
