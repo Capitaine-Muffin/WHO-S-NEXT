@@ -1042,7 +1042,7 @@ function afficherTable(historiquesSimules = null, options = {}) {
     carte.style.setProperty('--pile-y', `${Math.cos(angle) * distancePile}px`);
     carte.dataset.joueurIndex = index;
     const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
-    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong><span>${joueur.main.length} cartes · ${joueur.notes} ♪</span>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
+    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
     let historiqueAffiche = historiquesSimules?.[index] ?? joueur.historique;
     if (!historiquesSimules && fautif && etat.carteFaute) historiqueAffiche = [...historiqueAffiche.slice(-1), etat.carteFaute];
