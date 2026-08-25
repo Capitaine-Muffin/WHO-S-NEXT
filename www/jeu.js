@@ -421,6 +421,7 @@ function appliquerSens(sens) {
   etat.sens = sens;
   etat.choixSens = false;
   etat.actif = avancerActif(etat.chef, sens);
+  ajouterRapport({ type: 'sens', sens, texte: `Sens ${sens > 0 ? 'horaire' : 'antihoraire'}` });
   afficher();
   commencerTour();
 }
@@ -776,9 +777,26 @@ async function deplacerRapport(direction) {
   const prochainIndex = Math.max(debutMancheRapport(), Math.min(maximum, indexRapport + direction));
   if (prochainIndex === indexRapport) return;
   indexRapport = prochainIndex;
-  afficherEtapeRapport();
   const entree = etat?.rapport[indexRapport];
-  if (entree?.carte) await animerCarteRapport(entree);
+  if (direction > 0 && entree?.carte) {
+    afficherEtapeRapport(false);
+    const etapePrecedente = reconstruireRapport(indexRapport - 1);
+    const indexActeur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
+    afficherTable(etapePrecedente.historiques, { indexActeur, sensRapport: etapePrecedente.sens });
+    preparerCibleRapport(indexActeur);
+    await animerCarteRapport(entree);
+  } else {
+    afficherEtapeRapport();
+  }
+}
+
+function preparerCibleRapport(indexJoueur) {
+  const pile = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .pile-cartes`);
+  if (!pile || pile.children.length) return;
+  const cible = document.createElement('div');
+  cible.className = 'derniere-carte cible-rapport-vide';
+  cible.style.setProperty('--position-pile', 0);
+  pile.append(cible);
 }
 
 async function animerCarteRapport(entree) {
@@ -812,7 +830,7 @@ async function animerCarteRapport(entree) {
   afficherEtapeRapport();
 }
 
-function afficherEtapeRapport() {
+function afficherEtapeRapport(dessinerTable = true) {
   elements.etapeRapport.replaceChildren();
   const entrees = etat?.rapport ?? [];
   const entree = entrees[indexRapport];
@@ -820,7 +838,7 @@ function afficherEtapeRapport() {
   elements.rapportSuivant.disabled = indexRapport >= entrees.length - 1;
   if (!entree) {
     elements.etapeRapport.textContent = 'Aucune action enregistrée.';
-    afficherTable(etat.joueurs.map(() => []));
+    if (dessinerTable) afficherTable(etat.joueurs.map(() => []));
     return;
   }
   const icone = document.createElement(entree.carte ? 'i' : 'span');
@@ -833,21 +851,35 @@ function afficherEtapeRapport() {
   const texte = document.createElement('span');
   texte.textContent = `${indexRapport + 1}/${entrees.length} · ${texteRapport(entree)}`;
   elements.etapeRapport.append(icone, texte);
-  afficherTable(reconstruirePoses(indexRapport));
+  if (dessinerTable) {
+    const etape = reconstruireRapport(indexRapport);
+    const indexActeur = entree.joueur ? etat.joueurs.findIndex(({ nom }) => nom === entree.joueur) : -1;
+    afficherTable(etape.historiques, { indexActeur, sensRapport: etape.sens });
+  }
 }
 
 function reconstruirePoses(jusqua) {
+  return reconstruireRapport(jusqua).historiques;
+}
+
+function reconstruireRapport(jusqua) {
   const historiques = etat.joueurs.map(() => []);
+  let sens = 0;
   for (let index = 0; index <= jusque; index += 1) {
     const entree = etat.rapport[index];
-    if (entree.type === 'manche') historiques.forEach((historique) => historique.splice(0));
+    if (entree.type === 'manche') {
+      historiques.forEach((historique) => historique.splice(0));
+      sens = 0;
+    }
+    if (entree.type === 'sens') sens = entree.sens;
+    if (entree.type === 'carte' && entree.carte?.whootchi) sens *= -1;
     if (entree.type !== 'carte' || !entree.carte) continue;
     const indexJoueur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
     if (indexJoueur < 0) continue;
     historiques[indexJoueur].push({ ...entree.carte });
     historiques[indexJoueur] = historiques[indexJoueur].slice(-2);
   }
-  return historiques;
+  return { historiques, sens };
 }
 
 function construireRapport(conteneur) {
@@ -896,7 +928,7 @@ function afficherChrono() {
   elements.chronoBloc.classList.toggle('urgent', Boolean(etat && etat.temps <= 3));
 }
 
-function afficherTable(historiquesSimules = null) {
+function afficherTable(historiquesSimules = null, options = {}) {
   elements.table.replaceChildren();
   const nombre = etat.joueurs.length;
   etat.joueurs.forEach((joueur, index) => {
@@ -904,8 +936,9 @@ function afficherTable(historiquesSimules = null) {
     const carte = document.createElement('article');
     const choisitSens = etat.choixSens && index === etat.chef;
     const commence = !etat.choixSens && etat.premierTour && index === etat.actif;
-    const fautif = index === etat.fautifIndex;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}`;
+    const fautif = !historiquesSimules && index === etat.fautifIndex;
+    const acteurRapport = historiquesSimules && index === options.indexActeur;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
@@ -945,6 +978,14 @@ function afficherTable(historiquesSimules = null) {
     elements.table.append(carte);
   });
   if (!historiquesSimules && etat.tutoriel?.parcours) afficherParcoursTutoriel(etat.tutoriel.parcours);
+  if (historiquesSimules && options.sensRapport) afficherSensRapport(options.sensRapport);
+}
+
+function afficherSensRapport(sens) {
+  const flecheSens = document.createElement('div');
+  flecheSens.className = `sens-tutoriel sens-rapport ${sens > 0 ? 'horaire' : 'antihoraire'}`;
+  flecheSens.innerHTML = `<span></span><strong>SENS DU JEU</strong>`;
+  elements.table.append(flecheSens);
 }
 
 function afficherParcoursTutoriel({ depart, valeur, sens }) {
