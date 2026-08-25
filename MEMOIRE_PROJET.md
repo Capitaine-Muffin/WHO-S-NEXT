@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 25 août 2026 — version de test `v48`.
+Dernière mise à jour : 25 août 2026 — version de test `v50`.
 
 ## Référence et autorité
 
