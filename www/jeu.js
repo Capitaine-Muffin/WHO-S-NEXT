@@ -506,7 +506,7 @@ async function jouerCarte(indexCarte, retourner = false, auteur = 0) {
   if (auteur !== etat.actif) {
     arreterTemps();
     etat.animationErreur = true;
-    ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, carte });
+    ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, joueurAttendu: etat.joueurs[etat.actif].nom, carte });
     await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
     etat.animationErreur = false;
     sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
@@ -549,7 +549,7 @@ async function tenterErreurIA(dernierAuteur) {
   const carte = { ...carteBase, whootchi: aRegle('whootchi') && Math.random() < .5 };
   arreterTemps();
   etat.animationErreur = true;
-  ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, carte });
+  ajouterRapport({ type: 'carte-faute', joueur: joueur.nom, joueurAttendu: etat.joueurs[etat.actif].nom, carte });
   await animerCarteErreur(joueur, carte, `${joueur.nom} joue trop tôt !`);
   etat.animationErreur = false;
   sanctionner(joueur, `${joueur.nom} a joué alors que ce n'était pas son tour.`);
@@ -842,7 +842,8 @@ async function deplacerRapport(direction) {
     afficherEtapeRapport(false);
     const etapePrecedente = reconstruireRapport(indexRapport - 1);
     const indexActeur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
-    afficherTable(etapePrecedente.historiques, { indexActeur, sensRapport: etapePrecedente.sens });
+    const indexAttendu = entree.joueurAttendu ? etat.joueurs.findIndex(({ nom }) => nom === entree.joueurAttendu) : -1;
+    afficherTable(etapePrecedente.historiques, { indexActeur, indexAttendu, sensRapport: etapePrecedente.sens });
     preparerCibleRapport(indexActeur);
     await animerCarteRapport(entree);
   } else {
@@ -914,7 +915,10 @@ function afficherEtapeRapport(dessinerTable = true) {
   if (dessinerTable) {
     const etape = reconstruireRapport(indexRapport);
     const indexActeur = entree.joueur ? etat.joueurs.findIndex(({ nom }) => nom === entree.joueur) : -1;
-    afficherTable(etape.historiques, { indexActeur, sensRapport: etape.sens });
+    const indexAttendu = entree.type === 'carte-faute' && entree.joueurAttendu
+      ? etat.joueurs.findIndex(({ nom }) => nom === entree.joueurAttendu)
+      : -1;
+    afficherTable(etape.historiques, { indexActeur, indexAttendu, sensRapport: etape.sens });
   }
 }
 
@@ -998,7 +1002,8 @@ function afficherTable(historiquesSimules = null, options = {}) {
     const commence = !etat.choixSens && etat.premierTour && index === etat.actif;
     const fautif = !historiquesSimules && index === etat.fautifIndex;
     const acteurRapport = historiquesSimules && index === options.indexActeur;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}`;
+    const attenduRapport = historiquesSimules && index === options.indexAttendu;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}${attenduRapport ? ' attendu-rapport' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
