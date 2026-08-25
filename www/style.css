@@ -267,6 +267,8 @@ select {
 .musicien.fautif .avatar { outline-color: #df1738; background: #ffe0e5; box-shadow: 0 0 0 6px #df173844, 0 0 28px #df1738aa; animation: pulsation-faute .55s ease-in-out infinite alternate; }
 .musicien.fautif strong, .musicien.fautif span { color: #b40e2b; }
 .musicien.fautif .derniere-carte:last-child { filter: drop-shadow(0 0 5px #df1738); }
+.musicien.acteur-rapport .avatar { outline-color: #df1738; background: #ffe0e5; box-shadow: 0 0 0 6px #df173844, 0 0 26px #df173899; }
+.musicien.acteur-rapport strong, .musicien.acteur-rapport span { color: #b40e2b; }
 .musicien.elimine { opacity: .42; filter: grayscale(1); }
 .musicien.elimine .avatar { outline-color: #6e666b; }
 .compte-tutoriel { position: absolute; z-index: 9; left: 50%; top: -20px; min-width: 42px; padding: .25rem .42rem; border: 3px solid white; border-radius: 999px; background: #df1738; color: white; font-size: .8rem; line-height: 1; opacity: 0; box-shadow: 0 4px 0 #8d0d24; transform: translateX(-50%); animation: apparition-repere .38s cubic-bezier(.2,1.45,.35,1) var(--delai-compte, 0s) both, pulsation-compte .55s ease calc(var(--delai-compte, 0s) + .38s) 1; }
@@ -277,6 +279,7 @@ select {
 .sens-tutoriel.antihoraire span { border-color: #df1738; animation-name: rotation-sens-inverse; }
 .sens-tutoriel.antihoraire span::after { left: -4px; right: auto; background: #df1738; transform: rotate(112deg); }
 .sens-tutoriel.antihoraire strong { background: #df1738; }
+.sens-rapport { opacity: .92; }
 .fleche-j1-tutoriel { position: absolute; z-index: 10; left: 50%; bottom: -30px; display: grid; place-items: center; width: 48px; height: 27px; border: 3px solid white; border-radius: 999px; background: #df1738; color: white; font-size: 1.45rem; font-style: normal; font-weight: 950; line-height: 1; box-shadow: 0 3px 0 #8d0d24; transform: translateX(-50%); animation: glissement-fleche 1.15s ease-in-out infinite alternate; }
 .direction-joueur { position: absolute; z-index: 10; left: 50%; top: -23px; display: grid; place-items: center; width: 42px; height: 28px; border: 3px solid white; border-radius: 999px; background: #167aa9; color: white; font-size: 1.35rem; font-style: normal; font-weight: 950; line-height: 1; box-shadow: 0 3px 0 #0b5c82; transform: translateX(-50%); animation: apparition-repere .3s ease both; }
 .direction-joueur.antihoraire { background: #df1738; box-shadow: 0 3px 0 #8d0d24; }
@@ -285,6 +288,7 @@ select {
 .derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
 .mini-carte { width: 66px; height: 92px; background: white url('assets/cartes.webp') no-repeat; background-size: 660px 236.28px; background-position: var(--sprite-x) var(--sprite-y); transform: scale(.7879); transform-origin: top left; }
 .derniere-carte.cible-animation { opacity: 0; }
+.cible-rapport-vide { visibility: hidden; }
 
 .pose-carte {
   position: fixed;
