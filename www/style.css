@@ -500,11 +500,11 @@ dialog .primaire { width: 100%; }
 .boutons-sens { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 .boutons-sens .primaire { min-height: 72px; padding-inline: .7rem; }
 #choix-sens[open] { position: fixed; z-index: 50; inset: auto 50% max(150px, calc(env(safe-area-inset-bottom) + 135px)) auto; width: min(86vw, 330px); margin: 0; padding: .8rem; border: 3px solid var(--bleu); background: #fffdf2f2; box-shadow: 0 10px 0 #17819a55, 0 18px 35px #28212733; transform: translateX(50%); }
-#choix-sens .surtitre { color: var(--rose); }
-#choix-sens h2 { margin: .2rem 0; font-size: 1.25rem; }
+#choix-sens .surtitre { margin: 0 0 .45rem; color: var(--rose); font-size: 1.05rem; text-align: center; }
+#choix-sens h2 { margin: .2rem 0 .65rem; font-size: 1.25rem; text-align: center; }
 #choix-sens p { margin: .25rem 0 .55rem; font-size: .78rem; }
 #choix-sens .boutons-sens { gap: .45rem; }
-#choix-sens .boutons-sens .primaire { min-height: 44px; margin: 0; padding: .5rem; border-radius: 12px; font-size: .72rem; box-shadow: 0 4px 0 #b74d0b; }
+#choix-sens .boutons-sens .primaire { min-height: 64px; margin: 0; padding: .25rem; border-radius: 12px; font-size: 2.35rem; font-weight: 1000; line-height: 1; box-shadow: 0 4px 0 #b74d0b; }
 #fin-manche[open] { position: fixed; z-index: 50; inset: auto 50% max(150px, calc(env(safe-area-inset-bottom) + 135px)) auto; width: min(86vw, 340px); margin: 0; padding: .9rem; border: 3px solid var(--rose); background: #fffdf2f5; box-shadow: 0 10px 0 #b74d0b55, 0 18px 35px #28212733; transform: translateX(50%); }
 #fin-manche h2 { margin: .2rem 0; font-size: 1.35rem; }
 #fin-manche p { margin: .3rem 0 .65rem; font-size: .82rem; }
