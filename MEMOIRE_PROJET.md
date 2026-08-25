@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 25 août 2026 — version de test `v54`.
+Dernière mise à jour : 25 août 2026 — version de test `v55`.
 
 ## Référence et autorité
 
@@ -82,6 +82,7 @@ Les bots choisissent aléatoirement parmi leurs cartes légales et jouent à un 
 ## Interface de partie
 
 - J1 se trouve en bas de l'écran.
+- Aucune information secondaire n'est affichée sous le nom des joueurs : la ligne « cartes · fausses notes » a été supprimée.
 - À quatre joueurs, le nom de J4 est placé au-dessus de son avatar pour ne pas être recouvert par sa pile de cartes ; cette disposition vaut aussi dans les tutoriels.
 - Les adversaires sont disposés autour de la table et la pendule reste au centre.
 - La pendule est volontairement petite et vibre légèrement dans l'urgence ; elle ne doit pas se déplacer sur la table.
