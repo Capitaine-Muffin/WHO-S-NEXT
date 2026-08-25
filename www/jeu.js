@@ -1143,18 +1143,11 @@ function retournerMain() {
 }
 
 function appliquerFaceCarte(element, valeur, whootchi) {
-  const couleurs = ['#28abc1', '#d20a2e', '#edae2f', '#79556f', '#69a313', '#079d8c'];
-  const multiplicateurs = ['', 'DOUBLE', 'TRIPLE', 'QUADRUPLE', 'QUINTUPLE', 'SEXTUPLE'];
   element.classList.toggle('whootchi', whootchi);
-  element.style.setProperty('--couleur-carte', couleurs[valeur - 1]);
   element.dataset.valeur = String(valeur);
   element.dataset.face = whootchi ? 'whootchi' : 'whoot';
   element.innerHTML = `
-    <span class="carte-titre" aria-hidden="true">
-      ${valeur > 1 ? `<b class="carte-prefixe">${multiplicateurs[valeur - 1]}</b>` : ''}
-      <span class="carte-nom"><b class="carte-whoot">WHOOT${whootchi ? '/' : ''}</b>${whootchi ? '<b class="carte-chi">CHI</b>' : ''}</span>
-    </span>
-    <span class="carte-vinyle" aria-hidden="true"><b>${valeur}</b></span>
+    <img class="visuel-carte" src="assets/cartes-validees/carte-${valeur}-${whootchi ? 'whootchi' : 'whoot'}.webp" alt="" draggable="false">
     <span class="visuellement-cache">${nomCarte(valeur, whootchi)}</span>`;
 }
 
