@@ -374,7 +374,7 @@ select {
   --couleur-carte: #28abc1;
   position: relative;
   display: grid;
-  grid-template-rows: minmax(0, 40%) minmax(0, 60%);
+  grid-template-rows: auto 1fr;
   place-items: center;
   width: 1em;
   min-height: 1em;
@@ -390,18 +390,18 @@ select {
 .carte:not(.whootchi) { border-color: var(--couleur-carte); }
 .carte.whootchi { border-color: var(--couleur-carte); background: var(--couleur-carte); color: white; }
 .carte-titre { z-index: 1; align-self: stretch; display: grid; place-content: center; width: 100%; line-height: .76; text-align: center; }
-.carte-prefixe { display: block; font-size: .2em; font-weight: 1000; letter-spacing: -.055em; white-space: nowrap; }
-.carte-nom { display: flex; align-items: baseline; justify-content: center; white-space: nowrap; }
+.carte-prefixe { display: block; justify-self: center; font-size: .2em; font-weight: 1000; letter-spacing: -.055em; white-space: nowrap; transform: scaleX(.62); }
+.carte-nom { display: flex; align-items: baseline; justify-content: center; justify-self: center; white-space: nowrap; }
 .carte-whoot { font-size: .27em; font-weight: 1000; letter-spacing: -.075em; }
 .carte-chi { display: inline-block; margin-left: .02em; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-size: .36em; font-style: italic; font-weight: 1000; letter-spacing: -.03em; line-height: .7; transform: skew(-8deg) rotate(-2deg); filter: drop-shadow(.025em .025em 0 color-mix(in srgb, currentColor 55%, transparent)); }
-.carte-vinyle { position: relative; display: grid; place-items: center; width: 72%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, #111 0 8%, #242124 8.5% 10%, #090909 10.5% 15%); box-shadow: inset 0 0 0 .04em #050505, 0 .035em .04em #28212755; }
+.carte-vinyle { position: relative; display: grid; place-items: center; width: 68%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, #111 0 8%, #242124 8.5% 10%, #090909 10.5% 15%); box-shadow: inset 0 0 0 .04em #050505, 0 .035em .04em #28212755; }
 .carte-vinyle::before { content: ''; position: absolute; width: 52%; aspect-ratio: 1; border: .035em solid var(--couleur-carte); border-radius: 50%; background: #090909; }
 .carte-vinyle b { position: relative; z-index: 1; color: white; font-size: .52em; font-weight: 1000; line-height: 1; }
 .carte { font-size: 66px; }
 .carte[data-valeur="1"] .carte-whoot { font-size: .31em; }
 .carte.whootchi .carte-whoot { font-size: .18em; letter-spacing: -.09em; }
 .carte.whootchi .carte-chi { font-size: .25em; }
-.carte.whootchi .carte-nom { transform: scaleX(.68); }
+.carte.whootchi .carte-nom { transform: scaleX(.58); }
 .carte[data-valeur="1"].whootchi .carte-whoot { font-size: .2em; }
 .carte[data-valeur="1"].whootchi .carte-chi { font-size: .28em; }
 .carte[data-valeur="4"] .carte-prefixe,
@@ -409,9 +409,11 @@ select {
 .carte[data-valeur="6"] .carte-prefixe {
   font-family: "Arial Narrow", Impact, sans-serif;
   font-size: .175em;
-  transform: scaleX(.8);
+  transform: scaleX(.52);
 }
 .carte-animee { font-size: 156px; border-radius: 15px; padding: 9px; }
+.carte-animee .carte-vinyle { width: 52%; }
+.carte-animee:not(.whootchi) .carte-whoot { font-size: .2em; }
 .carte-animee.whootchi .carte-whoot { font-size: .19em; }
 .carte-animee.whootchi .carte-chi { font-size: .27em; }
 .carte-animee .carte-chi { filter: drop-shadow(2px 2px 0 #ffffff55); }
