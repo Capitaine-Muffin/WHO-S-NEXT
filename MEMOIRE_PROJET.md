@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 25 août 2026 — version de test `v57`.
+Dernière mise à jour : 25 août 2026 — version de test `v58`.
 
 ## Référence et autorité
 
@@ -88,7 +88,7 @@ Les bots choisissent aléatoirement parmi leurs cartes légales et jouent à un 
 - La pendule est volontairement petite et vibre légèrement dans l'urgence ; elle ne doit pas se déplacer sur la table.
 - Une carte jouée apparaît d'abord en grand avec le nom du joueur, reste visible, puis se réduit vers sa place.
 - Les deux dernières cartes posées devant chaque joueur sont empilées avec un léger décalage.
-- Les animations ne doivent pas bloquer une nouvelle pose de carte.
+- Les animations ne bloquent pas une nouvelle pose de carte, mais elles sont affichées dans une file d'attente : une animation doit se terminer avant que la suivante commence, afin d'éviter plusieurs grandes cartes simultanées à l'écran.
 - Lors d'une fausse note, la carte fautive est montrée, le joueur fautif passe en rouge, puis le bilan s'ouvre après l'animation.
 - La durée des animations est réglable : normale, rapide ou désactivée.
 
