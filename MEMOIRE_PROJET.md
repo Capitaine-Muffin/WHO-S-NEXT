@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 25 août 2026 — version de test `v56`.
+Dernière mise à jour : 25 août 2026 — version de test `v57`.
 
 ## Référence et autorité
 
@@ -83,7 +83,7 @@ Les bots choisissent aléatoirement parmi leurs cartes légales et jouent à un 
 
 - J1 se trouve en bas de l'écran.
 - Aucune information secondaire n'est affichée sous le nom des joueurs : la ligne « cartes · fausses notes » a été supprimée.
-- Les numéros J1, J2, J3, etc. sont affichés directement dans les avatars, avec un petit instrument accroché sur le côté. Aucun nom n'est placé sous l'avatar, afin de libérer la zone des cartes dans toutes les configurations et les tutoriels.
+- Les numéros J1, J2, J3, etc. et leur petit instrument sont réunis côte à côte dans le même avatar circulaire. Aucun nom n'est placé sous l'avatar, afin de libérer la zone des cartes dans toutes les configurations et les tutoriels.
 - Les adversaires sont disposés autour de la table et la pendule reste au centre.
 - La pendule est volontairement petite et vibre légèrement dans l'urgence ; elle ne doit pas se déplacer sur la table.
 - Une carte jouée apparaît d'abord en grand avec le nom du joueur, reste visible, puis se réduit vers sa place.
