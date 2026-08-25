@@ -1033,8 +1033,7 @@ function afficherTable(historiquesSimules = null, options = {}) {
     const fautif = !historiquesSimules && index === etat.fautifIndex;
     const acteurRapport = historiquesSimules && index === options.indexActeur;
     const attenduRapport = historiquesSimules && index === options.indexAttendu;
-    const nomAuDessus = nombre === 4 && index === 3;
-    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}${attenduRapport ? ' attendu-rapport' : ''}${nomAuDessus ? ' nom-au-dessus' : ''}`;
+    carte.className = `musicien${joueur.humain ? ' humain' : ''}${joueur.elimine ? ' elimine' : ''}${choisitSens || commence ? ' premier' : ''}${fautif ? ' fautif' : ''}${acteurRapport ? ' acteur-rapport' : ''}${attenduRapport ? ' attendu-rapport' : ''}`;
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
@@ -1042,7 +1041,7 @@ function afficherTable(historiquesSimules = null, options = {}) {
     carte.style.setProperty('--pile-y', `${Math.cos(angle) * distancePile}px`);
     carte.dataset.joueurIndex = index;
     const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
-    carte.innerHTML = `<div class="avatar">${joueur.avatar}</div><strong>${joueur.nom}</strong>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
+    carte.innerHTML = `<div class="avatar"><strong class="numero-joueur">${joueur.nom}</strong><i class="instrument-joueur" aria-hidden="true">${joueur.avatar}</i></div>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
     let historiqueAffiche = historiquesSimules?.[index] ?? joueur.historique;
     if (!historiquesSimules && fautif && etat.carteFaute) historiqueAffiche = [...historiqueAffiche.slice(-1), etat.carteFaute];
