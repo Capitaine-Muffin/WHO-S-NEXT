@@ -290,8 +290,8 @@ select {
 .direction-joueur.antihoraire { background: #df1738; box-shadow: 0 3px 0 #8d0d24; }
 .badge-premier { position: absolute; left: 50%; top: -14px; padding: .25rem .42rem; border-radius: 999px; background: var(--rose); color: white; font-size: .52rem; letter-spacing: .06em; transform: translateX(-50%) rotate(-3deg); }
 .pile-cartes { position: absolute; z-index: 1; left: 50%; top: 29px; width: 66px; height: 82px; pointer-events: none; transform: translate(calc(-50% + var(--pile-x)), calc(-50% + var(--pile-y))); }
-.derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 72px; border: 2px solid white; border-radius: 5px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
-.mini-carte { width: 66px; height: 92px; background: white url('assets/cartes.webp') no-repeat; background-size: 660px 236.28px; background-position: var(--sprite-x) var(--sprite-y); transform: scale(.7879); transform-origin: top left; }
+.derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 52px; border: 2px solid white; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
+.mini-carte { width: 66px; height: 66px; transform: scale(.7879); transform-origin: top left; }
 .derniere-carte.cible-animation { opacity: 0; }
 .cible-rapport-vide { visibility: hidden; }
 
@@ -324,9 +324,7 @@ select {
 
 .pose-carte .carte-animee {
   width: 156px;
-  min-height: 216px;
-  background-size: 1500px 537px;
-  background-position: var(--sprite-x-grand) var(--sprite-y-grand);
+  min-height: 156px;
   border-width: 5px;
   box-shadow: 0 10px 0 #8f8178;
 }
@@ -367,25 +365,58 @@ select {
 .liste-rapport { display: grid; gap: .35rem; max-height: 130px; margin-top: .4rem; overflow-y: auto; }
 .ligne-rapport { display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: .45rem; min-height: 38px; padding: .25rem .4rem; border-radius: 10px; background: var(--surface-2); color: var(--texte); font-size: .7rem; text-align: left; }
 .ligne-rapport.faute { grid-template-columns: 32px 1fr; background: #ffe3e8; color: #a90e2a; }
-.icone-rapport { display: grid; place-items: center; width: 30px; height: 34px; border-radius: 5px; background: white url('assets/cartes.webp') no-repeat; background-size: 300px 107.4px; background-position: var(--rapport-x) var(--rapport-y); box-shadow: 0 2px 0 #8f8178; }
+.icone-rapport { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 5px; box-shadow: 0 2px 0 #8f8178; }
 .main-et-flip { display: grid; grid-template-columns: minmax(0, 1fr) 50px; align-items: center; gap: .35rem; }
 .main-cartes { display: grid; justify-content: center; gap: .35rem; padding: .3rem .1rem .65rem; }
 .main-cartes.aide-active { padding-top: 2.7rem; }
 
 .carte {
+  --couleur-carte: #28abc1;
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 40%) minmax(0, 60%);
+  place-items: center;
   width: 66px;
-  min-height: 92px;
-  padding: 0;
+  min-height: 66px;
+  padding: 4px;
   border: 3px solid white;
   border-radius: 8px;
   background-color: white;
-  background-image: url('assets/cartes.webp');
-  background-repeat: no-repeat;
-  background-size: 660px 236.28px;
-  background-position: var(--sprite-x) var(--sprite-y);
+  color: var(--couleur-carte);
   box-shadow: 0 7px 0 #8f8178, 0 8px 16px #2c202733;
   overflow: hidden;
 }
+.carte:not(.whootchi) { border-color: var(--couleur-carte); }
+.carte.whootchi { border-color: var(--couleur-carte); background: var(--couleur-carte); color: white; }
+.carte-titre { z-index: 1; align-self: stretch; display: grid; place-content: center; width: 100%; line-height: .76; text-align: center; }
+.carte-prefixe { display: block; font-size: .2em; font-weight: 1000; letter-spacing: -.055em; white-space: nowrap; }
+.carte-nom { display: flex; align-items: baseline; justify-content: center; white-space: nowrap; }
+.carte-whoot { font-size: .27em; font-weight: 1000; letter-spacing: -.075em; }
+.carte-chi { display: inline-block; margin-left: .04em; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-size: .36em; font-style: italic; font-weight: 1000; letter-spacing: -.15em; line-height: .7; transform: skew(-8deg) rotate(-2deg); filter: drop-shadow(.025em .025em 0 color-mix(in srgb, currentColor 55%, transparent)); }
+.carte-vinyle { position: relative; display: grid; place-items: center; width: 72%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, #111 0 8%, #242124 8.5% 10%, #090909 10.5% 15%); box-shadow: inset 0 0 0 .04em #050505, 0 .035em .04em #28212755; }
+.carte-vinyle::before { content: ''; position: absolute; width: 52%; aspect-ratio: 1; border: .035em solid var(--couleur-carte); border-radius: 50%; background: #090909; }
+.carte-vinyle b { position: relative; z-index: 1; color: white; font-size: .52em; font-weight: 1000; line-height: 1; }
+.carte { font-size: 66px; }
+.carte[data-valeur="1"] .carte-whoot { font-size: .31em; }
+.carte.whootchi .carte-whoot { font-size: .18em; letter-spacing: -.09em; }
+.carte.whootchi .carte-chi { font-size: .25em; }
+.carte[data-valeur="1"].whootchi .carte-whoot { font-size: .2em; }
+.carte[data-valeur="1"].whootchi .carte-chi { font-size: .28em; }
+.carte[data-valeur="4"] .carte-prefixe,
+.carte[data-valeur="5"] .carte-prefixe,
+.carte[data-valeur="6"] .carte-prefixe { font-size: .175em; }
+.carte-animee { font-size: 156px; border-radius: 15px; padding: 9px; }
+.carte-animee.whootchi .carte-whoot { font-size: .19em; }
+.carte-animee.whootchi .carte-chi { font-size: .27em; }
+.carte-animee .carte-chi { filter: drop-shadow(2px 2px 0 #ffffff55); }
+.mini-carte { font-size: 66px; padding: 4px; border: 0; border-radius: 6px; box-shadow: none; }
+.mini-carte.whootchi { background: var(--couleur-carte); color: white; }
+.carte-compacte { --couleur-carte: #28abc1; position: relative; display: grid; grid-template-rows: 42% 58%; place-items: center; padding: 2px; overflow: hidden; background: white; color: var(--couleur-carte); font-size: 34px; }
+.carte-compacte.whootchi { background: var(--couleur-carte); color: white; }
+.carte-compacte .carte-prefixe { font-size: .17em; }
+.carte-compacte .carte-whoot { font-size: .23em; }
+.carte-compacte .carte-chi { font-size: .3em; }
+.carte-compacte .carte-vinyle { width: 68%; }
 
 .flip { width: 50px; min-height: 62px; padding: .25rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--bleu-fonce); font-size: .62rem; font-weight: 950; box-shadow: 0 5px 0 #17819a; }
 .flip span { display: block; font-size: 1.55rem; line-height: 1; }
