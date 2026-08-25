@@ -81,6 +81,10 @@ Les bots choisissent aléatoirement parmi leurs cartes légales et jouent à un 
 
 ## Interface de partie
 
+- Les cartes mobiles utilisent désormais un gabarit carré natif HTML/CSS, sans planche d'illustrations : face Whoot blanche avec repères colorés, face Whootchi entièrement colorée, valeur dans un vinyle noir et « CHI » au traitement rock.
+- Couleurs des valeurs : 1 bleu clair, 2 rouge, 3 orange, 4 violet, 5 vert, 6 turquoise foncé.
+- Le même composant est utilisé dans la main, les animations, les piles devant les joueurs, le rapport et les tutoriels.
+
 - J1 se trouve en bas de l'écran.
 - Aucune information secondaire n'est affichée sous le nom des joueurs : la ligne « cartes · fausses notes » a été supprimée.
 - Les numéros J1, J2, J3, etc. et leur petit instrument sont réunis côte à côte dans le même avatar circulaire. Aucun nom n'est placé sous l'avatar, afin de libérer la zone des cartes dans toutes les configurations et les tutoriels.
