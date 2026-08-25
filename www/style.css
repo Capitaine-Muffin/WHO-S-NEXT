@@ -393,7 +393,7 @@ select {
 .carte-prefixe { display: block; font-size: .2em; font-weight: 1000; letter-spacing: -.055em; white-space: nowrap; }
 .carte-nom { display: flex; align-items: baseline; justify-content: center; white-space: nowrap; }
 .carte-whoot { font-size: .27em; font-weight: 1000; letter-spacing: -.075em; }
-.carte-chi { display: inline-block; margin-left: .04em; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-size: .36em; font-style: italic; font-weight: 1000; letter-spacing: -.15em; line-height: .7; transform: skew(-8deg) rotate(-2deg); filter: drop-shadow(.025em .025em 0 color-mix(in srgb, currentColor 55%, transparent)); }
+.carte-chi { display: inline-block; margin-left: .02em; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-size: .36em; font-style: italic; font-weight: 1000; letter-spacing: -.03em; line-height: .7; transform: skew(-8deg) rotate(-2deg); filter: drop-shadow(.025em .025em 0 color-mix(in srgb, currentColor 55%, transparent)); }
 .carte-vinyle { position: relative; display: grid; place-items: center; width: 72%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, #111 0 8%, #242124 8.5% 10%, #090909 10.5% 15%); box-shadow: inset 0 0 0 .04em #050505, 0 .035em .04em #28212755; }
 .carte-vinyle::before { content: ''; position: absolute; width: 52%; aspect-ratio: 1; border: .035em solid var(--couleur-carte); border-radius: 50%; background: #090909; }
 .carte-vinyle b { position: relative; z-index: 1; color: white; font-size: .52em; font-weight: 1000; line-height: 1; }
@@ -401,6 +401,7 @@ select {
 .carte[data-valeur="1"] .carte-whoot { font-size: .31em; }
 .carte.whootchi .carte-whoot { font-size: .18em; letter-spacing: -.09em; }
 .carte.whootchi .carte-chi { font-size: .25em; }
+.carte.whootchi .carte-nom { transform: scaleX(.68); }
 .carte[data-valeur="1"].whootchi .carte-whoot { font-size: .2em; }
 .carte[data-valeur="1"].whootchi .carte-chi { font-size: .28em; }
 .carte[data-valeur="4"] .carte-prefixe,
