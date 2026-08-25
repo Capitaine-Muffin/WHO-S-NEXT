@@ -41,7 +41,6 @@ button { touch-action: manipulation; }
 
 #accueil {
   position: relative;
-  isolation: isolate;
   max-width: 520px;
   margin: auto;
   flex-direction: column;
@@ -58,7 +57,7 @@ button { touch-action: manipulation; }
   top: 105px;
   width: 150px;
   height: 205px;
-  background: url('assets/personnages.webp') no-repeat;
+  background: url('assets/personnages.webp?v=2') no-repeat;
   background-size: auto 200%;
   opacity: .16;
   mix-blend-mode: multiply;
@@ -103,7 +102,7 @@ h1 img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
 
 .identite-menu { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: .8rem; text-align: center; }
 .identite-menu .champ { text-align: center; }
-.portrait-menu { width: 82px; height: 108px; border: 3px solid white; border-radius: 18px; background: white url('assets/personnages.webp') no-repeat; background-size: auto 200%; background-position: var(--portrait-x) var(--portrait-y); background-blend-mode: multiply; box-shadow: 0 7px 0 #8f8178, 0 10px 18px #28212733; }
+.portrait-menu { width: 82px; height: 108px; border: 0; border-radius: 18px; background: transparent url('assets/personnages.webp?v=2') no-repeat; background-size: auto 200%; background-position: var(--portrait-x) var(--portrait-y); box-shadow: none; }
 .choix-centre { justify-items: center; text-align: center; }
 .pastilles-joueurs { display: grid; grid-template-columns: repeat(6, 1fr); gap: .35rem; width: 100%; }
 .pastilles-joueurs button { min-width: 0; aspect-ratio: .78; padding: .25rem .1rem; border: 3px solid white; border-radius: 13px; background: var(--couleur-pastille, var(--bleu)); color: white; box-shadow: 0 4px 0 #746a65; }
