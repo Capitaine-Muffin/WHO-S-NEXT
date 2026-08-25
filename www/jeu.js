@@ -134,6 +134,7 @@ function demarrerPartie() {
     main: [],
     derniere: null,
     historique: [],
+    posesVisibles: [],
     erreurConsecutive: 0,
     elimine: false,
   }));
@@ -219,6 +220,7 @@ function demarrerTutoriel(type = 'base') {
     main: creerMain(4),
     derniere: null,
     historique: [],
+    posesVisibles: [],
     erreurConsecutive: 0,
     elimine: false,
   }));
@@ -246,6 +248,7 @@ function demarrerTutoriel(type = 'base') {
   if (type === 'trio') {
     etat.joueurs[2].derniere = { valeur: 1, whootchi: false };
     etat.joueurs[2].historique.push({ valeur: 1, whootchi: false });
+    etat.joueurs[2].posesVisibles.push({ valeur: 1, whootchi: false });
   }
   if (type === 'point-faible') etat.joueurs[1].notes = 4;
   if (type === 'mort-subite') etat.joueurs[3].notes = 6;
@@ -476,6 +479,7 @@ function nouvelleManche() {
     joueur.main = joueur.elimine ? [] : creerMain(joueursActifs().length);
     joueur.derniere = null;
     joueur.historique = [];
+    joueur.posesVisibles = [];
   });
   etat.enCours = true;
   afficher();
@@ -624,7 +628,15 @@ async function executerAnimationCarteErreur(joueur, carte, texte) {
 }
 
 function animerCarteJouee(indexJoueur, joueur, carte) {
-  return mettreAnimationEnFile(() => executerAnimationCarteJouee(indexJoueur, joueur, carte));
+  const mancheAnimation = etat.manche;
+  return mettreAnimationEnFile(async () => {
+    await executerAnimationCarteJouee(indexJoueur, joueur, carte);
+    if (!etat || etat.manche !== mancheAnimation || etat.joueurs[indexJoueur] !== joueur) return;
+    joueur.posesVisibles ??= [];
+    joueur.posesVisibles.push({ ...carte });
+    joueur.posesVisibles = joueur.posesVisibles.slice(-2);
+    afficherTable();
+  });
 }
 
 async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
@@ -638,9 +650,8 @@ async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
   document.body.append(animation);
 
   const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`) ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
-  const positionPile = Math.max(0, joueur.historique.length - 1);
+  const positionPile = Math.min(1, joueur.posesVisibles?.length ?? 0);
   const cadre = cible?.getBoundingClientRect();
-  cible?.classList.add('cible-animation');
 
   await attendre(animationTutoriel ? 1450 : (rapide ? 350 : 1000));
 
@@ -658,7 +669,6 @@ async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
   }
 
   animation.remove();
-  cible?.classList.remove('cible-animation');
 }
 
 function attendre(duree) {
@@ -1055,7 +1065,7 @@ function afficherTable(historiquesSimules = null, options = {}) {
     const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
     carte.innerHTML = `<div class="avatar"><strong class="numero-joueur">${joueur.nom}</strong><i class="instrument-joueur" aria-hidden="true">${joueur.avatar}</i></div>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
     const pile = carte.querySelector('.pile-cartes');
-    let historiqueAffiche = historiquesSimules?.[index] ?? joueur.historique;
+    let historiqueAffiche = historiquesSimules?.[index] ?? (joueur.posesVisibles ?? joueur.historique);
     if (!historiquesSimules && fautif && etat.carteFaute) historiqueAffiche = [...historiqueAffiche.slice(-1), etat.carteFaute];
     historiqueAffiche.forEach((carteJouee, position) => {
       const conteneur = document.createElement('div');
