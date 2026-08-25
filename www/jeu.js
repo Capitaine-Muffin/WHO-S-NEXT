@@ -868,8 +868,8 @@ async function deplacerRapport(direction) {
     const indexActeur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
     const indexAttendu = entree.joueurAttendu ? etat.joueurs.findIndex(({ nom }) => nom === entree.joueurAttendu) : -1;
     afficherTable(etapePrecedente.historiques, { indexActeur, indexAttendu, sensRapport: etapePrecedente.sens });
-    preparerCibleRapport(indexActeur);
-    await animerCarteRapport(entree);
+    const positionPile = preparerCibleRapport(indexActeur);
+    await animerCarteRapport(entree, positionPile);
   } else {
     afficherEtapeRapport();
   }
@@ -877,14 +877,16 @@ async function deplacerRapport(direction) {
 
 function preparerCibleRapport(indexJoueur) {
   const pile = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .pile-cartes`);
-  if (!pile || pile.children.length) return;
+  if (!pile) return 0;
+  const positionPile = Math.min(pile.children.length, 1);
   const cible = document.createElement('div');
   cible.className = 'derniere-carte cible-rapport-vide';
-  cible.style.setProperty('--position-pile', 0);
+  cible.style.setProperty('--position-pile', positionPile);
   pile.append(cible);
+  return positionPile;
 }
 
-async function animerCarteRapport(entree) {
+async function animerCarteRapport(entree, positionPile = 0) {
   const indexJoueur = etat.joueurs.findIndex(({ nom }) => nom === entree.joueur);
   const joueur = etat.joueurs[indexJoueur];
   if (!joueur) return;
@@ -902,11 +904,15 @@ async function animerCarteRapport(entree) {
   cible?.classList.add('cible-animation');
   await attendre(650);
   if (cadre) {
+    const etiquette = animation.querySelector('strong');
+    await etiquette.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: 'forwards' }).finished;
+    etiquette.style.display = 'none';
     const arriveeX = cadre.left + cadre.width / 2;
     const arriveeY = cadre.top + cadre.height / 2;
+    const angleFinal = -7 + positionPile * 10;
     await animation.animate([
       { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: 'translate(-50%, -50%) scale(.3333) rotate(7deg)', opacity: 1 },
+      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: `translate(-50%, -50%) scale(.3333) rotate(${angleFinal}deg)`, opacity: 1 },
     ], { duration: 520, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
   }
   animation.remove();
