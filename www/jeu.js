@@ -5,8 +5,8 @@ const avatars = ['🎤', '🎸', '🥁', '🎷', '🎹', '🎺', '🪕'];
 const profils = {
   debutant: { regles: [], ia: 4, chrono: 8, animation: 'normale' },
   intermediaire: { regles: ['whootchi'], ia: 6, chrono: 5, animation: 'normale' },
-  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 3, animation: 'rapide' },
-  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 9, chrono: 2, animation: 'rapide' },
+  expert: { regles: ['whootchi', 'repetition', 'trio'], ia: 8, chrono: 3, animation: 'normale' },
+  impossible: { regles: ['whootchi', 'repetition', 'trio', 'point-faible'], ia: 9, chrono: 2, animation: 'normale' },
 };
 const parcoursTutoriels = {
   base: { regles: [], intro: 'Voici la table : J1 en bas, les autres joueurs autour et la pendule au centre.', notion: 'La valeur d’une carte indique combien de joueurs avancer dans le sens du jeu.', demo: { valeur: 2, whootchi: false }, resultat: 'Double Whoot avance de deux joueurs : c’est donc à J4 de jouer.', attendu: { valeur: 1, whootchi: false }, essai: 'Touche la carte Whoot avant la fin du chrono.' },
