@@ -150,7 +150,7 @@ select {
 .niveaux-prets button { min-height: 72px; padding: .65rem .45rem; border: 3px solid white; border-radius: 16px; background: var(--bleu); color: white; box-shadow: 0 5px 0 #17819a; }
 .niveaux-prets button:nth-child(2) { background: #41bf91; box-shadow-color: #248866; }.niveaux-prets button:nth-child(3) { background: #edae25; box-shadow-color: #ad7410; }.niveaux-prets button:nth-child(4) { background: var(--rose); box-shadow-color: #b74d0b; }
 .niveaux-prets strong, .niveaux-prets small { display: block; }.niveaux-prets strong { text-transform: uppercase; }.niveaux-prets small { margin-top: .2rem; font-size: .66rem; }
-.niveaux-prets button.actif { outline: 4px solid #282127; outline-offset: 2px; transform: translateY(-2px); }
+.niveaux-prets button.actif { outline: 4px solid var(--rose); outline-offset: 2px; transform: translateY(-2px); }
 
 .primaire {
   min-height: 56px;
