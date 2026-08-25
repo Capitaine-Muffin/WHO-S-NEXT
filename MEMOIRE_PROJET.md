@@ -1,6 +1,6 @@
 # Mémoire du projet Who's Next?
 
-Dernière mise à jour : 25 août 2026 — version de test `v50`.
+Dernière mise à jour : 25 août 2026 — version de test `v51`.
 
 ## Référence et autorité
 
@@ -98,6 +98,7 @@ Les bots choisissent aléatoirement parmi leurs cartes légales et jouent à un 
 - Les flèches gauche et droite parcourent les actions.
 - À chaque étape contenant une carte, celle-ci est rejouée avec une animation vers son joueur.
 - La carte apparaît dans la pile exactement à la fin de son animation et le joueur qui agit est signalé en rouge.
+- Si une carte est jouée hors tour, le fautif est rouge et le joueur qui devait jouer est indiqué en vert. Un simple dépassement du chrono ne déclenche pas ce marquage vert.
 - Un anneau autour de la pendule reconstitue le sens du jeu et s'inverse au passage d'une carte Whootchi.
 - Fermer le rapport restaure la table en direct et, si nécessaire, le bilan de fausse note.
 
