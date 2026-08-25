@@ -925,7 +925,7 @@ function reconstruirePoses(jusqua) {
 function reconstruireRapport(jusqua) {
   const historiques = etat.joueurs.map(() => []);
   let sens = 0;
-  for (let index = 0; index <= jusque; index += 1) {
+  for (let index = 0; index <= jusqua; index += 1) {
     const entree = etat.rapport[index];
     if (entree.type === 'manche') {
       historiques.forEach((historique) => historique.splice(0));
