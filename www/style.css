@@ -310,8 +310,8 @@ select {
 .direction-joueur.antihoraire { background: #df1738; box-shadow: 0 3px 0 #8d0d24; }
 .badge-premier { position: absolute; left: 50%; top: -14px; padding: .25rem .42rem; border-radius: 999px; background: var(--rose); color: white; font-size: .52rem; letter-spacing: .06em; transform: translateX(-50%) rotate(-3deg); }
 .pile-cartes { position: absolute; z-index: 1; left: 50%; top: 29px; width: 66px; height: 82px; pointer-events: none; transform: translate(calc(-50% + var(--pile-x)), calc(-50% + var(--pile-y))); }
-.derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 52px; border: 2px solid white; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
-.mini-carte { width: 66px; height: 66px; transform: scale(.7879); transform-origin: top left; }
+.derniere-carte { position: absolute; left: calc(var(--position-pile) * 9px); top: calc(var(--position-pile) * 5px); width: 52px; height: 52px; border: 0; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 8px #2c202744; transform: rotate(calc(-7deg + var(--position-pile) * 10deg)); }
+.mini-carte { width: 100%; height: 100%; padding: 0; transform: none; }
 .derniere-carte.cible-animation { opacity: 0; }
 .cible-rapport-vide { visibility: hidden; }
 .cible-pose-vide { visibility: hidden; }
@@ -438,7 +438,7 @@ select {
 .carte-animee.whootchi .carte-whoot { font-size: .19em; }
 .carte-animee.whootchi .carte-chi { font-size: .27em; }
 .carte-animee .carte-chi { filter: drop-shadow(2px 2px 0 #ffffff55); }
-.mini-carte { font-size: 66px; padding: 4px; border: 0; border-radius: 6px; box-shadow: none; }
+.mini-carte { font-size: 52px; padding: 0; border: 0; border-radius: 6px; background: transparent; box-shadow: none; }
 .mini-carte.whootchi { background: var(--couleur-carte); color: white; }
 .carte-compacte { --couleur-carte: #28abc1; position: relative; display: grid; grid-template-rows: 42% 58%; place-items: center; padding: 2px; overflow: hidden; background: white; color: var(--couleur-carte); font-size: 34px; }
 .carte-compacte.whootchi { background: var(--couleur-carte); color: white; }
