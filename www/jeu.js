@@ -184,13 +184,13 @@ function appliquerProfil(nom) {
   elements.dureeChrono.value = profil.chrono;
   document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.classList.toggle('actif', bouton.dataset.preset === nom));
   elements.ouvrirDifficulte.classList.remove('personnalise');
-  elements.ouvrirDifficulte.innerHTML = '<strong>Paramètres avancés</strong><small>Fais tes propres règles !</small>';
+  elements.ouvrirDifficulte.innerHTML = '<strong>MODE LIBRE !</strong><small>Fais tes propres règles !</small>';
 }
 
 function marquerPersonnalise() {
   document.querySelectorAll('[data-preset]').forEach((bouton) => bouton.classList.remove('actif'));
   elements.ouvrirDifficulte.classList.add('personnalise');
-  elements.ouvrirDifficulte.innerHTML = '<strong>Paramètres personnalisés</strong><small>Ta propre combinaison est active</small>';
+  elements.ouvrirDifficulte.innerHTML = '<strong>MODE LIBRE ACTIF !</strong><small>Ta propre combinaison est active</small>';
 }
 
 function afficherAide(event, nom) {
