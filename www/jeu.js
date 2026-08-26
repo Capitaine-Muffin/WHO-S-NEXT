@@ -1075,8 +1075,8 @@ function afficherTable(historiquesSimules = null, options = {}) {
     carte.style.left = `${50 + Math.cos(angle) * 37}%`;
     carte.style.top = `${50 + Math.sin(angle) * 36}%`;
     const distancePile = nombre >= 6 ? 47 : 58;
-    carte.style.setProperty('--pile-x', `${-Math.sin(angle) * distancePile}px`);
-    carte.style.setProperty('--pile-y', `${Math.cos(angle) * distancePile}px`);
+    carte.style.setProperty('--pile-x', `${-Math.cos(angle) * distancePile}px`);
+    carte.style.setProperty('--pile-y', `${-Math.sin(angle) * distancePile}px`);
     carte.dataset.joueurIndex = index;
     const badge = joueur.elimine ? 'ÉLIMINÉ' : (choisitSens ? 'CHOISIT LE SENS' : (commence ? 'COMMENCE' : ''));
     carte.innerHTML = `<div class="avatar"><strong class="numero-joueur">${joueur.nom}</strong><i class="instrument-joueur" aria-hidden="true">${joueur.avatar}</i></div>${badge ? `<b class="badge-premier">${badge}</b>` : ''}<div class="pile-cartes"></div>`;
