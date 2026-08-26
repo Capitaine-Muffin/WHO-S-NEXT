@@ -596,40 +596,17 @@ async function tenterErreurIA(dernierAuteur) {
 }
 
 function animerCarteErreur(joueur, carte, texte = `${joueur.nom} fait une fausse note !`) {
-  return mettreAnimationEnFile(() => executerAnimationCarteErreur(joueur, carte, texte));
-}
-
-async function executerAnimationCarteErreur(joueur, carte, texte) {
   const indexJoueur = etat.joueurs.indexOf(joueur);
-  etat.fautifIndex = indexJoueur;
-  etat.carteFaute = { ...carte };
-  afficher();
-  const cible = elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .derniere-carte:last-child`)
-    ?? elements.table.querySelector(`[data-joueur-index="${indexJoueur}"] .avatar`);
-  const cadre = cible?.getBoundingClientRect();
-  cible?.classList.add('cible-animation');
-  if (etat.vitesseAnimation === 'aucune') {
-    cible?.classList.remove('cible-animation');
-    return;
-  }
-  const rapide = etat.vitesseAnimation === 'rapide';
-  const animation = document.createElement('div');
-  animation.className = 'pose-carte erreur-pose';
-  animation.innerHTML = `<strong>${texte}</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
-  appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
-  document.body.append(animation);
-  await attendre(rapide ? 500 : 1350);
-  if (cadre) {
-    const arriveeX = cadre.left + cadre.width / 2;
-    const arriveeY = cadre.top + cadre.height / 2;
-    await animation.animate([
-      { left: '50%', top: '50%', transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-      { left: `${arriveeX}px`, top: `${arriveeY}px`, transform: 'translate(-50%, -50%) scale(.3333) rotate(7deg)', opacity: 1 },
-    ], { duration: rapide ? 220 : 560, easing: 'cubic-bezier(.22,.78,.25,1)', fill: 'forwards' }).finished;
-  }
-  animation.remove();
-  cible?.classList.remove('cible-animation');
-  await attendre(rapide ? 180 : 350);
+  const mancheAnimation = etat.manche;
+  return mettreAnimationEnFile(async () => {
+    etat.fautifIndex = indexJoueur;
+    etat.carteFaute = null;
+    afficher();
+    await executerAnimationCarteJouee(indexJoueur, joueur, carte, { texte, erreur: true });
+    if (!etat || etat.manche !== mancheAnimation || etat.joueurs[indexJoueur] !== joueur) return;
+    etat.carteFaute = { ...carte };
+    afficher();
+  });
 }
 
 function animerCarteJouee(indexJoueur, joueur, carte) {
@@ -644,13 +621,14 @@ function animerCarteJouee(indexJoueur, joueur, carte) {
   });
 }
 
-async function executerAnimationCarteJouee(indexJoueur, joueur, carte) {
+async function executerAnimationCarteJouee(indexJoueur, joueur, carte, options = {}) {
   if (etat.vitesseAnimation === 'aucune') return;
   const rapide = etat.vitesseAnimation === 'rapide';
   const animationTutoriel = Boolean(etat.tutoriel);
+  const texte = options.texte ?? `${joueur.nom} joue`;
   const animation = document.createElement('div');
-  animation.className = 'pose-carte';
-  animation.innerHTML = `<strong>${joueur.nom} joue</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
+  animation.className = `pose-carte${options.erreur ? ' erreur-pose' : ''}`;
+  animation.innerHTML = `<strong>${texte}</strong><div class="carte carte-animee"><span class="visuellement-cache">${nomCarte(carte.valeur, carte.whootchi)}</span></div>`;
   appliquerFaceCarte(animation.querySelector('.carte-animee'), carte.valeur, carte.whootchi);
   document.body.append(animation);
 
