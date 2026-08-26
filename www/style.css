@@ -143,8 +143,11 @@ select {
 .bouton-difficulte { width: 100%; min-height: 64px; padding: .7rem 1rem; border: 2px solid var(--bleu); border-radius: 14px; background: white; color: var(--texte); text-align: left; }
 .bouton-difficulte strong, .bouton-difficulte small { display: block; }
 .bouton-difficulte small { margin-top: .25rem; color: var(--muet); }
-.bouton-difficulte.avance { text-align: center; border-style: dashed; }
-.bouton-difficulte.personnalise { border-style: solid; border-color: var(--rose); background: #fff3e9; }
+.bouton-difficulte.avance { display: grid; grid-template-columns: 28px minmax(0, auto); justify-content: center; align-items: center; column-gap: .55rem; width: min(100%, 280px); min-height: 54px; margin-inline: auto; padding: .55rem .8rem; border: 3px solid white; border-radius: 16px; background: var(--bleu); color: white; text-align: left; box-shadow: 0 5px 0 #17819a; }
+.bouton-difficulte.avance::before { content: '⚙'; grid-row: 1 / span 2; font-size: 1.45rem; line-height: 1; }
+.bouton-difficulte.avance strong, .bouton-difficulte.avance small { grid-column: 2; }
+.bouton-difficulte.avance small { margin-top: .1rem; color: #ffffffd9; font-size: .66rem; }
+.bouton-difficulte.personnalise { border-color: white; background: var(--rose); color: white; box-shadow-color: #b74d0b; }
 .bouton-difficulte.tutoriel { text-align: center; border-color: var(--rose); background: #fff8d7; }
 .niveaux-prets { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; width: 100%; }
 .niveaux-prets button { min-height: 72px; padding: .65rem .45rem; border: 3px solid white; border-radius: 16px; background: var(--bleu); color: white; box-shadow: 0 5px 0 #17819a; }
